@@ -1,0 +1,31 @@
+.DS_Store
+
+# lib
+node_modules
+
+# dist
+/app/dist
+go-judger-demo
+judger/judger
+
+# local env files
+.env.local
+.env.*.local
+env.sh
+
+# Log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Test Files
+judger/run
+
+# Editor directories and files
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
