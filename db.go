@@ -41,7 +41,7 @@ const (
 	colName         = "submission"
 	defaultURI      = "mongodb://localhost:27017/admin"
 	defaultDatabase = "test1"
-	envMongoURI     = "MONGOURI"
+	envMongoURI     = "MONGODB_URI"
 )
 
 func getDB() *db {
