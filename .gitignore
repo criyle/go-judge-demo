@@ -7,6 +7,7 @@ node_modules
 /app/dist
 go-judger-demo
 judger/judger
+bin
 
 # local env files
 .env.local
