@@ -1,1 +1,1 @@
-web: bin/go-judger
+web: bin/go-judger-demo
