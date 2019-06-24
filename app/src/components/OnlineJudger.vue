@@ -47,7 +47,7 @@ export default {
     }
   },
   mounted: function() {
-    const url = (location.protocol == 'https'?'wss':'ws') + '://' +
+    const url = (location.protocol == 'https:'?'wss':'ws') + '://' +
       document.domain + ':' + location.port + '/ws';
     const ws = new WebSocket(url)
     ws.addEventListener('message', event => {
