@@ -30,7 +30,7 @@ func main() {
 	http.HandleFunc("/api", handleAPI)
 
 	// static files
-	http.Handle("/", http.FileServer(http.Dir("app/dist")))
+	http.Handle("/", http.FileServer(http.Dir("dist")))
 
 	// local test env
 	addr := ":5000"

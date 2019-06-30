@@ -4,10 +4,10 @@
 node_modules
 
 # dist
-/app/dist
-go-judger-demo
+/dist
+/bin
+web/web
 judger/judger
-bin
 
 # local env files
 .env.local
