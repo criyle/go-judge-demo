@@ -16,6 +16,7 @@ const (
 	outputLimit = 64        // 64k
 	memoryLimit = 512 << 10 // 512m
 	runDir      = "run"
+	pathEnv     = "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
 )
 
 func runLoop(input chan job, output chan Model) {
@@ -110,7 +111,7 @@ func run(args []string, workPath, pType, stdin, stdout, stderr string, timeLimit
 
 	runner := &runprogram.RunProgram{
 		Args:    h.Args,
-		Env:     os.Environ(),
+		Env:     []string{pathEnv},
 		WorkDir: workPath,
 		RLimits: runprogram.RLimits{
 			CPU:      timeLimit,

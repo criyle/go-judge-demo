@@ -28,6 +28,8 @@ func main() {
 			retryTime += time.Second
 			time.Sleep(retryTime)
 			continue
+		} else {
+			log.Println("ws connected")
 		}
 	loop:
 		for {
