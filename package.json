@@ -5,8 +5,7 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "lint": "vue-cli-service lint",
-    "postinstall": "npm run build"
+    "lint": "vue-cli-service lint"
   },
   "dependencies": {
     "axios": "^0.19.0",
