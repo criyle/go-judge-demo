@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -98,7 +99,10 @@ func readfile(filename string) string {
 }
 
 func run(args []string, workPath, pType, stdin, stdout, stderr string, timeLimit uint, showDetails bool) (*Update, error) {
-	var err error
+	var (
+		err       error
+		startTime = time.Now().UnixNano()
+	)
 	h := runconfig.GetConf(pType, workPath, args, nil, nil, false, showDetails)
 	files := make([]*os.File, 3)
 
@@ -159,6 +163,6 @@ func run(args []string, workPath, pType, stdin, stdout, stderr string, timeLimit
 		Stdin:  readfile(stdin),
 		Stdout: readfile(stdout),
 		Stderr: readfile(stderr),
-		Log:    "",
+		Log:    fmt.Sprintf("RealTime = %d ms", (time.Now().UnixNano()-startTime)/int64(time.Millisecond)),
 	}, nil
 }

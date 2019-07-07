@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import VueMaterial from 'vue-material'
 import App from './App.vue'
+import * as moment from 'moment'
 import 'vue-material/dist/vue-material.min.css'
 
 Vue.use(VueMaterial)
@@ -9,7 +10,7 @@ Vue.config.productionTip = false
 
 Vue.filter('date', function(value) {
   const d = new Date(value)
-  return d.toString()
+  return moment(d).format('dddd, MMMM Do YYYY, kk:mm:ss.SSS ZZ')
 })
 
 Vue.filter('cpu', function(value) {

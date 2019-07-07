@@ -6,8 +6,8 @@
         <span>
           <span class="status">{{getStatus(s)}}</span>
           <span>{{s.date | date}}</span>
-          <span>{{s.time | cpu}}</span>
-          <span>{{s.memory | memory}}</span>
+          <span class="cpu">{{getTime(s) | cpu}}</span>
+          <span class="memory">{{getMemory(s) | memory}}</span>
         </span>
       </div>
       <md-list slot="md-expand">
@@ -73,10 +73,14 @@ export default {
   props: ['submission'],
   methods: {
     getStatus: function(s) {
-      if (s.update && s.update.length > 0) {
-        return s.update[s.update.length - 1].status;
-      }
-      return 'Submitted';
+      return s.update && s.update.length > 0 ?
+        s.update[s.update.length - 1].status : 'Submitted';
+    },
+    getTime: function(s) {
+      return s.update[s.update.length - 1].time;
+    },
+    getMemory: function(s) {
+      return s.update[s.update.length - 1].memory;
     },
   },
 }
@@ -90,6 +94,10 @@ export default {
 
 .list-item span.status {
   width: 120px;
+}
+
+.list-item span.cpu {
+  width: 60px;
 }
 
 .list-item>span>span {

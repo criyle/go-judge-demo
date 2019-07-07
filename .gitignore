@@ -12,7 +12,7 @@ judger/judger
 # local env files
 .env.local
 .env.*.local
-env.sh
+env*.sh
 
 # Log files
 npm-debug.log*
