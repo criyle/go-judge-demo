@@ -24,16 +24,20 @@ type job struct {
 
 // Model is the database model as well as transfer model
 type Model struct {
-	ID     string `json:"id"`
+	ID      string `json:"id"`
+	*Update `json:"update"`
+}
+
+// Update is the judger updates
+type Update struct {
 	Status string `json:"status"`
 	Time   uint64 `json:"time,omitempty"`
 	Memory uint64 `json:"memory,omitempty"`
 	Date   uint64 `json:"date,omitempty"`
-	Lang   string `json:"language,omitempty"`
-	Code   string `json:"code,omitempty"`
 	Stdin  string `json:"stdin,omitempty"`
 	Stdout string `json:"stdout,omitempty"`
 	Stderr string `json:"stderr,omitempty"`
+	Log    string `json:"log,omitempty"`
 }
 
 type judger struct {

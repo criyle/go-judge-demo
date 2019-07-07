@@ -38,7 +38,7 @@ func (j *judger) readLoop() {
 	})
 
 	for {
-		v := Model{}
+		v := JudgerUpdate{}
 		err := j.conn.ReadJSON(&v)
 		if err != nil {
 			log.Println("judger ws: ", err)

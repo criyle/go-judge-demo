@@ -16,15 +16,28 @@ import (
 // Model is the database model as well as transfer model
 type Model struct {
 	ID     *primitive.ObjectID `json:"id" bson:"_id,omitempty"`
-	Status string              `json:"status" bson:"status,omitempty"`
-	Time   uint64              `json:"time,omitempty" bson:"time,omitempty"`
-	Memory uint64              `json:"memory,omitempty" bson:"memory,omitempty"`
 	Date   uint64              `json:"date,omitempty" bson:"date,omitempty"`
 	Lang   string              `json:"language,omitempty" bson:"language,omitempty"`
 	Code   string              `json:"code,omitempty" bson:"code,omitempty"`
-	Stdin  string              `json:"stdin,omitempty" bson:"stdin,omitempty"`
-	Stdout string              `json:"stdout,omitempty" bson:"stdout,omitempty"`
-	Stderr string              `json:"stderr,omitempty" bson:"stderr,omitempty"`
+	Update []Update            `json:"update,omitempty" bson:"update,omitempty"`
+}
+
+// Update is the judger updates
+type Update struct {
+	Status string `json:"status" bson:"status,omitempty"`
+	Time   uint64 `json:"time,omitempty" bson:"time,omitempty"`
+	Memory uint64 `json:"memory,omitempty" bson:"memory,omitempty"`
+	Date   uint64 `json:"date,omitempty" bson:"date,omitempty"`
+	Stdin  string `json:"stdin,omitempty" bson:"stdin,omitempty"`
+	Stdout string `json:"stdout,omitempty" bson:"stdout,omitempty"`
+	Stderr string `json:"stderr,omitempty" bson:"stderr,omitempty"`
+	Log    string `json:"log,omitempty" bson:"log,omitempty"`
+}
+
+// JudgerUpdate is judger submitted updates
+type JudgerUpdate struct {
+	ID      *primitive.ObjectID `json:"id" bson:"_id,omitempty"`
+	*Update `json:"update,omitempty" bson:"update,omitempty"`
 }
 
 type db struct {
@@ -33,12 +46,12 @@ type db struct {
 
 	insert     chan ClientSubmit
 	insertDone chan Model
-	update     chan Model
-	updateDone chan Model
+	update     chan JudgerUpdate
+	updateDone chan JudgerUpdate
 }
 
 const (
-	colName         = "submission"
+	colName         = "submission2"
 	defaultURI      = "mongodb://localhost:27017/admin"
 	defaultDatabase = "test1"
 	envMongoURI     = "MONGODB_URI"
@@ -58,7 +71,6 @@ func getDB() *db {
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
 	err = client.Connect(ctx)
-	//defer client.Disconnect(ctx)
 
 	if err != nil {
 		log.Fatalln(err)
@@ -69,8 +81,8 @@ func getDB() *db {
 		database:   client.Database(database),
 		insert:     make(chan ClientSubmit, 64),
 		insertDone: make(chan Model, 64),
-		update:     make(chan Model, 64),
-		updateDone: make(chan Model, 64),
+		update:     make(chan JudgerUpdate, 64),
+		updateDone: make(chan JudgerUpdate, 64),
 	}
 }
 
@@ -99,10 +111,10 @@ func (d *db) loop() {
 func (d *db) Add(cs *ClientSubmit) (*Model, error) {
 	c := d.database.Collection(colName)
 	m := &Model{
-		Status: "Submitted",
 		Lang:   cs.Lang,
 		Code:   cs.Code,
-		Date:   uint64(time.Now().Unix()),
+		Date:   uint64(time.Now().UnixNano() / int64(time.Millisecond)),
+		Update: []Update{},
 	}
 	i, err := c.InsertOne(nil, m)
 	if err != nil {
@@ -113,11 +125,18 @@ func (d *db) Add(cs *ClientSubmit) (*Model, error) {
 	return m, nil
 }
 
-func (d *db) Update(m *Model) (*Model, error) {
+func (d *db) Update(m *JudgerUpdate) (*JudgerUpdate, error) {
 	c := d.database.Collection(colName)
 
 	filter := bson.D{{Key: "_id", Value: m.ID}}
-	update := bson.D{{Key: "$set", Value: m}}
+	update := bson.D{
+		{
+			Key: "$push",
+			Value: bson.D{
+				{Key: "update", Value: m.Update},
+			},
+		},
+	}
 
 	_, err := c.UpdateOne(nil, filter, update)
 	if err != nil {
@@ -150,6 +169,7 @@ func (d *db) Query(id string) ([]Model, error) {
 		return nil, err
 	}
 	defer cursor.Close(nil)
+
 	rt := make([]Model, 0, 10)
 	for cursor.Next(nil) {
 		el := Model{}

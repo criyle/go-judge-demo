@@ -1,62 +1,101 @@
 <template>
-  <div class="submission-list-container">
-    <md-table class="submission-list" v-model="submission" md-fixed-header
-      :md-selected-value="item" @update:mdSelectedValue="onSelect">
-      <md-table-toolbar>
-        <div class="md-toolbar-section-start"><h1 class="md-title">Submissions</h1></div>
-        <div class="md-toolbar-section-end">
-          <md-button class="md-icon-button" @click="$emit('loadMore')">
-            <md-icon>refresh</md-icon>
-          </md-button>
-        </div>
-      </md-table-toolbar>
-      <md-table-row slot="md-table-row" slot-scope="{ item }" md-selectable="single">
-        <md-table-cell md-label="Status">{{item.status}}</md-table-cell>
-        <md-table-cell md-label="Date">{{item.date | date}}</md-table-cell>
-        <md-table-cell md-label="CPU">{{item.time | cpu}}</md-table-cell>
-        <md-table-cell md-label="Memory">{{item.memory | memory}}</md-table-cell>
-      </md-table-row>
-    </md-table>
-    <submission-list-detail :showDetail="showDetail" @update:showDetail="closeDetail" :item="item"></submission-list-detail>
-  </div>
+<div class="submission-list-container md-content">
+  <md-list>
+    <md-list-item class="md-elevation-1" md-expand v-for="s in submission" :key="s.id">
+      <div class="md-list-item-text list-item">
+        <span>
+          <span class="status">{{getStatus(s)}}</span>
+          <span>{{s.date | date}}</span>
+          <span>{{s.time | cpu}}</span>
+          <span>{{s.memory | memory}}</span>
+        </span>
+      </div>
+      <md-list slot="md-expand">
+        <md-list-item>
+          <div class="md-list-item-text">
+            <span>_id: {{s.id}}</span>
+            <span>
+              <md-field>
+                <label>Code</label>
+                <md-textarea :value="s.code" md-autogrow disabled></md-textarea>
+              </md-field>
+            </span>
+          </div>
+        </md-list-item>
+        <template v-for="u in s.update">
+          <md-divider></md-divider>
+          <md-list-item>
+            <div class="md-list-item-text">
+              <span>status: {{u.status}} </span>
+              <span>date: {{u.date | date}} </span>
+              <span>cpu: {{u.time | cpu}} </span>
+              <span>memory: {{u.memory | memory}} </span>
+              <span v-if="u.stdin">
+                <md-field>
+                  <label>Stdin</label>
+                  <md-textarea :value="u.stdin" md-autogrow disabled></md-textarea>
+                </md-field>
+              </span>
+              <span v-if="u.stdout">
+                <md-field>
+                  <label>Stdout</label>
+                  <md-textarea :value="u.stdout" md-autogrow disabled></md-textarea>
+                </md-field>
+              </span>
+              <span v-if="u.stderr">
+                <md-field>
+                  <label>Stderr</label>
+                  <md-textarea :value="u.stderr" md-autogrow disabled></md-textarea>
+                </md-field>
+              </span>
+              <span v-if="u.log">
+                <md-field>
+                  <label>Log</label>
+                  <md-textarea :value="u.log" md-autogrow disabled></md-textarea>
+                </md-field>
+              </span>
+            </div>
+          </md-list-item>
+        </template>
+      </md-list>
+    </md-list-item>
+    <md-list-item>
+      <md-button class="md-raised" @click="$emit('loadMore')">More</md-button>
+    </md-list-item>
+  </md-list>
+</div>
 </template>
 
 <script>
-import SubmissionListDetail from './SubmissionListDetail.vue'
-
 export default {
   name: "SubmissionList",
-  data: () => {
-    return {
-      showDetail: false,
-      item: null,
-    };
-  },
+  data: () => ({}),
   props: ['submission'],
   methods: {
-    onSelect(event) {
-      this.item = event;
-      if (event != null) {
-        this.showDetail = true;
+    getStatus: function(s) {
+      if (s.update && s.update.length > 0) {
+        return s.update[s.update.length - 1].status;
       }
+      return 'Submitted';
     },
-    closeDetail(event) {
-      this.showDetail = event;
-      this.item = null;
-    }
   },
-  components: {
-    SubmissionListDetail,
-  }
 }
 </script>
 
 <style scoped>
-  .submission-list-container {
-    height: 100%;
-  }
+.submission-list-container {
+  height: 100%;
+  overflow-y: scroll;
+}
 
-  .submission-list {
-    height: 100%;
-  }
+.list-item span.status {
+  width: 120px;
+}
+
+.list-item>span>span {
+  display: inline-block;
+  width: auto;
+  font-size: 14px;
+  padding-right: 10px;
+}
 </style>

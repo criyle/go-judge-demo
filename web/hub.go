@@ -24,7 +24,7 @@ type hub struct {
 	registerJudger, unregisterJudger chan *judger
 
 	// Transmissions
-	judgerUpdate    chan Model
+	judgerUpdate    chan JudgerUpdate
 	clientUpload    chan clientSubmitJob
 	clientBroadcast chan interface{}
 }
@@ -81,12 +81,10 @@ func (h *hub) loop() {
 
 			// submit job to judger
 			submited := false
-		loop:
 			for j := range h.judgers {
 				select {
 				case j.submit <- jo:
 					submited = true
-					break loop
 				default:
 					delete(h.judgers, j)
 					close(j.submit)
@@ -109,7 +107,7 @@ func newHub() *hub {
 		unregisterClient: make(chan *client, 64),
 		registerJudger:   make(chan *judger, 64),
 		unregisterJudger: make(chan *judger, 64),
-		judgerUpdate:     make(chan Model, 64),
+		judgerUpdate:     make(chan JudgerUpdate, 64),
 		clientUpload:     make(chan clientSubmitJob, 64),
 		clientBroadcast:  make(chan interface{}, 64),
 	}

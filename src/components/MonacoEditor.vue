@@ -1,6 +1,6 @@
 <template>
-  <div class="vue-monaco-editor">
-  </div>
+<div class="vue-monaco-editor">
+</div>
 </template>
 
 <script>
@@ -28,6 +28,5 @@ export default {
 </script>
 
 <style scoped>
-.vue-monaco-editor {
-}
+.vue-monaco-editor {}
 </style>

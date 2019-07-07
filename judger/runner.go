@@ -39,39 +39,50 @@ func runLoop(input chan job, output chan Model) {
 
 		// compile
 		cargs := []string{"/usr/bin/g++", "-o", exec, code}
-		m, err := run(cargs, workPath, "compiler", stdin, stdout, stderr, 10, false)
+		u, err := run(cargs, workPath, "compiler", stdin, stdout, stderr, 10, false)
 		if err != nil {
 			log.Println("runLoop: ", err)
 			output <- Model{
-				ID:     i.ID,
-				Status: "CJGF",
+				ID: i.ID,
+				Update: &Update{
+					Status: "CJGF: " + err.Error(),
+				},
 			}
 			continue
 		}
-		m.ID = i.ID
-		log.Println("runLoop compiled: ", m)
-		if m.Status != "AC" {
-			m.Status = "JGF " + m.Status
-			output <- *m
+		log.Println("runLoop compiled: ", u)
+		if u.Status != "AC" {
+			u.Status = "CJGF " + u.Status
+			output <- Model{
+				ID:     i.ID,
+				Update: u,
+			}
 			continue
 		}
-		m.Status = "Compiled"
-		output <- *m
+		u.Status = "Compiled"
+		output <- Model{
+			ID:     i.ID,
+			Update: u,
+		}
 
 		// run
 		args := []string{exec}
-		m, err = run(args, workPath, "", stdin, stdout, stderr, 1, false)
+		u, err = run(args, workPath, "", stdin, stdout, stderr, 1, false)
 		if err != nil {
 			log.Println("runLoop: ", err)
 			output <- Model{
-				ID:     i.ID,
-				Status: "JGF",
+				ID: i.ID,
+				Update: &Update{
+					Status: "JGF: " + err.Error(),
+				},
 			}
 			continue
 		}
-		m.ID = i.ID
-		log.Println("runLoop executed: ", m)
-		output <- *m
+		log.Println("runLoop executed: ", u)
+		output <- Model{
+			ID:     i.ID,
+			Update: u,
+		}
 	}
 }
 
@@ -86,7 +97,7 @@ func readfile(filename string) string {
 	return string(b)
 }
 
-func run(args []string, workPath, pType, stdin, stdout, stderr string, timeLimit uint, showDetails bool) (*Model, error) {
+func run(args []string, workPath, pType, stdin, stdout, stderr string, timeLimit uint, showDetails bool) (*Update, error) {
 	var err error
 	h := runconfig.GetConf(pType, workPath, args, nil, nil, false, showDetails)
 	files := make([]*os.File, 3)
@@ -140,13 +151,14 @@ func run(args []string, workPath, pType, stdin, stdout, stderr string, timeLimit
 	if rt.ExitCode != 0 {
 		status = "Exited: " + strconv.Itoa(rt.ExitCode)
 	}
-	return &Model{
+	return &Update{
 		Status: status,
 		Time:   uint64(rt.UserTime),
 		Memory: uint64(rt.UserMem),
-		Date:   uint64(time.Now().Unix()),
+		Date:   uint64(time.Now().UnixNano() / int64(time.Millisecond)),
 		Stdin:  readfile(stdin),
 		Stdout: readfile(stdout),
 		Stderr: readfile(stderr),
+		Log:    "",
 	}, nil
 }

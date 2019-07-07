@@ -8,7 +8,7 @@ Vue.use(VueMaterial)
 Vue.config.productionTip = false
 
 Vue.filter('date', function(value) {
-  const d = new Date(value * 1000)
+  const d = new Date(value)
   return d.toString()
 })
 
@@ -22,7 +22,7 @@ Vue.filter('cpu', function(value) {
 
 Vue.filter('memory', function(value) {
   if (value) {
-    return value + 'kB'
+    return value + ' kB'
   } else {
     return '0 kB'
   }
