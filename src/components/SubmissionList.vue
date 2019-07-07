@@ -77,10 +77,12 @@ export default {
         s.update[s.update.length - 1].status : 'Submitted';
     },
     getTime: function(s) {
-      return s.update[s.update.length - 1].time;
+      return s.update && s.update.length > 0 ?
+        s.update[s.update.length - 1].time : 0;
     },
     getMemory: function(s) {
-      return s.update[s.update.length - 1].memory;
+      return s.update && s.update.length > 0 ?
+        s.update[s.update.length - 1].memory : 0;
     },
   },
 }

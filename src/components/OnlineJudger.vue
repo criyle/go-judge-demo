@@ -66,9 +66,7 @@ export default {
         }
         this.submission = [...this.submission];
       } else {
-        this.submission.splice(0, 0, {
-          ...data,
-        });
+        this.submission = [data, ...this.submission];
       }
     });
     this.$ws = ws;
