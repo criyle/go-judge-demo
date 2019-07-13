@@ -136,8 +136,8 @@ func run(args []string, workPath, pType, stdin, stdout, stderr string, timeLimit
 			Stack:    memoryLimit,
 		},
 		TraceLimit: runprogram.TraceLimit{
-			TimeLimit:     timeLimit * 1e3,
-			RealTimeLimit: (timeLimit + 2) * 1e3,
+			TimeLimit:     uint64(timeLimit * 1e3),
+			RealTimeLimit: uint64(timeLimit+2) * 1e3,
 			MemoryLimit:   memoryLimit,
 		},
 		Files:          fds,

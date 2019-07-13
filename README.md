@@ -1,6 +1,6 @@
 # go-judger-demo
 
-A simple demo site for the [https://github.com/criyle/go-judger](go-judger), deployed on [https://go-judger.herokuapp.com](heroku).
+A simple demo site for the [go-judger](https://github.com/criyle/go-judger), deployed on [heroku](https://go-judger.herokuapp.com).
 Under development...
 
 +   Frontend: Vue.js
