@@ -9,11 +9,11 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/criyle/go-judger/rlimit"
 	"github.com/criyle/go-judger/runconfig"
 	"github.com/criyle/go-judger/runprogram"
 	"github.com/criyle/go-judger/rununshared"
-	"github.com/criyle/go-judger/tracer"
+	"github.com/criyle/go-judger/types/rlimit"
+	"github.com/criyle/go-judger/types/specs"
 )
 
 const (
@@ -110,7 +110,7 @@ func readfile(filename string) string {
 
 // Runner can be ptraced runner or namespaced runner
 type Runner interface {
-	Start() (tracer.TraceResult, error)
+	Start() (specs.TraceResult, error)
 }
 
 func run(args []string, workPath, pType, stdin, stdout, stderr string, timeLimit uint64, showDetails, namespace bool) (*Update, error) {
@@ -164,7 +164,7 @@ func run(args []string, workPath, pType, stdin, stdout, stderr string, timeLimit
 			WorkDir: "/w",
 			Files:   fds,
 			RLimits: rlims,
-			ResLimits: tracer.ResLimit{
+			ResLimits: specs.ResLimit{
 				TimeLimit:     timeLimit * 1e3,
 				RealTimeLimit: uint64(timeLimit+2) * 1e3,
 				MemoryLimit:   memoryLimit << 10,
@@ -185,7 +185,7 @@ func run(args []string, workPath, pType, stdin, stdout, stderr string, timeLimit
 			Env:     []string{pathEnv},
 			WorkDir: workPath,
 			RLimits: rlims,
-			TraceLimit: runprogram.TraceLimit{
+			TraceLimit: specs.ResLimit{
 				TimeLimit:     timeLimit * 1e3,
 				RealTimeLimit: (timeLimit + 2) * 1e3,
 				MemoryLimit:   memoryLimit,
