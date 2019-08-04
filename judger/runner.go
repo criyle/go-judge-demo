@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/criyle/go-judger/cgroup"
 	"github.com/criyle/go-judger/runconfig"
 	"github.com/criyle/go-judger/runprogram"
 	"github.com/criyle/go-judger/rununshared"
@@ -144,6 +145,24 @@ func run(args []string, workPath, pType, stdin, stdout, stderr string, timeLimit
 		fds[i] = x.Fd()
 	}
 
+	cg, err := cgroup.NewCGroup("judger")
+	if err != nil {
+		return nil, err
+	}
+	defer cg.Destroy()
+	if err = cg.SetMemoryLimitInBytes(memoryLimit << 10); err != nil {
+		return nil, err
+	}
+
+	syncFunc := func(pid int) error {
+		if cg != nil {
+			if err := cg.AddProc(pid); err != nil {
+				return err
+			}
+		}
+		return nil
+	}
+
 	rlims := rlimit.RLimits{
 		CPU:      timeLimit,
 		CPUHard:  timeLimit + 2,
@@ -178,6 +197,7 @@ func run(args []string, workPath, pType, stdin, stdout, stderr string, timeLimit
 				},
 			}),
 			ShowDetails: true,
+			SyncFunc:    syncFunc,
 		}
 	} else {
 		runner = &runprogram.RunProgram{
@@ -195,6 +215,7 @@ func run(args []string, workPath, pType, stdin, stdout, stderr string, timeLimit
 			SyscallTraced:  h.SyscallTrace,
 			ShowDetails:    showDetails,
 			Handler:        h,
+			SyncFunc:       syncFunc,
 		}
 	}
 
@@ -206,13 +227,22 @@ func run(args []string, workPath, pType, stdin, stdout, stderr string, timeLimit
 	if rt.ExitCode != 0 {
 		status = "Exited: " + strconv.Itoa(rt.ExitCode)
 	}
+	cpu, err := cg.CpuacctUsage()
+	if err != nil {
+		return nil, err
+	}
+	memory, err := cg.MemoryMaxUsageInBytes()
+	if err != nil {
+		return nil, err
+	}
+
 	l := fmt.Sprintf("SetUpTime = %d ms\nRunningTime = %d ms\nRealTime = %d ms",
 		rt.TraceStat.SetUpTime/int64(time.Millisecond), rt.TraceStat.RunningTime/int64(time.Millisecond),
 		(time.Now().UnixNano()-startTime)/int64(time.Millisecond))
 	return &Update{
 		Status: status,
-		Time:   uint64(rt.UserTime),
-		Memory: uint64(rt.UserMem),
+		Time:   uint64(cpu / uint64(time.Millisecond)),
+		Memory: uint64(memory >> 10),
 		Date:   uint64(time.Now().UnixNano() / int64(time.Millisecond)),
 		Stdin:  readfile(fin),
 		Stdout: readfile(fout),
