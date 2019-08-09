@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/criyle/go-judger/cgroup"
+	"github.com/criyle/go-judger/deamon"
 	"github.com/criyle/go-judger/runconfig"
 	"github.com/criyle/go-judger/runprogram"
 	"github.com/criyle/go-judger/rununshared"
@@ -19,19 +20,20 @@ import (
 
 const (
 	outputLimit = 64        // 64k
-	memoryLimit = 512 << 10 // 512m
+	memoryLimit = 256 << 10 // 256m
 	runDir      = "run"
-	pathEnv     = "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+	pathEnv     = "PATH=/usr/local/bin:/usr/bin:/bin"
 )
 
-func runLoop(input chan job, output chan Model, namespace bool) {
+func runLoop(input chan job, output chan Model, namespace, ud bool) {
 	prefix := "ptrace: "
-	if namespace {
-		prefix = "namespace: "
-	}
 	subdir := "p"
 	if namespace {
+		prefix = "namespace: "
 		subdir = "n"
+	} else if ud {
+		prefix = "d: "
+		subdir = "d"
 	}
 
 	for {
@@ -48,9 +50,14 @@ func runLoop(input chan job, output chan Model, namespace bool) {
 		ioutil.WriteFile(code, []byte(i.Code), 0755)
 		ioutil.WriteFile(stdin, []byte("1 1"), 0755)
 
+		if ud {
+			f, _ := os.Open(code)
+			m.CopyIn(f, "code.cc")
+		}
+
 		// compile
 		cargs := []string{"/usr/bin/g++", "-lm", "-o", "exec", "code.cc"}
-		u, err := run(cargs, p, "compiler", "stdin", "stdout", "stderr", 10, namespace, namespace)
+		u, err := run(cargs, p, "compiler", "stdin", "stdout", "stderr", 10, namespace, namespace, ud)
 		if err != nil {
 			log.Println("runLoop: ", err)
 			output <- Model{
@@ -78,7 +85,7 @@ func runLoop(input chan job, output chan Model, namespace bool) {
 
 		// run
 		args := []string{"exec"}
-		u, err = run(args, p, "compiler", "stdin", "stdout", "stderr", 1, false, namespace)
+		u, err = run(args, p, "compiler", "stdin", "stdout", "stderr", 1, false, namespace, ud)
 		if err != nil {
 			log.Println("runLoop: ", err)
 			output <- Model{
@@ -94,6 +101,9 @@ func runLoop(input chan job, output chan Model, namespace bool) {
 		output <- Model{
 			ID:     i.ID,
 			Update: u,
+		}
+		if ud {
+			m.Reset()
 		}
 	}
 }
@@ -114,11 +124,12 @@ type Runner interface {
 	Start() (specs.TraceResult, error)
 }
 
-func run(args []string, workPath, pType, stdin, stdout, stderr string, timeLimit uint64, showDetails, namespace bool) (*Update, error) {
+func run(args []string, workPath, pType, stdin, stdout, stderr string, timeLimit uint64, showDetails, namespace, ud bool) (*Update, error) {
 	var (
 		err       error
 		startTime = time.Now().UnixNano()
 		runner    Runner
+		rt        specs.TraceResult
 	)
 	h := runconfig.GetConf(pType, workPath, args, nil, nil, false, showDetails)
 	files := make([]*os.File, 3)
@@ -171,7 +182,37 @@ func run(args []string, workPath, pType, stdin, stdout, stderr string, timeLimit
 		Stack:    memoryLimit,
 	}
 
-	if namespace {
+	if ud {
+		var s *deamon.ExecveStatus
+		sTime := time.Now()
+		s, err = m.Execve(&deamon.ExecveParam{
+			Args:     args,
+			Envv:     []string{pathEnv},
+			Fds:      fds,
+			RLimits:  rlims.PrepareRLimit(),
+			SyncFunc: syncFunc,
+		})
+		if err != nil {
+			return nil, err
+		}
+		rTime := time.Now()
+		tC := time.After(time.Duration(int64(timeLimit+1) * int64(time.Second)))
+		select {
+		case <-tC:
+			s.Kill <- 1
+			rt = <-s.Wait
+
+		case rt = <-s.Wait:
+			s.Kill <- 1
+		}
+		<-s.Wait
+		eTime := time.Now()
+		rt.SetUpTime = int64(rTime.Sub(sTime))
+		rt.RunningTime = int64(eTime.Sub(rTime))
+		if rt.TraceStatus > 0 {
+			err = rt.TraceStatus
+		}
+	} else if namespace {
 		h.SyscallAllow = append(h.SyscallAllow, h.SyscallTrace...)
 		root, err := ioutil.TempDir("", "ns")
 		if err != nil {
@@ -218,8 +259,9 @@ func run(args []string, workPath, pType, stdin, stdout, stderr string, timeLimit
 			SyncFunc:       syncFunc,
 		}
 	}
-
-	rt, err := runner.Start()
+	if runner != nil {
+		rt, err = runner.Start()
+	}
 	status := "AC"
 	if err != nil {
 		status = err.Error()
@@ -237,7 +279,7 @@ func run(args []string, workPath, pType, stdin, stdout, stderr string, timeLimit
 	}
 
 	l := fmt.Sprintf("SetUpTime = %d ms\nRunningTime = %d ms\nRealTime = %d ms",
-		rt.TraceStat.SetUpTime/int64(time.Millisecond), rt.TraceStat.RunningTime/int64(time.Millisecond),
+		rt.SetUpTime/int64(time.Millisecond), rt.RunningTime/int64(time.Millisecond),
 		(time.Now().UnixNano()-startTime)/int64(time.Millisecond))
 	return &Update{
 		Status: status,

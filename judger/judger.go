@@ -1,27 +1,43 @@
 package main
 
 import (
+	"io/ioutil"
 	"log"
 	"os"
 	"time"
+
+	"github.com/criyle/go-judger/deamon"
 )
 
 const (
 	envWebURL = "WEB_URL"
 )
 
+// currently only allow one deamon to test
+var m *deamon.Master
+
+func initM() {
+	var err error
+	root, err := ioutil.TempDir("", "dm")
+	log.Println("init: ", root, err)
+	m, err = deamon.New(root)
+	log.Println("init: ", m, err)
+}
+
 func main() {
+	deamon.ContainerInit()
+	initM()
+
 	retryTime := time.Second
 	input := make(chan job, 64)
-	defer close(input)
 	input2 := make(chan job, 64)
-	defer close(input2)
+	input3 := make(chan job, 64)
 	output := make(chan Model, 64)
-	defer close(output)
 
 	// start run loop
-	go runLoop(input, output, false)
-	go runLoop(input2, output, true)
+	go runLoop(input, output, false, false)
+	go runLoop(input2, output, true, false)
+	go runLoop(input3, output, false, true)
 
 	for {
 		j, err := dialWS(os.Getenv(envWebURL))
@@ -43,6 +59,7 @@ func main() {
 			case s := <-j.submit:
 				input <- s
 				input2 <- s
+				input3 <- s
 
 			case o := <-output:
 				j.update <- o
