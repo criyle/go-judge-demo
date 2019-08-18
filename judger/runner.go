@@ -121,13 +121,22 @@ func readfile(filename string) string {
 
 // Runner can be ptraced runner or namespaced runner
 type Runner interface {
-	Start() (specs.TraceResult, error)
+	Start(<-chan struct{}) (<-chan specs.TraceResult, error)
+}
+
+type deamonRunner struct {
+	*deamon.Master
+	*deamon.ExecveParam
+}
+
+func (r *deamonRunner) Start(done <-chan struct{}) (<-chan specs.TraceResult, error) {
+	return r.Master.Execve(done, r.ExecveParam)
 }
 
 func run(args []string, workPath, pType, stdin, stdout, stderr string, timeLimit uint64, showDetails, namespace, ud bool) (*Update, error) {
 	var (
 		err       error
-		startTime = time.Now().UnixNano()
+		startTime = time.Now()
 		runner    Runner
 		rt        specs.TraceResult
 	)
@@ -183,34 +192,15 @@ func run(args []string, workPath, pType, stdin, stdout, stderr string, timeLimit
 	}
 
 	if ud {
-		var s *deamon.ExecveStatus
-		sTime := time.Now()
-		s, err = m.Execve(&deamon.ExecveParam{
-			Args:     args,
-			Envv:     []string{pathEnv},
-			Fds:      fds,
-			RLimits:  rlims.PrepareRLimit(),
-			SyncFunc: syncFunc,
-		})
-		if err != nil {
-			return nil, err
-		}
-		rTime := time.Now()
-		tC := time.After(time.Duration(int64(timeLimit+1) * int64(time.Second)))
-		select {
-		case <-tC:
-			s.Kill <- 1
-			rt = <-s.Wait
-
-		case rt = <-s.Wait:
-			s.Kill <- 1
-		}
-		<-s.Wait
-		eTime := time.Now()
-		rt.SetUpTime = int64(rTime.Sub(sTime))
-		rt.RunningTime = int64(eTime.Sub(rTime))
-		if rt.TraceStatus > 0 {
-			err = rt.TraceStatus
+		runner = &deamonRunner{
+			Master: m,
+			ExecveParam: &deamon.ExecveParam{
+				Args:     args,
+				Envv:     []string{pathEnv},
+				Fds:      fds,
+				RLimits:  rlims.PrepareRLimit(),
+				SyncFunc: syncFunc,
+			},
 		}
 	} else if namespace {
 		h.SyscallAllow = append(h.SyscallAllow, h.SyscallTrace...)
@@ -259,9 +249,29 @@ func run(args []string, workPath, pType, stdin, stdout, stderr string, timeLimit
 			SyncFunc:       syncFunc,
 		}
 	}
-	if runner != nil {
-		rt, err = runner.Start()
+
+	sTime := time.Now()
+	done := make(chan struct{})
+	s, err := runner.Start(done)
+	rTime := time.Now()
+	if err != nil {
+		return nil, fmt.Errorf("failed to execve: %v", err)
 	}
+	tC := time.After(time.Duration(int64(timeLimit) * int64(time.Second)))
+	select {
+	case <-tC:
+		close(done)
+		rt = <-s
+
+	case rt = <-s:
+	}
+	eTime := time.Now()
+
+	if rt.SetUpTime == 0 {
+		rt.SetUpTime = int64(rTime.Sub(sTime))
+		rt.RunningTime = int64(eTime.Sub(rTime))
+	}
+
 	status := "AC"
 	if err != nil {
 		status = err.Error()
@@ -278,9 +288,9 @@ func run(args []string, workPath, pType, stdin, stdout, stderr string, timeLimit
 		return nil, err
 	}
 
-	l := fmt.Sprintf("SetUpTime = %d ms\nRunningTime = %d ms\nRealTime = %d ms",
-		rt.SetUpTime/int64(time.Millisecond), rt.RunningTime/int64(time.Millisecond),
-		(time.Now().UnixNano()-startTime)/int64(time.Millisecond))
+	l := fmt.Sprintf("SetUpTime=%v\nRunningTime=%v\nTotalTime=%v",
+		time.Duration(rt.SetUpTime), time.Duration(rt.RunningTime),
+		time.Since(startTime))
 	return &Update{
 		Status: status,
 		Time:   uint64(cpu / uint64(time.Millisecond)),
