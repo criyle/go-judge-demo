@@ -4,13 +4,13 @@ import (
 	"context"
 	"log"
 	"os"
-	"strings"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
+	"go.mongodb.org/mongo-driver/x/mongo/driver/connstring"
 )
 
 // Model is the database model as well as transfer model
@@ -62,9 +62,13 @@ func getDB() *db {
 	database := defaultDatabase
 	if u := os.Getenv(envMongoURI); u != "" {
 		uri = u
-		database = uri[strings.LastIndex(uri, "/")+1:]
+		con, err := connstring.Parse(u)
+		if err != nil {
+			log.Fatal(err)
+		}
+		database = con.Database
 	}
-	client, err := mongo.NewClient(options.Client().ApplyURI(uri))
+	client, err := mongo.NewClient(options.Client().ApplyURI(uri).SetRetryWrites(false))
 	if err != nil {
 		log.Fatal(err)
 	}
