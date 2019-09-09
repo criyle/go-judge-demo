@@ -9,13 +9,15 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/criyle/go-judger/cgroup"
-	"github.com/criyle/go-judger/deamon"
-	"github.com/criyle/go-judger/runconfig"
-	"github.com/criyle/go-judger/runprogram"
-	"github.com/criyle/go-judger/rununshared"
-	"github.com/criyle/go-judger/types/rlimit"
-	"github.com/criyle/go-judger/types/specs"
+	"github.com/criyle/go-sandbox/config"
+	"github.com/criyle/go-sandbox/daemon"
+	"github.com/criyle/go-sandbox/pkg/cgroup"
+	"github.com/criyle/go-sandbox/pkg/rlimit"
+	"github.com/criyle/go-sandbox/pkg/seccomp"
+	"github.com/criyle/go-sandbox/pkg/seccomp/libseccomp"
+	"github.com/criyle/go-sandbox/runner/ptrace"
+	"github.com/criyle/go-sandbox/runner/unshare"
+	"github.com/criyle/go-sandbox/types"
 )
 
 const (
@@ -121,15 +123,15 @@ func readfile(filename string) string {
 
 // Runner can be ptraced runner or namespaced runner
 type Runner interface {
-	Start(<-chan struct{}) (<-chan specs.TraceResult, error)
+	Start(<-chan struct{}) (<-chan types.Result, error)
 }
 
-type deamonRunner struct {
-	*deamon.Master
-	*deamon.ExecveParam
+type daemonRunner struct {
+	*daemon.Master
+	*daemon.ExecveParam
 }
 
-func (r *deamonRunner) Start(done <-chan struct{}) (<-chan specs.TraceResult, error) {
+func (r *daemonRunner) Start(done <-chan struct{}) (<-chan types.Result, error) {
 	return r.Master.Execve(done, r.ExecveParam)
 }
 
@@ -138,9 +140,9 @@ func run(args []string, workPath, pType, stdin, stdout, stderr string, timeLimit
 		err       error
 		startTime = time.Now()
 		runner    Runner
-		rt        specs.TraceResult
+		rt        types.Result
 	)
-	h := runconfig.GetConf(pType, workPath, args, nil, nil, false, showDetails)
+	args, allow, trace, h := config.GetConf(pType, workPath, args, nil, nil, false)
 	files := make([]*os.File, 3)
 
 	fin := path.Join(workPath, "stdin")
@@ -191,10 +193,15 @@ func run(args []string, workPath, pType, stdin, stdout, stderr string, timeLimit
 		Stack:    memoryLimit,
 	}
 
+	actionDefault := seccomp.ActionKill
+	if showDetails {
+		actionDefault = seccomp.ActionTrace.WithReturnCode(seccomp.MsgDisallow)
+	}
+
 	if ud {
-		runner = &deamonRunner{
+		runner = &daemonRunner{
 			Master: m,
-			ExecveParam: &deamon.ExecveParam{
+			ExecveParam: &daemon.ExecveParam{
 				Args:     args,
 				Envv:     []string{pathEnv},
 				Fds:      fds,
@@ -203,25 +210,28 @@ func run(args []string, workPath, pType, stdin, stdout, stderr string, timeLimit
 			},
 		}
 	} else if namespace {
-		h.SyscallAllow = append(h.SyscallAllow, h.SyscallTrace...)
+		builder := libseccomp.Builder{
+			Allow:   append(allow, trace...),
+			Default: actionDefault,
+		}
+		filter, err := builder.Build()
 		root, err := ioutil.TempDir("", "ns")
 		if err != nil {
 			return nil, err
 		}
-		runner = &rununshared.RunUnshared{
-			Args:    h.Args,
+		runner = &unshare.Runner{
+			Args:    args,
 			Env:     []string{pathEnv},
 			WorkDir: "/w",
 			Files:   fds,
 			RLimits: rlims,
-			ResLimits: specs.ResLimit{
-				TimeLimit:     timeLimit * 1e3,
-				RealTimeLimit: uint64(timeLimit+2) * 1e3,
-				MemoryLimit:   memoryLimit << 10,
+			Limit: types.Limit{
+				TimeLimit:   timeLimit * 1e3,
+				MemoryLimit: memoryLimit << 10,
 			},
-			SyscallAllowed: h.SyscallAllow,
-			Root:           root,
-			Mounts: rununshared.GetDefaultMounts(root, []rununshared.AddBind{
+			Seccomp: filter,
+			Root:    root,
+			Mounts: unshare.GetDefaultMounts(root, []unshare.AddBind{
 				{
 					Source: workPath,
 					Target: "w",
@@ -231,22 +241,29 @@ func run(args []string, workPath, pType, stdin, stdout, stderr string, timeLimit
 			SyncFunc:    syncFunc,
 		}
 	} else {
-		runner = &runprogram.RunProgram{
-			Args:    h.Args,
+		builder := libseccomp.Builder{
+			Allow:   allow,
+			Trace:   trace,
+			Default: actionDefault,
+		}
+		filter, err := builder.Build()
+		if err != nil {
+			return nil, fmt.Errorf("failed to create seccomp filter %v", err)
+		}
+		runner = &ptrace.Runner{
+			Args:    args,
 			Env:     []string{pathEnv},
 			WorkDir: workPath,
 			RLimits: rlims,
-			TraceLimit: specs.ResLimit{
-				TimeLimit:     timeLimit * 1e3,
-				RealTimeLimit: (timeLimit + 2) * 1e3,
-				MemoryLimit:   memoryLimit,
+			Limit: types.Limit{
+				TimeLimit:   timeLimit * 1e3,
+				MemoryLimit: memoryLimit << 10,
 			},
-			Files:          fds,
-			SyscallAllowed: h.SyscallAllow,
-			SyscallTraced:  h.SyscallTrace,
-			ShowDetails:    showDetails,
-			Handler:        h,
-			SyncFunc:       syncFunc,
+			Files:       fds,
+			Seccomp:     filter,
+			ShowDetails: showDetails,
+			Handler:     h,
+			SyncFunc:    syncFunc,
 		}
 	}
 
@@ -268,16 +285,16 @@ func run(args []string, workPath, pType, stdin, stdout, stderr string, timeLimit
 	eTime := time.Now()
 
 	if rt.SetUpTime == 0 {
-		rt.SetUpTime = int64(rTime.Sub(sTime))
-		rt.RunningTime = int64(eTime.Sub(rTime))
+		rt.SetUpTime = rTime.Sub(sTime)
+		rt.RunningTime = eTime.Sub(rTime)
 	}
 
 	status := "AC"
 	if err != nil {
 		status = err.Error()
 	}
-	if rt.ExitCode != 0 {
-		status = "Exited: " + strconv.Itoa(rt.ExitCode)
+	if rt.ExitStatus != 0 {
+		status = "Exited: " + strconv.Itoa(rt.ExitStatus)
 	}
 	cpu, err := cg.CpuacctUsage()
 	if err != nil {

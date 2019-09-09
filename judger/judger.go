@@ -6,7 +6,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/criyle/go-judger/deamon"
+	"github.com/criyle/go-sandbox/daemon"
 )
 
 const (
@@ -14,18 +14,18 @@ const (
 )
 
 // currently only allow one deamon to test
-var m *deamon.Master
+var m *daemon.Master
 
 func initM() {
 	var err error
 	root, err := ioutil.TempDir("", "dm")
 	log.Println("init: ", root, err)
-	m, err = deamon.New(root)
+	m, err = daemon.New(root)
 	log.Println("init: ", m, err)
 }
 
 func main() {
-	deamon.ContainerInit()
+	daemon.ContainerInit()
 	initM()
 
 	retryTime := time.Second
