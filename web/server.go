@@ -11,26 +11,25 @@ import (
 var upgrader = websocket.Upgrader{}
 
 func main() {
+	// connect to database
+	db := getDB()
+	go db.loop()
+
 	// creates hub
-	hub := newHub()
+	hub := newHub(db)
 	go hub.loop()
 
 	// websocket
-	http.HandleFunc("/ws", func(w http.ResponseWriter, r *http.Request) {
-		handleClientWS(hub, w, r)
-	})
-	http.HandleFunc("/jws", func(w http.ResponseWriter, r *http.Request) {
-		handleJudgerWS(hub, w, r)
-	})
+	http.HandleFunc("/ws", hub.handleWS)
+	http.HandleFunc("/jws", hub.handleJudgerWS)
 
 	// REST api
-	http.HandleFunc("/api/submission", func(w http.ResponseWriter, r *http.Request) {
-		apiSubmission(hub, w, r)
-	})
-	http.HandleFunc("/api", handleAPI)
+	a := api{db: db}
+	http.Handle("/api/", http.StripPrefix("/api", a.serveMux()))
 
-	// static files
-	http.Handle("/", http.FileServer(http.Dir("dist")))
+	// static files for spa
+	s := spaFS{FileSystem: http.Dir("dist")}
+	http.Handle("/", http.FileServer(s))
 
 	// local test env
 	addr := ":5000"
@@ -40,4 +39,16 @@ func main() {
 
 	// start serve
 	log.Fatal(http.ListenAndServe(addr, nil))
+}
+
+type spaFS struct {
+	http.FileSystem
+}
+
+func (fs spaFS) Open(name string) (http.File, error) {
+	f, err := fs.FileSystem.Open(name)
+	if err != nil && os.IsNotExist(err) {
+		return fs.FileSystem.Open("index.html")
+	}
+	return f, err
 }

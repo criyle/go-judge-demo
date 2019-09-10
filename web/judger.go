@@ -2,8 +2,6 @@ package main
 
 import (
 	"log"
-	"net/http"
-	"os"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -75,29 +73,4 @@ func (j *judger) writeLoop() {
 			}
 		}
 	}
-}
-
-func handleJudgerWS(h *hub, w http.ResponseWriter, r *http.Request) {
-	token := os.Getenv(envJudgerToken)
-	// no token == dev env
-	if token != "" {
-		if r.Header["Authorization"] == nil || r.Header["Authorization"][1] != token {
-			log.Println("judger ws: auth failed", r)
-			http.Error(w, "QAQ", http.StatusUnauthorized)
-			return
-		}
-	}
-	log.Println("judger ws: logged in", r)
-	conn, err := upgrader.Upgrade(w, r, nil)
-	if err != nil {
-		return
-	}
-	j := &judger{
-		hub:    h,
-		conn:   conn,
-		submit: make(chan job),
-	}
-	h.registerJudger <- j
-	go j.readLoop()
-	go j.writeLoop()
 }

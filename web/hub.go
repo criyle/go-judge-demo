@@ -1,8 +1,14 @@
 package main
 
 import (
+	"bytes"
+	"encoding/json"
 	"log"
+	"net/http"
+	"os"
 	"time"
+
+	"github.com/gorilla/websocket"
 )
 
 const (
@@ -30,7 +36,6 @@ type hub struct {
 }
 
 func (h *hub) loop() {
-	go h.db.loop()
 	for {
 		select {
 		case c := <-h.registerClient:
@@ -55,10 +60,21 @@ func (h *hub) loop() {
 			h.db.update <- ju
 
 		case da := <-h.clientBroadcast:
+			// prepare message
+			buf := new(bytes.Buffer)
+			err := json.NewEncoder(buf).Encode(da)
+			if err != nil {
+				log.Println("JSON encode error", err)
+			}
+			pMsg, err := websocket.NewPreparedMessage(websocket.TextMessage, buf.Bytes())
+			if err != nil {
+				log.Println("prepare message error", err)
+			}
+
 			// broadcast to clients
 			for c := range h.clients {
 				select {
-				case c.send <- da:
+				case c.send <- pMsg:
 				default:
 					delete(h.clients, c)
 					close(c.send)
@@ -98,11 +114,11 @@ func (h *hub) loop() {
 	}
 }
 
-func newHub() *hub {
+func newHub(db *db) *hub {
 	return &hub{
 		clients:          make(map[*client]bool),
 		judgers:          make(map[*judger]bool),
-		db:               getDB(),
+		db:               db,
 		registerClient:   make(chan *client, 64),
 		unregisterClient: make(chan *client, 64),
 		registerJudger:   make(chan *judger, 64),
@@ -111,4 +127,47 @@ func newHub() *hub {
 		clientUpload:     make(chan clientSubmitJob, 64),
 		clientBroadcast:  make(chan interface{}, 64),
 	}
+}
+
+func (h *hub) handleWS(w http.ResponseWriter, r *http.Request) {
+	conn, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		log.Println("client ws:", err)
+		http.Error(w, "TAT", http.StatusUpgradeRequired)
+		return
+	}
+	log.Println("client ws:", "new connection", r)
+	c := &client{
+		hub:  h,
+		conn: conn,
+		send: make(chan *websocket.PreparedMessage, 64),
+	}
+	h.registerClient <- c
+	go c.readLoop()
+	go c.writeLoop()
+}
+
+func (h *hub) handleJudgerWS(w http.ResponseWriter, r *http.Request) {
+	token := os.Getenv(envJudgerToken)
+	// no token == dev env
+	if token != "" {
+		if r.Header["Authorization"] == nil || r.Header["Authorization"][1] != token {
+			log.Println("judger ws: auth failed", r)
+			http.Error(w, "QAQ", http.StatusUnauthorized)
+			return
+		}
+	}
+	log.Println("judger ws: logged in", r)
+	conn, err := upgrader.Upgrade(w, r, nil)
+	if err != nil {
+		return
+	}
+	j := &judger{
+		hub:    h,
+		conn:   conn,
+		submit: make(chan job),
+	}
+	h.registerJudger <- j
+	go j.readLoop()
+	go j.writeLoop()
 }

@@ -2,7 +2,6 @@ package main
 
 import (
 	"log"
-	"net/http"
 	"time"
 
 	"github.com/gorilla/websocket"
@@ -22,7 +21,7 @@ type clientSubmitJob struct {
 type client struct {
 	hub  *hub
 	conn *websocket.Conn
-	send chan interface{}
+	send chan *websocket.PreparedMessage
 }
 
 func (c *client) readLoop() {
@@ -63,7 +62,7 @@ func (c *client) writeLoop() {
 				c.conn.WriteMessage(websocket.CloseMessage, nil)
 				return
 			}
-			err := c.conn.WriteJSON(m)
+			err := c.conn.WritePreparedMessage(m)
 			if err != nil {
 				log.Println("client ws write: ", err)
 				return
@@ -76,22 +75,4 @@ func (c *client) writeLoop() {
 			}
 		}
 	}
-}
-
-func handleClientWS(h *hub, w http.ResponseWriter, r *http.Request) {
-	conn, err := upgrader.Upgrade(w, r, nil)
-	if err != nil {
-		log.Println("client ws:", err)
-		http.Error(w, "TAT", http.StatusUpgradeRequired)
-		return
-	}
-	log.Println("client ws:", "new connection", r)
-	c := &client{
-		hub:  h,
-		conn: conn,
-		send: make(chan interface{}, 64),
-	}
-	h.registerClient <- c
-	go c.readLoop()
-	go c.writeLoop()
 }
