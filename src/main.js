@@ -8,12 +8,12 @@ Vue.use(VueMaterial)
 
 Vue.config.productionTip = false
 
-Vue.filter('date', function(value) {
+Vue.filter('date', function (value) {
   const d = new Date(value)
   return moment(d).format('dddd, MMMM Do YYYY, kk:mm:ss.SSS ZZ')
 })
 
-Vue.filter('cpu', function(value) {
+Vue.filter('cpu', function (value) {
   if (value) {
     return value + ' ms'
   } else {
@@ -21,7 +21,7 @@ Vue.filter('cpu', function(value) {
   }
 })
 
-Vue.filter('memory', function(value) {
+Vue.filter('memory', function (value) {
   if (value) {
     return value + ' kB'
   } else {
