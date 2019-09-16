@@ -3,26 +3,41 @@
 A simple demo site for the [go-sandbox](https://github.com/criyle/go-sandbox), deployed on [heroku](https://go-judger.herokuapp.com).
 Under development...
 
-+   Frontend: Vue.js
-+   Backend: GO
-+   Judger Client: GO
++ Frontend: Vue.js
++ Backend: GO
++ Judger Client: GO
 
 ## API
 
 ### Database Model
 
+Language:
+
 ``` json
 {
-  "_id": "mongodb primary key",
-  "language": "c++",
-  "code": "<code>",
-  "date": "<submit date @ unit epoch date (ms)",
-  "updates": [
+  "name": "c++",
+  "sourceFileName": "a.cc",
+  "compileCmd": "g++ -o a a.cc",
+  "executables": [ "a" ],
+  "runCmd": "a",
+}
+```
+
+Model:
+
+``` json
+{
+  "_id": "primary key",
+  "language": "<language>",
+  "source": "<source code>",
+  "date": "<submit date>",
+  "status": "<current status (AC / TLE / MLE / OLE / JGF)>",
+  "totalTime": "total time",
+  "maxMemory": "max memory",
+  "results": [
     {
-      "status": "<current status (AC / TLE / MLE / OLE / JGF)>",
       "time": "<user time (ms)>",
       "memory": "<memory (kb)>",
-      "date": "<update date @ unix epoch date (ms)>",
       "stdin": "<stdin>",
       "stdout": "<stdout>",
       "stderr": "<stderr>",
@@ -32,71 +47,77 @@ Under development...
 }
 ```
 
-### Client WS
+### Rest API
 
-Send:
+#### POST /api/submit
 
-``` json
+Request:
+
+```json
 {
-  "language": "c++",
-  "code" : "#include <iostream>\n ....",
+  "language": "<language>",
+  "source": "<source code>",
 }
 ```
 
-Receive:
+Response:
+
+```json
+{
+  "_id": "<_id>"
+}
+```
+
+### Client WS
+
+S -> C:
 
 ``` json
 {
   "id": "<id>",
-  "language": "c++",
-  "code": "<code>",
-  "update": {
-    "status": "<status>",
-    "time": "<time>",
-    "memory": "<memory>",
-    "date": "<date>",
-    "stdin": "<stdin>",
-    "stdout": "<stdout>",
-    "stderr": "<stderr>",
-    "log": "<judger log>",
-  },
+  "status": "<status>",
+  "date": "<date>",
+  "language": "language name",
 }
 ```
-
-Id is madatory. Others are optional.
 
 ### Judger WS
 
-Send:
+Include `Authorization: Token token` in the HTTP Header when call for upgrade.
+
+J -> S:
+
+Progress:
 
 ``` json
 {
   "id": "<id>",
-  "update": {
-    "status": "<status>",
-    "time": "<time>",
-    "memory": "<memory>",
-    "date": "<date>",
-    "stdin": "<stdin>",
-    "stdout": "<stdout>",
-    "stderr": "<stderr>",
-    "log": "<judger log>"
-  },
+  "type": "progress",
+  "status": "<status>",
+  "date": "<date>",
+  "language": "language name",
 }
 ```
 
-Id is madatory. Others are optional.
-
-Receive:
+Finish:
 
 ``` json
 {
   "id": "<id>",
-  "language": "c++",
-  "code": "...",
+  "type": "finish",
+  "status": "<status>",
+  "date": "<date>",
+  "language": "language name",
+  "results": [ "result" ],
 }
 ```
 
-Connect:
+S -> J:
 
-Include `Authorization: Token token` in the header when call for upgrade.
+``` json
+{
+  "id": "<id>",
+  "language": "<language>",
+  "source": "source",
+}
+```

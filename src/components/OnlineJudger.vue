@@ -1,24 +1,46 @@
 <template>
-  <div class="md-layout">
-    <div class="md-layout-item md-size-50">
-      <code-editor
-        v-model="code"
-        @submit="submit"
-      ></code-editor>
+  <div>
+    <div style="display: flex">
+      <div style="flex: 1 0 "></div>
+      <md-button 
+        class="md-raised" 
+        @click="submit"
+      >Submit</md-button>
     </div>
-    <div class="md-layout-item md-size-50 submission">
-      <submission-list
-        :submission="submission"
-        @loadMore="loadMore"
-      ></submission-list>
+    <div class="inputs">
+      <md-field class="input">
+        <label>Language Name</label>
+        <md-input v-model="language"></md-input>
+      </md-field>
+      <md-field class="input">
+        <label>Source File Name</label>
+        <md-input v-model="sourceFileName"></md-input>
+      </md-field>
+      <md-field class="input">
+        <label>Compile Cmd</label>
+        <md-input v-model="compileCmd"></md-input>
+      </md-field>
+      <md-field class="input">
+        <label>Executable File Name</label>
+        <md-input v-model="executables"></md-input>
+      </md-field>
+      <md-field class="input">
+        <label>Exec Cmd</label>
+        <md-input v-model="runCmd"></md-input>
+      </md-field>
     </div>
+    <monaco-editor
+      class="code-editor-editor md-elevation-1 editor"
+      v-model="source"
+      :language="language"
+    ></monaco-editor>
   </div>
 </template>
 
 <script>
-import CodeEditor from "./CodeEditor.vue";
-import SubmissionList from "./SubmissionList.vue";
+import MonacoEditor from "./MonacoEditor.vue";
 import axios from "axios";
+import router from "../routes.js";
 
 const defaultCode = `#include <iostream>
 using namespace std;
@@ -32,84 +54,48 @@ int main() {
 export default {
   name: "OnlineJudger",
   data: () => ({
-    code: defaultCode,
-    submission: []
+    source: defaultCode,
+    language: "cpp",
+    sourceFileName: "a.cc",
+    compileCmd: "/usr/bin/g++ -o a a.cc",
+    executables: "a",
+    runCmd: "a",
   }),
   components: {
-    CodeEditor,
-    SubmissionList
+    MonacoEditor
   },
   methods: {
     submit() {
-      this.$ws.send(
-        JSON.stringify({
-          language: "c++",
-          code: this.code
-        })
-      );
-    },
-    loadMore() {
-      const p =
-        this.submission.length > 0
-          ? {
-              id: this.submission[this.submission.length - 1].id
-            }
-          : {};
-      axios
-        .get("/api/submission", {
-          params: p
-        })
-        .then(r => {
-          this.submission.push(...r.data);
-        });
-    }
-  },
-  mounted: function() {
-    const url =
-      (location.protocol == "https:" ? "wss" : "ws") +
-      "://" +
-      document.domain +
-      ":" +
-      location.port +
-      "/ws";
-    const ws = new WebSocket(url);
-    ws.addEventListener("message", event => {
-      const data = JSON.parse(event.data);
-      const sub = this.submission.find(s => s.id === data.id);
-      if (sub) {
-        if (sub.update) {
-          sub.update.push(data.update);
-        } else {
-          sub.update = [data.update];
+      axios.post('/api/submit', {
+        source: this.source,
+        language: {
+          name: this.language,
+          sourceFileName: this.sourceFileName,
+          compileCmd: this.compileCmd,
+          executables: this.executables,
+          runCmd: this.runCmd,
         }
-        this.submission = [...this.submission];
-      } else {
-        this.submission = [data, ...this.submission];
-      }
-    });
-    this.$ws = ws;
+      }).then(() => {
+        router.push("/submissions");
+      })
+    },
   },
-  created: function() {
-    this.loadMore();
-  },
-  beforeDestory: function() {
-    this.$ws.close();
-  }
 };
 </script>
 
 <style scoped>
-.md-layout {
-  height: 100%;
-  overflow-y: hidden;
+.editor {
+  height: 500px;
 }
 
-.md-layout-item {
-  height: 100%;
+.inputs {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
 }
 
-.submission {
-  padding-left: 5px;
-  padding-right: 5px;
+.inputs > .input {
+  flex: 0 0 33%;
+  min-height: unset;
 }
 </style>

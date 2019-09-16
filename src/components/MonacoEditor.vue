@@ -9,12 +9,13 @@ import * as monaco from "monaco-editor";
 export default {
   name: "MonacoEditor",
   props: {
-    value: String
+    value: String,
+    language: String,
   },
   mounted: function() {
     this.$editor = monaco.editor.create(this.$el, {
       value: this.value,
-      language: "cpp",
+      language: this.language,
       automaticLayout: true
     });
     this.$editor.onDidChangeModelContent(() => {
@@ -23,6 +24,11 @@ export default {
   },
   beforeDestory: function() {
     this.$editor.dispose();
+  },
+  watch: {
+    language: function (newVal, oldVal) {
+      monaco.editor.setModelLanguage(this.$editor.getModel(), newVal);
+    },
   }
 };
 </script>

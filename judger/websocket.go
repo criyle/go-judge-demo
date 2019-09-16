@@ -16,24 +16,35 @@ const (
 	pingPeriod     = 50 * time.Second
 )
 
+// Language defines the way to compile / run
+type Language struct {
+	Name           string `json:"name"`
+	SourceFileName string `json:"sourceFileName"`
+	CompileCmd     string `json:"compileCmd"`
+	Executables    string `json:"executables"`
+	RunCmd         string `json:"runCmd"`
+}
+
 type job struct {
-	ID   string `json:"id"`
-	Lang string `json:"language"`
-	Code string `json:"code"`
+	ID     string   `json:"id"`
+	Lang   Language `json:"language"`
+	Source string   `json:"source"`
 }
 
 // Model is the database model as well as transfer model
 type Model struct {
-	ID      string `json:"id"`
-	*Update `json:"update"`
+	ID       string    `json:"id"`
+	Type     string    `json:"type"`
+	Status   string    `json:"status"`
+	Date     time.Time `json:"date,omitempty"`
+	Language string    `json:"language"`
+	Results  []Result  `json:"results,omitempty"`
 }
 
-// Update is the judger updates
-type Update struct {
-	Status string `json:"status"`
+// Result is the judger updates
+type Result struct {
 	Time   uint64 `json:"time,omitempty"`
 	Memory uint64 `json:"memory,omitempty"`
-	Date   uint64 `json:"date,omitempty"`
 	Stdin  string `json:"stdin,omitempty"`
 	Stdout string `json:"stdout,omitempty"`
 	Stderr string `json:"stderr,omitempty"`

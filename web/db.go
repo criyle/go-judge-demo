@@ -15,19 +15,30 @@ import (
 
 // Model is the database model as well as transfer model
 type Model struct {
-	ID     *primitive.ObjectID `json:"id" bson:"_id,omitempty"`
-	Date   uint64              `json:"date,omitempty" bson:"date,omitempty"`
-	Lang   string              `json:"language,omitempty" bson:"language,omitempty"`
-	Code   string              `json:"code,omitempty" bson:"code,omitempty"`
-	Update []Update            `json:"update,omitempty" bson:"update,omitempty"`
+	ID *primitive.ObjectID `json:"id" bson:"_id,omitempty"`
+
+	Lang      Language  `json:"language,omitempty" bson:"language,omitempty"`
+	Source    string    `json:"source,omitempty" bson:"source,omitempty"`
+	Date      time.Time `json:"date,omitempty" bson:"date,omitempty"`
+	Status    string    `json:"status,omitempty" bson:"status,omitempty"`
+	TotalTime uint64    `json:"totalTime,omitempty" bson:"totalTime"`
+	MaxMemory uint64    `json:"maxMemory,omitempty" bson:"maxMemory"`
+	Results   []Result  `json:"results,omitempty" bson:"results"`
 }
 
-// Update is the judger updates
-type Update struct {
-	Status string `json:"status" bson:"status,omitempty"`
+// Language defines the way to compile / run
+type Language struct {
+	Name           string `json:"name" bson:"name"`
+	SourceFileName string `json:"sourceFileName" bson:"sourceFileName"`
+	CompileCmd     string `json:"compileCmd" bson:"compileCmd"`
+	Executables    string `json:"executables" bson:"executables"`
+	RunCmd         string `json:"runCmd" bson:"runCmd"`
+}
+
+// Result is the judger updates
+type Result struct {
 	Time   uint64 `json:"time,omitempty" bson:"time,omitempty"`
 	Memory uint64 `json:"memory,omitempty" bson:"memory,omitempty"`
-	Date   uint64 `json:"date,omitempty" bson:"date,omitempty"`
 	Stdin  string `json:"stdin,omitempty" bson:"stdin,omitempty"`
 	Stdout string `json:"stdout,omitempty" bson:"stdout,omitempty"`
 	Stderr string `json:"stderr,omitempty" bson:"stderr,omitempty"`
@@ -36,22 +47,22 @@ type Update struct {
 
 // JudgerUpdate is judger submitted updates
 type JudgerUpdate struct {
-	ID      *primitive.ObjectID `json:"id" bson:"_id,omitempty"`
-	*Update `json:"update,omitempty" bson:"update,omitempty"`
+	ID *primitive.ObjectID `json:"id" bson:"_id,omitempty"`
+
+	Type     string    `json:"type"`
+	Status   string    `json:"status"`
+	Date     time.Time `json:"date,omitempty"`
+	Language string    `json:"language"`
+	Results  []Result  `json:"results,omitempty"`
 }
 
 type db struct {
 	client   *mongo.Client
 	database *mongo.Database
-
-	insert     chan ClientSubmit
-	insertDone chan Model
-	update     chan JudgerUpdate
-	updateDone chan JudgerUpdate
 }
 
 const (
-	colName         = "submission2"
+	colName         = "submission3"
 	defaultURI      = "mongodb://localhost:27017/admin"
 	defaultDatabase = "test1"
 	envMongoURI     = "MONGODB_URI"
@@ -81,34 +92,8 @@ func getDB() *db {
 		return nil
 	}
 	return &db{
-		client:     client,
-		database:   client.Database(database),
-		insert:     make(chan ClientSubmit, 64),
-		insertDone: make(chan Model, 64),
-		update:     make(chan JudgerUpdate, 64),
-		updateDone: make(chan JudgerUpdate, 64),
-	}
-}
-
-func (d *db) loop() {
-	for {
-		select {
-		case cs := <-d.insert:
-			di, err := d.Add(&cs)
-			if err != nil {
-				log.Println("db add:", err)
-				continue
-			}
-			d.insertDone <- *di
-
-		case jd := <-d.update:
-			ud, err := d.Update(&jd)
-			if err != nil {
-				log.Println("db update:", err)
-				continue
-			}
-			d.updateDone <- *ud
-		}
+		client:   client,
+		database: client.Database(database),
 	}
 }
 
@@ -116,9 +101,8 @@ func (d *db) Add(cs *ClientSubmit) (*Model, error) {
 	c := d.database.Collection(colName)
 	m := &Model{
 		Lang:   cs.Lang,
-		Code:   cs.Code,
-		Date:   uint64(time.Now().UnixNano() / int64(time.Millisecond)),
-		Update: []Update{},
+		Source: cs.Source,
+		Date:   time.Now(),
 	}
 	i, err := c.InsertOne(nil, m)
 	if err != nil {
@@ -134,15 +118,14 @@ func (d *db) Update(m *JudgerUpdate) (*JudgerUpdate, error) {
 
 	filter := bson.D{{Key: "_id", Value: m.ID}}
 	update := bson.D{
-		{
-			Key: "$push",
-			Value: bson.D{
-				{Key: "update", Value: m.Update},
-			},
-		},
+		{Key: "status", Value: m.Status},
+		{Key: "results", Value: m.Results},
+	}
+	updateCmd := bson.D{
+		{Key: "$set", Value: update},
 	}
 
-	_, err := c.UpdateOne(nil, filter, update)
+	_, err := c.UpdateOne(nil, filter, updateCmd)
 	if err != nil {
 		return nil, err
 	}

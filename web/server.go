@@ -4,27 +4,35 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/gorilla/websocket"
 )
 
 var upgrader = websocket.Upgrader{}
 
+const (
+	writeWait  = 10 * time.Second
+	pongWait   = 60 * time.Second
+	pingPeriod = 50 * time.Second
+)
+
 func main() {
 	// connect to database
 	db := getDB()
-	go db.loop()
 
-	// creates hub
-	hub := newHub(db)
-	go hub.loop()
+	// creates client hub
+	ch := newClientHub()
+	go ch.loop()
+	http.HandleFunc("/ws", ch.handleWS)
 
-	// websocket
-	http.HandleFunc("/ws", hub.handleWS)
-	http.HandleFunc("/jws", hub.handleJudgerWS)
+	// creates judger hub
+	jh := newJudgerHub(db, ch)
+	go jh.loop()
+	http.HandleFunc("/jws", jh.handleJudgerWS)
 
 	// REST api
-	a := api{db: db}
+	a := api{db: db, judgerHub: jh}
 	http.Handle("/api/", http.StripPrefix("/api", a.serveMux()))
 
 	// static files for spa
