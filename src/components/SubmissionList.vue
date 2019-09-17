@@ -104,10 +104,6 @@ export default {
 </script>
 
 <style scoped>
-.submission-list-container {
-  height: 100%;
-  overflow-y: scroll;
-}
 
 .list-item span.status {
   width: 180px;
