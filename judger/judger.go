@@ -18,17 +18,22 @@ const (
 	envWebURL = "WEB_URL"
 )
 
-func main() {
-	daemon.ContainerInit()
+func init() {
+	daemon.Init()
+}
 
+func main() {
 	done := make(chan struct{})
 	root, err := ioutil.TempDir("", "dm")
 	if err != nil {
 		panic(err)
 	}
 	q := channel.New()
+	b := &daemon.Builder{
+		Root: root,
+	}
 	r := &runner.Runner{
-		Root:     root,
+		Builder:  b,
 		Queue:    q,
 		Language: &dumbLang{},
 	}

@@ -41,7 +41,7 @@ func runLoop(input <-chan job, output chan<- Model, q taskqueue.Queue) {
 
 		// compile
 		result := make(chan types.RunTaskResult)
-		q.Enqueue(types.RunTask{
+		q.Send(types.RunTask{
 			Type:      "compile",
 			Language:  lang,
 			Code:      task.Source,
@@ -66,13 +66,13 @@ func runLoop(input <-chan job, output chan<- Model, q taskqueue.Queue) {
 
 		// run
 		for i := 0; i < noCase; i++ {
-			q.Enqueue(types.RunTask{
+			q.Send(types.RunTask{
 				Type:        "exec",
 				Language:    lang,
 				Code:        task.Source,
 				TimeLimit:   1000,
 				MemoryLimit: memoryLimit,
-				Executables: ret.ExecFiles,
+				ExecFiles:   ret.ExecFiles,
 				InputFile:   input,
 				AnswerFile:  answer,
 			}, result)
