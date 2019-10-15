@@ -30,7 +30,10 @@ export default {
       monaco.editor.setModelLanguage(this.$editor.getModel(), newVal);
     },
     value: function (newVal, oldVal) {
-      this.$editor.setValue(newVal);
+      const curVal = this.$editor.getValue();
+      if (newVal !== curVal) {
+        this.$editor.setValue(newVal);
+      }
     }
   }
 };
