@@ -1,7 +1,8 @@
 FROM golang:latest
 
 RUN apt-get update && apt-get install -y \
-    libseccomp-dev \
+    python2 \
+    python3 \
     && rm -rf /var/lib/apt/lists/*
 
 COPY ./ /go/judger

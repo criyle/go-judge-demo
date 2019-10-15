@@ -27,19 +27,33 @@ type client struct {
 	send chan *websocket.PreparedMessage
 }
 
-// loop starts to broadcast to clients
-func (c *client) loop() {
-	ticker := time.NewTicker(pingPeriod)
+func (c *client) pongLoop() {
 	defer func() {
 		c.hub.unregister <- c
-		ticker.Stop()
 		c.conn.Close()
 	}()
+	c.conn.SetReadLimit(512)
 	c.conn.SetReadDeadline(time.Now().Add(pongWait))
 	c.conn.SetPongHandler(func(string) error {
 		c.conn.SetReadDeadline(time.Now().Add(pongWait))
 		return nil
 	})
+	for {
+		_, _, err := c.conn.ReadMessage()
+		if err != nil {
+			break
+		}
+	}
+}
+
+// loop starts to broadcast to clients
+func (c *client) loop() {
+	ticker := time.NewTicker(pingPeriod)
+	defer func() {
+		ticker.Stop()
+		c.conn.Close()
+	}()
+
 	for {
 		select {
 		case m, ok := <-c.send:
@@ -96,6 +110,7 @@ func (h *clientHub) handleWS(w http.ResponseWriter, r *http.Request) {
 		send: make(chan *websocket.PreparedMessage, 64),
 	}
 	h.register <- c
+	go c.pongLoop()
 	go c.loop()
 }
 

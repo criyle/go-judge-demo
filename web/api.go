@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"io"
 	"log"
 	"net/http"
 )
@@ -33,8 +34,13 @@ func (a *api) apiSubmit(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "TAT", http.StatusBadRequest)
 		return
 	}
+
+	// limit upload size..
+	const limit = 65536
+	body := &io.LimitedReader{R: r.Body, N: limit}
+
 	var cs ClientSubmit
-	if err := json.NewDecoder(r.Body).Decode(&cs); err != nil {
+	if err := json.NewDecoder(body).Decode(&cs); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}

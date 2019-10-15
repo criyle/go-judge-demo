@@ -12,6 +12,7 @@ import (
 	"github.com/criyle/go-judge/runner"
 	"github.com/criyle/go-judge/taskqueue/channel"
 	"github.com/criyle/go-sandbox/daemon"
+	"github.com/criyle/go-sandbox/pkg/mount"
 )
 
 const (
@@ -29,18 +30,31 @@ func main() {
 		panic(err)
 	}
 	q := channel.New()
+	m, err := mount.NewBuilder().
+		WithBind("/bin", "bin", true).
+		WithBind("/lib", "lib", true).
+		WithBind("/lib64", "lib64", true).
+		WithBind("/usr", "usr", true).
+		WithTmpfs("w", "size=8m,nr_inodes=4k").
+		WithTmpfs("tmp", "size=8m,nr_inodes=4k").
+		Build(true)
+
+	if err != nil {
+		panic(err)
+	}
 	b := &daemon.Builder{
-		Root: root,
+		Root:   root,
+		Mounts: m,
 	}
 	r := &runner.Runner{
 		Builder:  b,
 		Queue:    q,
 		Language: &dumbLang{},
 	}
-	go r.Loop(done)
-	go r.Loop(done)
-	go r.Loop(done)
-	go r.Loop(done)
+	const parallism = 4
+	for i := 0; i < parallism; i++ {
+		go r.Loop(done)
+	}
 
 	retryTime := 3 * time.Second
 	input := make(chan job, 64)

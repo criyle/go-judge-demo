@@ -29,6 +29,9 @@ export default {
     language: function (newVal, oldVal) {
       monaco.editor.setModelLanguage(this.$editor.getModel(), newVal);
     },
+    value: function (newVal, oldVal) {
+      this.$editor.setValue(newVal);
+    }
   }
 };
 </script>
