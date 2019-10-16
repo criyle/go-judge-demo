@@ -3,8 +3,8 @@ module github.com/criyle/go-judger-demo
 go 1.13
 
 require (
-	github.com/criyle/go-judge v0.0.0-20191014073448-e0d9c13de4b3
-	github.com/criyle/go-sandbox v0.0.0-20191015002529-6a91022c58c9
+	github.com/criyle/go-judge v0.0.0-20191016065402-2903d42e1d53
+	github.com/criyle/go-sandbox v0.0.0-20191016053250-f2a28034f310
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/go-stack/stack v1.8.0 // indirect
 	github.com/golang/snappy v0.0.1 // indirect

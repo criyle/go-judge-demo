@@ -1,9 +1,7 @@
-github.com/criyle/go-judge v0.0.0-20191014073448-e0d9c13de4b3 h1:liK1YHuDlPkVJryBFvlfeoTwTJcULLwTWqUUG8nhKDs=
-github.com/criyle/go-judge v0.0.0-20191014073448-e0d9c13de4b3/go.mod h1:jKltnIdY+xlH1/5GmvLvqJgJVP0ptyWr6vQwdNBqc/w=
-github.com/criyle/go-sandbox v0.0.0-20191014070058-6e46a732897f h1:5PNJaA2V/NVR98BegmbYW2g5pHdiX3b1iXdaV/fPA9M=
-github.com/criyle/go-sandbox v0.0.0-20191014070058-6e46a732897f/go.mod h1:q6ywqlRA0V2VxWo9E+dQkzK2s5mHyq2GXHtF8oZq+mI=
-github.com/criyle/go-sandbox v0.0.0-20191015002529-6a91022c58c9 h1:J6rSUDlKGegf+W3y1BE5PMflZxP8FbqYKUKC7sgCoZo=
-github.com/criyle/go-sandbox v0.0.0-20191015002529-6a91022c58c9/go.mod h1:q6ywqlRA0V2VxWo9E+dQkzK2s5mHyq2GXHtF8oZq+mI=
+github.com/criyle/go-judge v0.0.0-20191016065402-2903d42e1d53 h1:wLCoVApbEPpLIS1JgxgwYtDFcAn56rNWdSfLxNmAXG0=
+github.com/criyle/go-judge v0.0.0-20191016065402-2903d42e1d53/go.mod h1:gkyXuNImCszcuoiZtawYHzX5//t/CzTpBEcRvsmaCIY=
+github.com/criyle/go-sandbox v0.0.0-20191016053250-f2a28034f310 h1:mE+H7/ycELStwFvM4+1hPUhILrf5lC4WbdiyT8RlD5M=
+github.com/criyle/go-sandbox v0.0.0-20191016053250-f2a28034f310/go.mod h1:q6ywqlRA0V2VxWo9E+dQkzK2s5mHyq2GXHtF8oZq+mI=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=

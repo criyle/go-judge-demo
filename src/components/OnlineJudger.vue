@@ -56,39 +56,119 @@ import MonacoEditor from "./MonacoEditor.vue";
 import axios from "axios";
 import router from "../routes.js";
 
-const defaultCode = `#include <iostream>
+const cSource = `#include <stdio.h>
+
+int main() {
+  int a, b;
+  scanf("%d%d", &a, &b);
+  printf("%d", a + b);
+}
+`;
+
+const cppSource = `#include <iostream>
 using namespace std;
 
 int main() {
   int a, b;
   cin >> a >> b;
   cout << a + b;
-}`;
+}
+`;
+
+const goSource = `package main
+
+import "fmt"
+
+func main() {
+  var a, b int
+  fmt.Scanf("%d%d", &a, &b)
+  fmt.Printf("%d", a + b)
+}
+`
+const nodeSource = `const fs = require('fs');
+const [a, b] = fs.readFileSync(0, 'utf-8').split(' ').map(s => parseInt(s));
+process.stdout.write(a + b + '\\n');
+`;
+
+const pascalSource = `program main;
+
+var a, b: Integer;
+begin
+  Readln(a, b);
+  Writeln(a + b);
+end.
+`;
+
+const python3Source = `a, b = map(int, input().split())
+print(a + b)
+`;
+
+const python2Source = `a, b = map(int, raw_input().split())
+print a + b
+`;
+
+const javaSource = `import java.io.*;
+import java.util.*;
+
+public class Main
+{
+  public static void main(String args[]) throws Exception
+  {
+    Scanner cin = new Scanner(System.in);
+    int a = cin.nextInt(), b = cin.nextInt();
+    System.out.println(a + b);
+  }
+}
+`;
 
 const languageOptions = {
-  "cpp": {
-    name: "cpp",
-    sourceFileName: "a.cc",
-    compileCmd: "/usr/bin/g++ -std=c++11 -o a a.cc",
+  "c": {
+    name: "c",
+    sourceFileName: "a.c",
+    compileCmd: "/usr/bin/gcc -O2 -o a a.c",
     executables: "a",
     runCmd: "a",
-    defaultSource: `#include <iostream>
-using namespace std;
-
-int main() {
-  int a, b;
-  cin >> a >> b;
-  cout << a + b;
-}`,
+    defaultSource: cSource,
   },
-  "python3": {
-    name: "python",
-    sourceFileName: "a.py",
+  "c++": {
+    name: "cpp",
+    sourceFileName: "a.cc",
+    compileCmd: "/usr/bin/g++ -O2 -std=c++11 -o a a.cc",
+    executables: "a",
+    runCmd: "a",
+    defaultSource: cppSource,
+  },
+  "go": {
+    name: "go",
+    sourceFileName: "a.go",
+    compileCmd: "/usr/local/go/bin/go build -o a a.go",
+    executables: "a",
+    runCmd: "a",
+    defaultSource: goSource,
+  },
+  "node": {
+    name: "javascript",
+    sourceFileName: "a.js",
     compileCmd: "/bin/echo compile",
-    executables: "a.py",
-    runCmd: "/usr/bin/python3 a.py",
-    defaultSource: `a, b = map(int, input().split())
-print(a + b)`,
+    executables: "a.js",
+    runCmd: "/usr/bin/node a.js",
+    defaultSource: nodeSource,
+  },
+  "java": {
+    name: "java",
+    sourceFileName: "Main.java",
+    compileCmd: "/usr/bin/javac Main.java",
+    executables: "Main.class",
+    runCmd: "/usr/bin/java Main",
+    defaultSource: javaSource,
+  },
+  "pascal": {
+    name: "pascal",
+    sourceFileName: "a.pas",
+    compileCmd: "/usr/bin/fpc -O2 a.pas",
+    executables: "a",
+    runCmd: "a",
+    defaultSource: pascalSource,
   },
   "python2": {
     name: "python",
@@ -96,36 +176,29 @@ print(a + b)`,
     compileCmd: "/bin/echo compile",
     executables: "a.py",
     runCmd: "/usr/bin/python2 a.py",
-    defaultSource: `a, b = map(int, raw_input().split())
-print a + b`,
+    defaultSource: python2Source,
   },
-  "c": {
-    name: "c",
-    sourceFileName: "a.c",
-    compileCmd: "/usr/bin/gcc -o a a.c",
-    executables: "a",
-    runCmd: "a",
-    defaultSource: `#include <stdio.h>
-
-int main() {
-  int a, b;
-  scanf("%d%d", &a, &b);
-  printf("%d", a + b);
-}`,
+  "python3": {
+    name: "python",
+    sourceFileName: "a.py",
+    compileCmd: "/bin/echo compile",
+    executables: "a.py",
+    runCmd: "/usr/bin/python3 a.py",
+    defaultSource: python3Source,
   },
 };
 
 export default {
   name: "OnlineJudger",
   data: () => ({
-    source: defaultCode,
+    source: cppSource,
     language: "cpp",
     sourceFileName: "a.cc",
     compileCmd: "/usr/bin/g++ -std=c++11 -o a a.cc",
     executables: "a",
     runCmd: "a",
     languageOptions: languageOptions,
-    selectedOption: "cpp",
+    selectedOption: "c++",
   }),
   components: {
     MonacoEditor

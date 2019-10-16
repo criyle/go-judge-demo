@@ -33,12 +33,12 @@ type job struct {
 
 // Model is the database model as well as transfer model
 type Model struct {
-	ID       string    `json:"id"`
-	Type     string    `json:"type"`
-	Status   string    `json:"status"`
-	Date     time.Time `json:"date,omitempty"`
-	Language string    `json:"language"`
-	Results  []Result  `json:"results,omitempty"`
+	ID       string     `json:"id"`
+	Type     string     `json:"type"`
+	Status   string     `json:"status"`
+	Date     *time.Time `json:"date,omitempty"`
+	Language string     `json:"language"`
+	Results  []Result   `json:"results,omitempty"`
 }
 
 // Result is the judger updates

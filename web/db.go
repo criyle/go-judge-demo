@@ -17,13 +17,13 @@ import (
 type Model struct {
 	ID *primitive.ObjectID `json:"id" bson:"_id,omitempty"`
 
-	Lang      Language  `json:"language,omitempty" bson:"language,omitempty"`
-	Source    string    `json:"source,omitempty" bson:"source,omitempty"`
-	Date      time.Time `json:"date,omitempty" bson:"date,omitempty"`
-	Status    string    `json:"status,omitempty" bson:"status,omitempty"`
-	TotalTime uint64    `json:"totalTime,omitempty" bson:"totalTime"`
-	MaxMemory uint64    `json:"maxMemory,omitempty" bson:"maxMemory"`
-	Results   []Result  `json:"results,omitempty" bson:"results"`
+	Lang      Language   `json:"language,omitempty" bson:"language,omitempty"`
+	Source    string     `json:"source,omitempty" bson:"source,omitempty"`
+	Date      *time.Time `json:"date,omitempty" bson:"date,omitempty"`
+	Status    string     `json:"status,omitempty" bson:"status,omitempty"`
+	TotalTime uint64     `json:"totalTime,omitempty" bson:"totalTime"`
+	MaxMemory uint64     `json:"maxMemory,omitempty" bson:"maxMemory"`
+	Results   []Result   `json:"results,omitempty" bson:"results"`
 }
 
 // Language defines the way to compile / run
@@ -49,11 +49,11 @@ type Result struct {
 type JudgerUpdate struct {
 	ID *primitive.ObjectID `json:"id" bson:"_id,omitempty"`
 
-	Type     string    `json:"type"`
-	Status   string    `json:"status"`
-	Date     time.Time `json:"date,omitempty"`
-	Language string    `json:"language"`
-	Results  []Result  `json:"results,omitempty"`
+	Type     string     `json:"type"`
+	Status   string     `json:"status"`
+	Date     *time.Time `json:"date,omitempty"`
+	Language string     `json:"language"`
+	Results  []Result   `json:"results,omitempty"`
 }
 
 type db struct {
@@ -99,10 +99,11 @@ func getDB() *db {
 
 func (d *db) Add(cs *ClientSubmit) (*Model, error) {
 	c := d.database.Collection(colName)
+	t := time.Now()
 	m := &Model{
 		Lang:   cs.Lang,
 		Source: cs.Source,
-		Date:   time.Now(),
+		Date:   &t,
 	}
 	i, err := c.InsertOne(nil, m)
 	if err != nil {
