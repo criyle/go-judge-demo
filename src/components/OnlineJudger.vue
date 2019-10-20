@@ -84,7 +84,7 @@ func main() {
   fmt.Scanf("%d%d", &a, &b)
   fmt.Printf("%d", a + b)
 }
-`
+`;
 const nodeSource = `const fs = require('fs');
 const [a, b] = fs.readFileSync(0, 'utf-8').split(' ').map(s => parseInt(s));
 process.stdout.write(a + b + '\\n');
@@ -122,13 +122,13 @@ public class Main
 `;
 
 const languageOptions = {
-  "c": {
+  c: {
     name: "c",
     sourceFileName: "a.c",
     compileCmd: "/usr/bin/gcc -O2 -o a a.c",
     executables: "a",
     runCmd: "a",
-    defaultSource: cSource,
+    defaultSource: cSource
   },
   "c++": {
     name: "cpp",
@@ -136,56 +136,56 @@ const languageOptions = {
     compileCmd: "/usr/bin/g++ -O2 -std=c++11 -o a a.cc",
     executables: "a",
     runCmd: "a",
-    defaultSource: cppSource,
+    defaultSource: cppSource
   },
-  "go": {
+  go: {
     name: "go",
     sourceFileName: "a.go",
     compileCmd: "/usr/local/go/bin/go build -o a a.go",
     executables: "a",
     runCmd: "a",
-    defaultSource: goSource,
+    defaultSource: goSource
   },
-  "node": {
+  node: {
     name: "javascript",
     sourceFileName: "a.js",
     compileCmd: "/bin/echo compile",
     executables: "a.js",
     runCmd: "/usr/bin/node a.js",
-    defaultSource: nodeSource,
+    defaultSource: nodeSource
   },
-  "java": {
+  java: {
     name: "java",
     sourceFileName: "Main.java",
     compileCmd: "/usr/bin/javac Main.java",
     executables: "Main.class",
     runCmd: "/usr/bin/java Main",
-    defaultSource: javaSource,
+    defaultSource: javaSource
   },
-  "pascal": {
+  pascal: {
     name: "pascal",
     sourceFileName: "a.pas",
     compileCmd: "/usr/bin/fpc -O2 a.pas",
     executables: "a",
     runCmd: "a",
-    defaultSource: pascalSource,
+    defaultSource: pascalSource
   },
-  "python2": {
+  python2: {
     name: "python",
     sourceFileName: "a.py",
     compileCmd: "/bin/echo compile",
     executables: "a.py",
     runCmd: "/usr/bin/python2 a.py",
-    defaultSource: python2Source,
+    defaultSource: python2Source
   },
-  "python3": {
+  python3: {
     name: "python",
     sourceFileName: "a.py",
     compileCmd: "/bin/echo compile",
     executables: "a.py",
     runCmd: "/usr/bin/python3 a.py",
-    defaultSource: python3Source,
-  },
+    defaultSource: python3Source
+  }
 };
 
 export default {
@@ -198,26 +198,28 @@ export default {
     executables: "a",
     runCmd: "a",
     languageOptions: languageOptions,
-    selectedOption: "c++",
+    selectedOption: "c++"
   }),
   components: {
     MonacoEditor
   },
   methods: {
     submit() {
-      axios.post('/api/submit', {
-        source: this.source,
-        language: {
-          name: this.language,
-          sourceFileName: this.sourceFileName,
-          compileCmd: this.compileCmd,
-          executables: this.executables,
-          runCmd: this.runCmd,
-        }
-      }).then(() => {
-        router.push("/submissions");
-      })
-    },
+      axios
+        .post("/api/submit", {
+          source: this.source,
+          language: {
+            name: this.language,
+            sourceFileName: this.sourceFileName,
+            compileCmd: this.compileCmd,
+            executables: this.executables,
+            runCmd: this.runCmd
+          }
+        })
+        .then(() => {
+          router.push("/submissions");
+        });
+    }
   },
   watch: {
     selectedOption: function(v) {
@@ -228,8 +230,8 @@ export default {
       this.executables = option.executables;
       this.runCmd = option.runCmd;
       this.source = option.defaultSource;
-    },
-  },
+    }
+  }
 };
 </script>
 

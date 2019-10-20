@@ -14,97 +14,104 @@
             <span>{{s.date | date}}</span>
           </span>
         </div>
-        <md-list slot="md-expand">
-          <md-list-item>
-            <div class="md-list-item-text">
-              <span>_id: {{s.id}}</span>
-              <span>language name: {{s.language.name}}</span>
-              <span>source file name: {{s.language.sourceFileName}}</span>
-              <span>compile cmd: {{s.language.compileCmd}}</span>
-              <span>executable file names: {{s.language.executables}}</span>
-              <span>exec cmd: {{s.language.runCmd}}</span>
-              <span>
-                <md-field>
-                  <label>Source</label>
-                  <md-textarea
-                    :value="s.source"
-                    md-autogrow
-                    disabled
-                  ></md-textarea>
-                </md-field>
-              </span>
-            </div>
-          </md-list-item>
+        <div slot="md-expand">
+          <div class="info properties">
+            <property-view
+              label="_id"
+              :value="s.id"
+            ></property-view>
+            <property-view
+              label="language name"
+              :value="s.language.name"
+            ></property-view>
+            <property-view
+              label="source file name"
+              :value="s.language.sourceFileName"
+            ></property-view>
+            <property-view
+              label="compile cmd"
+              :value="s.language.compileCmd"
+            ></property-view>
+            <property-view
+              label="executable file names"
+              :value="s.language.executables"
+            ></property-view>
+            <property-view
+              label="exec cmd"
+              :value="s.language.runCmd"
+            ></property-view>
+          </div>
+          <div class="info">
+            <code-view 
+              label="code"
+              :value="s.source"
+              :language="s.language.name"
+            ></code-view>
+          </div>
           <template v-for="u in s.results">
             <md-divider></md-divider>
-            <md-list-item>
-              <div class="md-list-item-text">
-                <span>cpu: {{u.time | cpu}} </span>
-                <span>memory: {{u.memory | memory}} </span>
-                <span v-if="u.stdin">
-                  <md-field>
-                    <label>Stdin</label>
-                    <md-textarea
-                      :value="u.stdin"
-                      md-autogrow
-                      disabled
-                    ></md-textarea>
-                  </md-field>
-                </span>
-                <span v-if="u.stdout">
-                  <md-field>
-                    <label>Stdout</label>
-                    <md-textarea
-                      :value="u.stdout"
-                      md-autogrow
-                      disabled
-                    ></md-textarea>
-                  </md-field>
-                </span>
-                <span v-if="u.stderr">
-                  <md-field>
-                    <label>Stderr</label>
-                    <md-textarea
-                      :value="u.stderr"
-                      md-autogrow
-                      disabled
-                    ></md-textarea>
-                  </md-field>
-                </span>
-                <span v-if="u.log">
-                  <md-field>
-                    <label>Log</label>
-                    <md-textarea
-                      :value="u.log"
-                      md-autogrow
-                      disabled
-                    ></md-textarea>
-                  </md-field>
-                </span>
-              </div>
-            </md-list-item>
+            <div class="info properties">
+              <property-view
+                label="cpu"
+                :value="u.time | cpu"
+              ></property-view>
+              <property-view
+                label="memory"
+                :value="u.memory | memory"
+              ></property-view>
+            </div>
+            <div class="info">
+              <code-view 
+                v-if="u.stdin"
+                label="stdin"
+                :value="u.stdin"
+                language="text"
+              ></code-view>
+              <code-view
+                v-if="u.stdout"
+                label="stdout"
+                :value="u.stdout"
+                language="text"
+              ></code-view>
+              <code-view
+                v-if="u.stderr"
+                label="stderr"
+                :value="u.stderr"
+                language="text"
+              ></code-view>
+              <code-view
+                v-if="u.log"
+                label="log"
+                :value="u.log"
+                language="text"
+              ></code-view>
+            </div>
           </template>
-        </md-list>
-        </md-list-item>
-        <md-list-item>
-          <md-button
-            class="md-raised"
-            @click="$emit('loadMore')"
-          >More</md-button>
-        </md-list-item>
+        </div>
+      </md-list-item>
     </md-list>
+    <md-button
+      class="md-raised"
+      @click="$emit('loadMore')"
+    >More</md-button>
   </div>
 </template>
 
 <script>
+import CodeView from "./CodeView.vue";
+import PropertyView from "./PropertyView";
+
 export default {
   name: "SubmissionList",
   props: ["submission"],
+  components: {
+    CodeView,
+    PropertyView
+  }
 };
 </script>
 
 <style scoped>
-
 .list-item span.status {
   width: 180px;
 }
@@ -113,6 +120,20 @@ export default {
   display: inline-block;
   width: auto;
   font-size: 14px;
+  padding-right: 10px;
+}
+
+.info {
+  padding: 4px 16px;
+}
+
+.properties {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.properties > div {
   padding-right: 10px;
 }
 </style>

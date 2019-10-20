@@ -12,10 +12,10 @@ import axios from "axios";
 export default {
   name: "Submission",
   data: () => ({
-    submission: [],
+    submission: []
   }),
   components: {
-    SubmissionList,
+    SubmissionList
   },
   methods: {
     loadMore() {
@@ -48,9 +48,7 @@ export default {
       const sub = this.submission.find(s => s.id === data.id);
       if (sub) {
         sub.status = data.status;
-        if (data.date && data.date !== "0001-01-01T00:00:00Z") {
-          sub.date = data.date;
-        }
+        sub.date = data.date || sub.date;
         sub.language = data.language || sub.language;
         sub.results = data.results || sub.results;
         this.submission = [...this.submission];
@@ -66,9 +64,5 @@ export default {
   beforeDestory: function() {
     this.$ws.close();
   }
-}
+};
 </script>
-
-<style scoped>
-
-</style>

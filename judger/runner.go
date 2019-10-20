@@ -30,8 +30,7 @@ func runLoop(input <-chan job, output chan<- Model, q taskqueue.Queue) {
 		json.NewEncoder(&b).Encode(task.Lang)
 		lang := b.String()
 
-		input := memfile.New("input", []byte("1 1"))
-		answer := memfile.New("answer", []byte("2"))
+		input := memfile.New("input", []byte{})
 
 		output <- Model{
 			ID:     task.ID,
@@ -66,6 +65,8 @@ func runLoop(input <-chan job, output chan<- Model, q taskqueue.Queue) {
 
 		// run
 		for i := 0; i < noCase; i++ {
+			input := memfile.New("input", []byte(fmt.Sprintf("%d %d", i+1, i+1)))
+			answer := memfile.New("answer", []byte(fmt.Sprintf("%d", i+i+2)))
 			q.Send(types.RunTask{
 				Type:        "exec",
 				Language:    lang,

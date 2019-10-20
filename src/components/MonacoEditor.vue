@@ -1,5 +1,5 @@
 <template>
-  <div class="vue-monaco-editor">
+  <div>
   </div>
 </template>
 
@@ -10,7 +10,7 @@ export default {
   name: "MonacoEditor",
   props: {
     value: String,
-    language: String,
+    language: String
   },
   mounted: function() {
     this.$editor = monaco.editor.create(this.$el, {
@@ -26,10 +26,10 @@ export default {
     this.$editor.dispose();
   },
   watch: {
-    language: function (newVal, oldVal) {
+    language: function(newVal, oldVal) {
       monaco.editor.setModelLanguage(this.$editor.getModel(), newVal);
     },
-    value: function (newVal, oldVal) {
+    value: function(newVal, oldVal) {
       const curVal = this.$editor.getValue();
       if (newVal !== curVal) {
         this.$editor.setValue(newVal);
@@ -38,6 +38,3 @@ export default {
   }
 };
 </script>
-
-<style scoped>
-</style>
