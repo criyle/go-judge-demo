@@ -13,6 +13,7 @@ import (
 	"github.com/criyle/go-judge/runner"
 	"github.com/criyle/go-judge/taskqueue/channel"
 	"github.com/criyle/go-sandbox/daemon"
+	"github.com/criyle/go-sandbox/pkg/cgroup"
 	"github.com/criyle/go-sandbox/pkg/mount"
 )
 
@@ -75,10 +76,15 @@ func main() {
 		Root:   root,
 		Mounts: m,
 	}
+	cgb, err := cgroup.NewBuilder("go-judger").WithCPUAcct().WithMemory().WithPids().FilterByEnv()
+	if err != nil {
+		panic(err)
+	}
 	r := &runner.Runner{
-		Builder:  b,
-		Queue:    q,
-		Language: &dumbLang{},
+		Builder:       b,
+		Queue:         q,
+		CgroupBuilder: cgb,
+		Language:      &dumbLang{},
 	}
 	const parallism = 4
 	for i := 0; i < parallism; i++ {
