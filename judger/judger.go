@@ -5,7 +5,10 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"os/signal"
 	"strings"
+	"sync"
+	"sync/atomic"
 	"syscall"
 	"time"
 
@@ -34,6 +37,8 @@ func init() {
 }
 
 func main() {
+	var wg sync.WaitGroup
+
 	done := make(chan struct{})
 	root, err := ioutil.TempDir("", "dm")
 	if err != nil {
@@ -73,8 +78,10 @@ func main() {
 		panic(err)
 	}
 	b := &daemon.Builder{
-		Root:   root,
-		Mounts: m,
+		Root:          root,
+		Mounts:        m,
+		CredGenerator: newCredGen(),
+		Stderr:        true,
 	}
 	cgb, err := cgroup.NewBuilder("go-judger").WithCPUAcct().WithMemory().WithPids().FilterByEnv()
 	if err != nil {
@@ -88,7 +95,11 @@ func main() {
 	}
 	const parallism = 4
 	for i := 0; i < parallism; i++ {
-		go r.Loop(done)
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			r.Loop(done)
+		}()
 	}
 
 	retryTime := 3 * time.Second
@@ -98,16 +109,27 @@ func main() {
 	// start run loop
 	go runLoop(input, output, q)
 
-	for {
-		j, err := dialWS(os.Getenv(envWebURL))
-		if err != nil {
-			log.Println("ws:", err)
-			time.Sleep(retryTime)
-			continue
+	// start ws loop
+	go func() {
+		for {
+			j, err := dialWS(os.Getenv(envWebURL))
+			if err != nil {
+				log.Println("ws:", err)
+				time.Sleep(retryTime)
+				continue
+			}
+			log.Println("ws connected")
+			judgerLoop(j, input, output)
 		}
-		log.Println("ws connected")
-		judgerLoop(j, input, output)
-	}
+	}()
+
+	sig := make(chan os.Signal, 1)
+	signal.Notify(sig, os.Interrupt)
+	<-sig
+
+	log.Println("interrupted")
+	close(done)
+	wg.Wait()
 }
 
 type dumbLang struct{}
@@ -165,5 +187,21 @@ func judgerLoop(j *judger, input chan job, output chan Model) {
 			log.Println("output: ", o)
 			j.update <- o
 		}
+	}
+}
+
+type credGen struct {
+	cur uint32
+}
+
+func newCredGen() *credGen {
+	return &credGen{cur: 10000}
+}
+
+func (c *credGen) Get() syscall.Credential {
+	n := atomic.AddUint32(&c.cur, 1)
+	return syscall.Credential{
+		Uid: n,
+		Gid: n,
 	}
 }

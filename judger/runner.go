@@ -15,7 +15,7 @@ const (
 	memoryLimit = 256 << 10 // 256m
 	runDir      = "run"
 	pathEnv     = "PATH=/usr/local/bin:/usr/bin:/bin"
-	noCase      = 5
+	noCase      = 8
 )
 
 func runLoop(input <-chan job, output chan<- Model, q taskqueue.Queue) {
@@ -39,7 +39,7 @@ func runLoop(input <-chan job, output chan<- Model, q taskqueue.Queue) {
 		}
 
 		// compile
-		result := make(chan types.RunTaskResult)
+		result := make(chan types.RunTaskResult, noCase)
 		q.Send(types.RunTask{
 			Type:      "compile",
 			Language:  lang,
