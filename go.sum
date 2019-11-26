@@ -1,5 +1,5 @@
-github.com/criyle/go-judge v0.0.0-20191125090634-1dffe2d7971d h1:Z3kgQ86d4+BLq3WJhMxx10tRXyQMfxB+CH/w6vTryfM=
-github.com/criyle/go-judge v0.0.0-20191125090634-1dffe2d7971d/go.mod h1:RDvHsj4/jNJQENSwBNc3/4L+GMbrUP3QhziTWbjNtDU=
+github.com/criyle/go-judge v0.0.0-20191126093724-42e77905cc7c h1:z5nB6u4tJpQ5Ez+GtBBQxdDYd4H/zKPM2c6glXGZFlk=
+github.com/criyle/go-judge v0.0.0-20191126093724-42e77905cc7c/go.mod h1:RDvHsj4/jNJQENSwBNc3/4L+GMbrUP3QhziTWbjNtDU=
 github.com/criyle/go-sandbox v0.0.0-20191121105801-1cf901bbc2c9 h1:IwTDFajfYLnG1lG2zI/XO977akYq/U3rBeCXRnf0Y9c=
 github.com/criyle/go-sandbox v0.0.0-20191121105801-1cf901bbc2c9/go.mod h1:daneaH9drlUpP91/irZBJ0vPNo1WGMcOM4+JjbXTsek=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=

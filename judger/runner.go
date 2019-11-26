@@ -96,6 +96,7 @@ func runLoop(input <-chan job, output chan<- Model, q taskqueue.Queue) {
 				Stdin:  string(ret2.Input),
 				Stdout: string(ret2.UserOutput),
 				Stderr: string(ret2.UserError),
+				Log:    string(ret2.SpjOutput),
 			})
 		}
 		if status == "" {
