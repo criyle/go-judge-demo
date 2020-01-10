@@ -51,14 +51,14 @@ type Result struct {
 	Log    string `json:"log,omitempty"`
 }
 
-type judger struct {
+type judgerWS struct {
 	conn      *websocket.Conn // connection
 	submit    chan job        // job submitted by web
 	update    chan Model      // update web model
 	disconnet chan *struct{}  // disconneted
 }
 
-func (j *judger) readLoop() {
+func (j *judgerWS) readLoop() {
 	defer func() {
 		j.disconnet <- nil
 		j.conn.Close()
@@ -82,7 +82,7 @@ func (j *judger) readLoop() {
 	}
 }
 
-func (j *judger) writeLoop() {
+func (j *judgerWS) writeLoop() {
 	ticker := time.NewTicker(pingPeriod)
 	defer func() {
 		ticker.Stop()
@@ -111,7 +111,7 @@ func (j *judger) writeLoop() {
 	}
 }
 
-func dialWS(url string) (*judger, error) {
+func dialWS(url string) (*judgerWS, error) {
 	header := make(http.Header)
 	token := os.Getenv(envJudgerToken)
 	header["Authorization"] = []string{"Token", token}
@@ -123,7 +123,7 @@ func dialWS(url string) (*judger, error) {
 		return nil, err
 	}
 
-	j := &judger{
+	j := &judgerWS{
 		conn:      conn,
 		submit:    make(chan job),
 		update:    make(chan Model),

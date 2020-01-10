@@ -1,17 +1,25 @@
-FROM golang:latest
+FROM golang:latest AS builder
+
+COPY ./ /go/judger/
+
+WORKDIR /go/judger
+
+RUN go get -d  \
+    && go build -o /bin/judger
+
+FROM ubuntu:latest
 
 RUN apt-get update && apt-get install -y \
-    python2 \
+    python2.7 \
     python3 \
     fpc \
     openjdk-11-jdk \
     nodejs \
+    golang-go \
     && rm -rf /var/lib/apt/lists/*
 
-COPY ./ /go/judger
+COPY --from=builder /bin/judger /bin/judger
 
 WORKDIR /go/judger
-
-RUN go get -d ./... && go build -o /bin/judger
 
 ENTRYPOINT ["/bin/judger"]

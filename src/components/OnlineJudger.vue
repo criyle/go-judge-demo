@@ -141,7 +141,7 @@ const languageOptions = {
   go: {
     name: "go",
     sourceFileName: "a.go",
-    compileCmd: "/usr/local/go/bin/go build -o a a.go",
+    compileCmd: "/usr/bin/go build -o a a.go",
     executables: "a",
     runCmd: "a",
     defaultSource: goSource

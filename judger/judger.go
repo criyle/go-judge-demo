@@ -1,18 +1,16 @@
 package main
 
 import (
-	"encoding/json"
 	"io/ioutil"
 	"log"
 	"os"
 	"os/signal"
-	"strings"
 	"sync"
 	"sync/atomic"
 	"syscall"
 	"time"
 
-	"github.com/criyle/go-judge/language"
+	"github.com/criyle/go-judge/judger"
 	"github.com/criyle/go-judge/runner"
 	"github.com/criyle/go-judge/taskqueue/channel"
 	"github.com/criyle/go-sandbox/daemon"
@@ -38,6 +36,8 @@ func init() {
 
 func main() {
 	var wg sync.WaitGroup
+
+	c := newClient(os.Getenv(envWebURL), 3*time.Second)
 
 	done := make(chan struct{})
 	root, err := ioutil.TempDir("", "dm")
@@ -87,6 +87,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	log.Printf("Initialized cgroup: %v", cgb)
 	r := &runner.Runner{
 		Builder:       b,
 		Queue:         q,
@@ -102,26 +103,12 @@ func main() {
 		}()
 	}
 
-	retryTime := 3 * time.Second
-	input := make(chan job, 64)
-	output := make(chan Model, 64)
-
-	// start run loop
-	go runLoop(input, output, q)
-
-	// start ws loop
-	go func() {
-		for {
-			j, err := dialWS(os.Getenv(envWebURL))
-			if err != nil {
-				log.Println("ws:", err)
-				time.Sleep(retryTime)
-				continue
-			}
-			log.Println("ws connected")
-			judgerLoop(j, input, output)
-		}
-	}()
+	j := &judger.Judger{
+		Client:  c,
+		Sender:  q,
+		Builder: &dumbBuilder{},
+	}
+	go j.Loop(done)
 
 	sig := make(chan os.Signal, 1)
 	signal.Notify(sig, os.Interrupt)
@@ -130,64 +117,6 @@ func main() {
 	log.Println("interrupted")
 	close(done)
 	wg.Wait()
-}
-
-type dumbLang struct{}
-
-func (l *dumbLang) Get(n string, t language.Type) language.ExecParam {
-	var d Language
-	json.NewDecoder(strings.NewReader(n)).Decode(&d)
-	switch t {
-	case language.TypeCompile:
-		return language.ExecParam{
-			Args:              strings.Split(d.CompileCmd, " "),
-			Env:               compileEnv,
-			SourceFileName:    d.SourceFileName,
-			CompiledFileNames: strings.Split(d.Executables, " "),
-			TimeLimit:         10 * uint64(time.Millisecond),
-			MemoryLimit:       512 << 10,
-			ProcLimit:         100,
-			OutputLimit:       64 << 10,
-		}
-	case language.TypeExec:
-		// java, go, node needs more threads.. need a better way
-		// may be add cpu bandwidth on cgroup..
-		var procLimit uint64 = 1
-		switch d.Name {
-		case "java":
-			procLimit = 25
-		case "go":
-			procLimit = 12
-		case "javascript":
-			procLimit = 12
-		}
-		return language.ExecParam{
-			Args:              strings.Split(d.RunCmd, " "),
-			Env:               runEnv,
-			SourceFileName:    d.SourceFileName,
-			CompiledFileNames: strings.Split(d.Executables, " "),
-			ProcLimit:         procLimit,
-		}
-	}
-	return language.ExecParam{}
-}
-
-func judgerLoop(j *judger, input chan job, output chan Model) {
-	for {
-		select {
-		case <-j.disconnet:
-			log.Println("ws disconneted")
-			return
-
-		case s := <-j.submit:
-			log.Println("input: ", s)
-			input <- s
-
-		case o := <-output:
-			log.Println("output: ", o)
-			j.update <- o
-		}
-	}
 }
 
 type credGen struct {
