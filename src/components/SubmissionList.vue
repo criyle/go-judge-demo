@@ -1,8 +1,6 @@
 <template>
   <div class="submission-list-container md-content">
-    <md-list
-      class="md-elevation-1"
-    >
+    <md-list class="md-elevation-1">
       <md-list-item
         md-expand
         v-for="s in submission"
@@ -42,13 +40,16 @@
             ></property-view>
           </div>
           <div class="info">
-            <code-view 
+            <code-view
               label="code"
               :value="s.source"
               :language="s.language.name"
             ></code-view>
           </div>
-          <template v-for="u in s.results">
+          <div
+            v-for="(u, index) in s.results"
+            :key="index"
+          >
             <md-divider></md-divider>
             <div class="info properties">
               <property-view
@@ -61,7 +62,7 @@
               ></property-view>
             </div>
             <div class="info">
-              <code-view 
+              <code-view
                 v-if="u.stdin"
                 label="stdin"
                 :value="u.stdin"
@@ -86,7 +87,7 @@
                 language="text"
               ></code-view>
             </div>
-          </template>
+          </div>
         </div>
       </md-list-item>
     </md-list>

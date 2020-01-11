@@ -1,8 +1,8 @@
 <template>
-  <div 
+  <div
     class="code"
     :data-lang="language"
-  >{{value}}</div>
+  >{{ value }}</div>
 </template>
 
 <script>

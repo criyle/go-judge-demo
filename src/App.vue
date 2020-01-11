@@ -1,14 +1,19 @@
 <template>
   <div id="app">
     <md-toolbar class="toolbar">
-      <router-link to="/"><h3 class="md-title">GO Judger</h3></router-link>
+      <router-link to="/">
+        <h3 class="md-title">GO Judger</h3>
+      </router-link>
       <md-tabs md-sync-route>
-        <md-tab md-label="Submissions" to="/submissions"></md-tab>
+        <md-tab
+          md-label="Submissions"
+          to="/submissions"
+        ></md-tab>
       </md-tabs>
     </md-toolbar>
     <div class="container">
       <keep-alive>
-        <router-view></router-view> 
+        <router-view></router-view>
       </keep-alive>
     </div>
   </div>

@@ -1,8 +1,8 @@
 <template>
-  <submission-list 
+  <submission-list
     :submission="submission"
-    @loadMore="loadMore">
-  </submission-list>
+    @loadMore="loadMore"
+  ></submission-list>
 </template>
 
 <script>

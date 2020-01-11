@@ -1,12 +1,10 @@
 <template>
   <div>
     <div style="display: flex">
-      <md-field
-        style="max-width: 240px"
-      >
+      <md-field style="max-width: 240px">
         <label>Language</label>
         <md-select v-model="selectedOption">
-          <md-option 
+          <md-option
             v-for="(option, name) in languageOptions"
             :key="name"
             :value="name"
@@ -16,8 +14,8 @@
         </md-select>
       </md-field>
       <div style="flex: 1 0 "></div>
-      <md-button 
-        class="md-raised" 
+      <md-button
+        class="md-raised"
         @click="submit"
       >Submit</md-button>
     </div>

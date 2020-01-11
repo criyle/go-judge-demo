@@ -1,7 +1,7 @@
 <template>
   <div>
     <div class="md-caption">{{label}}</div>
-    <monaco-highlighter 
+    <monaco-highlighter
       :value="value"
       :language="language"
     ></monaco-highlighter>

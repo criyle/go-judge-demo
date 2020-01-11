@@ -26,10 +26,10 @@ export default {
     this.$editor.dispose();
   },
   watch: {
-    language: function(newVal, oldVal) {
+    language: function(newVal) {
       monaco.editor.setModelLanguage(this.$editor.getModel(), newVal);
     },
-    value: function(newVal, oldVal) {
+    value: function(newVal) {
       const curVal = this.$editor.getValue();
       if (newVal !== curVal) {
         this.$editor.setValue(newVal);
