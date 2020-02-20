@@ -5,7 +5,10 @@ Under development...
 
 + Frontend: Vue.js
 + Backend: GO
++ Backend Refresher: Air
 + Judger Client: GO
+
+Benchmark (docker desktop on MacOS): 4 concurrent thread -> 172 op/s
 
 ## API
 

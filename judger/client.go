@@ -31,8 +31,8 @@ func (t *task) Param() *types.JudgeTask {
 			Code:     memfile.New("code", []byte(t.j.Source)),
 			Language: string(buff.Bytes()),
 		},
-		TileLimit:   1000,      // 1s
-		MemoryLimit: 256 << 10, // 256 M
+		TimeLimit:   time.Second, // 1s
+		MemoryLimit: 256 << 20,   // 256 M
 	}
 }
 
@@ -69,8 +69,8 @@ func (t *task) Finished(rt *types.JudgeResult) {
 		status = rt.SubTasks[0].Cases[0].ExecStatus.String()
 		for _, ca := range rt.SubTasks[0].Cases {
 			r = append(r, Result{
-				Time:   ca.Time,
-				Memory: ca.Memory,
+				Time:   uint64(ca.Time / time.Millisecond),
+				Memory: uint64(ca.Memory >> 10),
 				Stdin:  string(ca.Input),
 				Stdout: string(ca.UserOutput),
 				Stderr: string(ca.UserError),

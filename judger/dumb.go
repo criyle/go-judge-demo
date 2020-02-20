@@ -13,8 +13,8 @@ import (
 )
 
 const (
-	outputLimit = 64        // 64k
-	memoryLimit = 256 << 10 // 256m
+	outputLimit = 64 << 10  // 64k
+	memoryLimit = 256 << 20 // 256m
 	runDir      = "run"
 	pathEnv     = "PATH=/usr/local/bin:/usr/bin:/bin"
 	noCase      = 8
@@ -32,8 +32,8 @@ func (l *dumbLang) Get(n string, t language.Type) language.ExecParam {
 			Env:               compileEnv,
 			SourceFileName:    d.SourceFileName,
 			CompiledFileNames: strings.Split(d.Executables, " "),
-			TimeLimit:         10 * uint64(time.Millisecond),
-			MemoryLimit:       512 << 10,
+			TimeLimit:         10 * time.Second,
+			MemoryLimit:       512 << 20,
 			ProcLimit:         100,
 			OutputLimit:       64 << 10,
 		}
@@ -60,7 +60,7 @@ func (l *dumbLang) Get(n string, t language.Type) language.ExecParam {
 	return language.ExecParam{}
 }
 
-const total = 8
+const total = 500
 
 type dumbBuilder struct {
 }

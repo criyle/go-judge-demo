@@ -13,7 +13,7 @@ import (
 	"github.com/criyle/go-judge/judger"
 	"github.com/criyle/go-judge/runner"
 	"github.com/criyle/go-judge/taskqueue/channel"
-	"github.com/criyle/go-sandbox/daemon"
+	"github.com/criyle/go-sandbox/container"
 	"github.com/criyle/go-sandbox/pkg/cgroup"
 	"github.com/criyle/go-sandbox/pkg/mount"
 )
@@ -31,7 +31,7 @@ var (
 )
 
 func init() {
-	daemon.Init()
+	container.Init()
 }
 
 func main() {
@@ -77,7 +77,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	b := &daemon.Builder{
+	b := &container.Builder{
 		Root:          root,
 		Mounts:        m,
 		CredGenerator: newCredGen(),
