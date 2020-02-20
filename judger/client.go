@@ -31,8 +31,8 @@ func (t *task) Param() *types.JudgeTask {
 			Code:     memfile.New("code", []byte(t.j.Source)),
 			Language: string(buff.Bytes()),
 		},
-		TimeLimit:   time.Second, // 1s
-		MemoryLimit: 256 << 20,   // 256 M
+		TimeLimit:   time.Second / 10, // 1s
+		MemoryLimit: 256 << 20,        // 256 M
 	}
 }
 
@@ -58,7 +58,7 @@ func (t *task) Progressed(*types.ProgressProgressed) {
 	t.o <- Model{
 		ID:     t.j.ID,
 		Type:   "progress",
-		Status: fmt.Sprintf("Judging (%d / %d)", n, total),
+		Status: fmt.Sprintf("Judging (%d / %d)", n, noCase),
 	}
 }
 
@@ -68,13 +68,16 @@ func (t *task) Finished(rt *types.JudgeResult) {
 	if len(rt.SubTasks) > 0 {
 		status = rt.SubTasks[0].Cases[0].ExecStatus.String()
 		for _, ca := range rt.SubTasks[0].Cases {
+			if ca.ExecStatus != types.StatusAccepted {
+				status = ca.ExecStatus.String()
+			}
 			r = append(r, Result{
-				Time:   uint64(ca.Time / time.Millisecond),
+				Time:   uint64(ca.Time.Round(time.Millisecond) / time.Millisecond),
 				Memory: uint64(ca.Memory >> 10),
 				Stdin:  string(ca.Input),
 				Stdout: string(ca.UserOutput),
 				Stderr: string(ca.UserError),
-				Log:    string(ca.SPJOutput),
+				Log:    string(ca.SPJOutput) + ca.Error,
 			})
 		}
 	} else {

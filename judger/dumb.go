@@ -60,14 +60,12 @@ func (l *dumbLang) Get(n string, t language.Type) language.ExecParam {
 	return language.ExecParam{}
 }
 
-const total = 500
-
 type dumbBuilder struct {
 }
 
 func (b *dumbBuilder) Build([]file.File) (types.ProblemConfig, error) {
-	c := make([]types.Case, 0, total)
-	for i := 0; i < total; i++ {
+	c := make([]types.Case, 0, noCase)
+	for i := 0; i < noCase; i++ {
 		inputContent := strconv.Itoa(i) + " " + strconv.Itoa(i)
 		outputContent := strconv.Itoa(i + i)
 		c = append(c, types.Case{
