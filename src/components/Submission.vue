@@ -45,15 +45,15 @@ export default {
     const ws = new WebSocket(url);
     ws.addEventListener("message", event => {
       const data = JSON.parse(event.data);
-      const sub = this.submission.find(s => s.id === data.id);
-      if (sub) {
-        sub.status = data.status;
-        sub.date = data.date || sub.date;
-        sub.language = data.language || sub.language;
-        sub.results = data.results || sub.results;
-        this.submission = [...this.submission];
+      const idx = this.submission.findIndex(s => s.id === data.id);
+      if (idx >= 0) {
+        this.$set(this.submission, idx, {
+          ...this.submission[idx],
+          status: data.status,
+          results: data.results || this.submission[idx].results
+        });
       } else {
-        this.submission = [data, ...this.submission];
+        this.submission.unshift(data);
       }
     });
     this.$ws = ws;

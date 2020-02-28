@@ -5,6 +5,7 @@
         md-expand
         v-for="s in submission"
         :key="s.id"
+        :md-expanded.sync="s.expanded"
       >
         <div class="md-list-item-text list-item">
           <span>
@@ -13,7 +14,10 @@
           </span>
         </div>
         <div slot="md-expand">
-          <div class="info properties">
+          <div
+            v-if="s.expanded"
+            class="info properties"
+          >
             <property-view
               label="_id"
               :value="s.id"
@@ -46,46 +50,48 @@
               :language="s.language.name"
             ></code-view>
           </div>
-          <div
-            v-for="(u, index) in s.results"
-            :key="index"
-          >
-            <md-divider></md-divider>
-            <div class="info properties">
-              <property-view
-                label="cpu"
-                :value="u.time | cpu"
-              ></property-view>
-              <property-view
-                label="memory"
-                :value="u.memory | memory"
-              ></property-view>
-            </div>
-            <div class="info">
-              <code-view
-                v-if="u.stdin"
-                label="stdin"
-                :value="u.stdin"
-                language="text"
-              ></code-view>
-              <code-view
-                v-if="u.stdout"
-                label="stdout"
-                :value="u.stdout"
-                language="text"
-              ></code-view>
-              <code-view
-                v-if="u.stderr"
-                label="stderr"
-                :value="u.stderr"
-                language="text"
-              ></code-view>
-              <code-view
-                v-if="u.log"
-                label="log"
-                :value="u.log"
-                language="text"
-              ></code-view>
+          <div v-if="s.expanded">
+            <div
+              v-for="(u, index) in s.results"
+              :key="index"
+            >
+              <md-divider></md-divider>
+              <div class="info properties">
+                <property-view
+                  label="cpu"
+                  :value="u.time | cpu"
+                ></property-view>
+                <property-view
+                  label="memory"
+                  :value="u.memory | memory"
+                ></property-view>
+              </div>
+              <div class="info">
+                <code-view
+                  v-if="u.stdin"
+                  label="stdin"
+                  :value="u.stdin"
+                  language="text"
+                ></code-view>
+                <code-view
+                  v-if="u.stdout"
+                  label="stdout"
+                  :value="u.stdout"
+                  language="text"
+                ></code-view>
+                <code-view
+                  v-if="u.stderr"
+                  label="stderr"
+                  :value="u.stderr"
+                  language="text"
+                ></code-view>
+                <code-view
+                  v-if="u.log"
+                  label="log"
+                  :value="u.log"
+                  language="text"
+                ></code-view>
+              </div>
             </div>
           </div>
         </div>
