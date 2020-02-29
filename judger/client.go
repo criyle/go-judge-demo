@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/criyle/go-judge/client"
-	"github.com/criyle/go-judge/file/memfile"
+	"github.com/criyle/go-judge/file"
 	"github.com/criyle/go-judge/types"
 )
 
@@ -28,7 +28,7 @@ func (t *task) Param() *types.JudgeTask {
 
 	return &types.JudgeTask{
 		Code: types.SourceCode{
-			Code:     memfile.New("code", []byte(t.j.Source)),
+			Code:     file.NewMemFile("code", []byte(t.j.Source)),
 			Language: string(buff.Bytes()),
 		},
 		TimeLimit:   time.Second / 10, // 1s
@@ -68,8 +68,10 @@ func (t *task) Finished(rt *types.JudgeResult) {
 	if len(rt.SubTasks) > 0 {
 		status = rt.SubTasks[0].Cases[0].ExecStatus.String()
 		for _, ca := range rt.SubTasks[0].Cases {
+			var ex string
 			if ca.ExecStatus != types.StatusAccepted {
 				status = ca.ExecStatus.String()
+				ex = ca.ExecStatus.String()
 			}
 			r = append(r, Result{
 				Time:   uint64(ca.Time.Round(time.Millisecond) / time.Millisecond),
@@ -77,7 +79,7 @@ func (t *task) Finished(rt *types.JudgeResult) {
 				Stdin:  string(ca.Input),
 				Stdout: string(ca.UserOutput),
 				Stderr: string(ca.UserError),
-				Log:    string(ca.SPJOutput) + ca.Error,
+				Log:    string(ca.SPJOutput) + ca.Error + ex,
 			})
 		}
 	} else {

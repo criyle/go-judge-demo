@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/criyle/go-judge/file"
-	"github.com/criyle/go-judge/file/memfile"
 	"github.com/criyle/go-judge/language"
 	"github.com/criyle/go-judge/types"
 )
@@ -69,8 +68,8 @@ func (b *dumbBuilder) Build([]file.File) (types.ProblemConfig, error) {
 		inputContent := strconv.Itoa(i) + " " + strconv.Itoa(i)
 		outputContent := strconv.Itoa(i + i)
 		c = append(c, types.Case{
-			Input:  memfile.New("input", []byte(inputContent)),
-			Answer: memfile.New("output", []byte(outputContent)),
+			Input:  file.NewMemFile("input", []byte(inputContent)),
+			Answer: file.NewMemFile("output", []byte(outputContent)),
 		})
 	}
 
