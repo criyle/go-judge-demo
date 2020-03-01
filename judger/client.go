@@ -45,6 +45,7 @@ func (t *task) Parsed(c *types.ProblemConfig) {
 }
 
 func (t *task) Compiled(c *types.ProgressCompiled) {
+	log.Println(time.Now(), "compiled")
 	t.cmsg = c.Message
 	t.o <- Model{
 		ID:     t.j.ID,
@@ -63,6 +64,7 @@ func (t *task) Progressed(*types.ProgressProgressed) {
 }
 
 func (t *task) Finished(rt *types.JudgeResult) {
+	log.Println(time.Now(), "finished")
 	var r []Result
 	var status string
 	if len(rt.SubTasks) > 0 {
@@ -159,7 +161,7 @@ func judgerLoop(j *judgerWS, input chan job, output chan Model) {
 			input <- s
 
 		case o := <-output:
-			log.Println("output: ", o)
+			//log.Println("output: ", o)
 			j.update <- o
 		}
 	}

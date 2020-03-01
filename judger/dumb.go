@@ -16,7 +16,7 @@ const (
 	memoryLimit = 256 << 20 // 256m
 	runDir      = "run"
 	pathEnv     = "PATH=/usr/local/bin:/usr/bin:/bin"
-	noCase      = 8
+	noCase      = 10
 )
 
 type dumbLang struct{}
