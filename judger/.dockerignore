@@ -1,7 +1,0 @@
-.DS_Store
-
-# test files
-run
-.env.local
-env*.sh
-judger

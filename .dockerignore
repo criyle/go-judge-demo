@@ -1,0 +1,7 @@
+# Ignore everything
+**
+
+# Allow some of the file
+!go.mod
+!go.sum
+!judger/

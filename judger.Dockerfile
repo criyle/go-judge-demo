@@ -1,11 +1,14 @@
 FROM golang:latest AS builder
 
-COPY ./ /go/judger/
-
 WORKDIR /go/judger
 
-RUN go get -d  \
-    && go build -o /bin/judger
+COPY go.mod go.sum /go/judger/
+
+RUN go mod download
+
+COPY judger /go/judger/
+
+RUN go build -o /bin/judger
 
 FROM ubuntu:latest
 
@@ -18,8 +21,8 @@ RUN apt-get update && apt-get install -y \
     golang-go \
     && rm -rf /var/lib/apt/lists/*
 
-COPY --from=builder /bin/judger /bin/judger
+COPY --from=builder /bin/judger /opt/bin/judger
 
-WORKDIR /go/judger
+WORKDIR /opt/go/judger
 
-ENTRYPOINT ["/bin/judger"]
+ENTRYPOINT ["/opt/bin/judger"]

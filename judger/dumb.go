@@ -8,7 +8,7 @@ import (
 
 	"github.com/criyle/go-judge/file"
 	"github.com/criyle/go-judge/language"
-	"github.com/criyle/go-judge/types"
+	"github.com/criyle/go-judge/problem"
 )
 
 const (
@@ -16,7 +16,8 @@ const (
 	memoryLimit = 256 << 20 // 256m
 	runDir      = "run"
 	pathEnv     = "PATH=/usr/local/bin:/usr/bin:/bin"
-	noCase      = 10
+	noCase      = 5000
+	parallism   = 1
 )
 
 type dumbLang struct{}
@@ -62,21 +63,21 @@ func (l *dumbLang) Get(n string, t language.Type) language.ExecParam {
 type dumbBuilder struct {
 }
 
-func (b *dumbBuilder) Build([]file.File) (types.ProblemConfig, error) {
-	c := make([]types.Case, 0, noCase)
+func (b *dumbBuilder) Build([]file.File) (problem.Config, error) {
+	c := make([]problem.Case, 0, noCase)
 	for i := 0; i < noCase; i++ {
 		inputContent := strconv.Itoa(i) + " " + strconv.Itoa(i)
 		outputContent := strconv.Itoa(i + i)
-		c = append(c, types.Case{
+		c = append(c, problem.Case{
 			Input:  file.NewMemFile("input", []byte(inputContent)),
 			Answer: file.NewMemFile("output", []byte(outputContent)),
 		})
 	}
 
-	return types.ProblemConfig{
+	return problem.Config{
 		Type: "standard",
-		Subtasks: []types.SubTask{
-			types.SubTask{
+		Subtasks: []problem.SubTask{
+			problem.SubTask{
 				ScoringType: "sum",
 				Score:       100,
 				Cases:       c,

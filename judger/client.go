@@ -10,7 +10,8 @@ import (
 
 	"github.com/criyle/go-judge/client"
 	"github.com/criyle/go-judge/file"
-	"github.com/criyle/go-judge/types"
+	"github.com/criyle/go-judge/pkg/envexec"
+	"github.com/criyle/go-judge/problem"
 )
 
 type task struct {
@@ -22,12 +23,12 @@ type task struct {
 
 var _ client.Task = &task{}
 
-func (t *task) Param() *types.JudgeTask {
+func (t *task) Param() *client.JudgeTask {
 	var buff bytes.Buffer
 	json.NewEncoder(&buff).Encode(t.j.Lang)
 
-	return &types.JudgeTask{
-		Code: types.SourceCode{
+	return &client.JudgeTask{
+		Code: file.SourceCode{
 			Code:     file.NewMemFile("code", []byte(t.j.Source)),
 			Language: string(buff.Bytes()),
 		},
@@ -36,7 +37,7 @@ func (t *task) Param() *types.JudgeTask {
 	}
 }
 
-func (t *task) Parsed(c *types.ProblemConfig) {
+func (t *task) Parsed(c *problem.Config) {
 	t.o <- Model{
 		ID:     t.j.ID,
 		Type:   "progress",
@@ -44,7 +45,7 @@ func (t *task) Parsed(c *types.ProblemConfig) {
 	}
 }
 
-func (t *task) Compiled(c *types.ProgressCompiled) {
+func (t *task) Compiled(c *client.ProgressCompiled) {
 	log.Println(time.Now(), "compiled")
 	t.cmsg = c.Message
 	t.o <- Model{
@@ -54,7 +55,7 @@ func (t *task) Compiled(c *types.ProgressCompiled) {
 	}
 }
 
-func (t *task) Progressed(*types.ProgressProgressed) {
+func (t *task) Progressed(*client.ProgressProgressed) {
 	n := atomic.AddInt32(&t.c, 1)
 	t.o <- Model{
 		ID:     t.j.ID,
@@ -63,7 +64,7 @@ func (t *task) Progressed(*types.ProgressProgressed) {
 	}
 }
 
-func (t *task) Finished(rt *types.JudgeResult) {
+func (t *task) Finished(rt *client.JudgeResult) {
 	log.Println(time.Now(), "finished")
 	var r []Result
 	var status string
@@ -71,7 +72,7 @@ func (t *task) Finished(rt *types.JudgeResult) {
 		status = rt.SubTasks[0].Cases[0].ExecStatus.String()
 		for _, ca := range rt.SubTasks[0].Cases {
 			var ex string
-			if ca.ExecStatus != types.StatusAccepted {
+			if ca.ExecStatus != envexec.StatusAccepted {
 				status = ca.ExecStatus.String()
 				ex = ca.ExecStatus.String()
 			}

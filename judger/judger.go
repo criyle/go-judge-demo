@@ -15,7 +15,7 @@ import (
 
 	"github.com/criyle/go-judge/judger"
 	"github.com/criyle/go-judge/runner"
-	"github.com/criyle/go-judge/taskqueue/channel"
+	"github.com/criyle/go-judge/taskqueue"
 	"github.com/criyle/go-sandbox/container"
 	"github.com/criyle/go-sandbox/pkg/cgroup"
 	"github.com/criyle/go-sandbox/pkg/mount"
@@ -63,7 +63,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	q := channel.New()
+	q := taskqueue.NewChannelQueue(5120)
 	m, err := mount.NewBuilder().
 		// basic exec and lib
 		WithBind("/bin", "bin", true).
@@ -108,7 +108,7 @@ func main() {
 		CgroupBuilder: cgb,
 		Language:      &dumbLang{},
 	}
-	const parallism = 4
+
 	for i := 0; i < parallism; i++ {
 		wg.Add(1)
 		go func() {
