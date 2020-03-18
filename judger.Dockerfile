@@ -19,7 +19,7 @@ RUN apt-get update && apt-get install -y \
     openjdk-11-jdk \
     nodejs \
     golang-go \
-    php7.3-cli \
+    php-cli \
     ghc \
     rustc \
     ruby \
