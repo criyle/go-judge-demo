@@ -19,6 +19,14 @@ RUN apt-get update && apt-get install -y \
     openjdk-11-jdk \
     nodejs \
     golang-go \
+    php7.3-cli \
+    ghc \
+    rustc \
+    ruby \
+    node-typescript \
+    perl6 \
+    perl \
+    ocaml \
     && rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /bin/judger /opt/bin/judger

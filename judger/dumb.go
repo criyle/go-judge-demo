@@ -9,6 +9,7 @@ import (
 	"github.com/criyle/go-judge/file"
 	"github.com/criyle/go-judge/language"
 	"github.com/criyle/go-judge/problem"
+	"github.com/flynn/go-shlex"
 )
 
 const (
@@ -25,10 +26,30 @@ type dumbLang struct{}
 func (l *dumbLang) Get(n string, t language.Type) language.ExecParam {
 	var d Language
 	json.NewDecoder(strings.NewReader(n)).Decode(&d)
+
+	var (
+		compileEnv = []string{
+			pathEnv,
+		}
+		runEnv = []string{
+			pathEnv,
+		}
+	)
+	switch d.Name {
+	case "java":
+		// compileEnv = append(compileEnv, "LD_LIBRARY_PATH=/usr/lib/jvm/java-11-openjdk-amd64/lib/jli")
+		// runEnv = append(runEnv, "LD_LIBRARY_PATH=/usr/lib/jvm/java-11-openjdk-amd64/lib/jli")
+	case "go":
+		compileEnv = append(compileEnv, "GOCACHE=/tmp")
+	case "haskell":
+		// compileEnv = append(compileEnv, "LD_LIBRARY_PATH=/usr/lib/ghc")
+	}
+
 	switch t {
 	case language.TypeCompile:
+		args, _ := shlex.Split(d.CompileCmd)
 		return language.ExecParam{
-			Args:              strings.Split(d.CompileCmd, " "),
+			Args:              args,
 			Env:               compileEnv,
 			SourceFileName:    d.SourceFileName,
 			CompiledFileNames: strings.Split(d.Executables, " "),
@@ -44,13 +65,12 @@ func (l *dumbLang) Get(n string, t language.Type) language.ExecParam {
 		switch d.Name {
 		case "java":
 			procLimit = 25
-		case "go":
-			procLimit = 12
-		case "javascript":
+		case "go", "javascript", "typescript", "ruby", "csharp", "perl":
 			procLimit = 12
 		}
+		args, _ := shlex.Split(d.RunCmd)
 		return language.ExecParam{
-			Args:              strings.Split(d.RunCmd, " "),
+			Args:              args,
 			Env:               runEnv,
 			SourceFileName:    d.SourceFileName,
 			CompiledFileNames: strings.Split(d.Executables, " "),

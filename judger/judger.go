@@ -25,14 +25,6 @@ const (
 	envWebURL = "WEB_URL"
 )
 
-var (
-	compileEnv = []string{
-		pathEnv,
-		"GOCACHE=/tmp",
-	}
-	runEnv = []string{pathEnv}
-)
-
 var cpuprofile = flag.String("cpuprofile", "", "write cpu profile to file")
 var memprofile = flag.String("memprofile", "", "write memory profile to this file")
 
@@ -74,13 +66,17 @@ func main() {
 		// however, /proc gives interface like /proc/1/fd/3 ..
 		// it is fine since open that file will be a EPERM
 		// changing the fs uid and gid would be a good idea
+		// ghc want it as well
 		WithProc().
+		//WithBind("/proc/self/exe", "proc/self/exe", true).
 		// some compiler have multiple version
 		WithBind("/etc/alternatives", "etc/alternatives", true).
 		// fpc wants /etc/fpc.cfg
 		WithBind("/etc/fpc.cfg", "etc/fpc.cfg", true).
 		// go wants /dev/null
 		WithBind("/dev/null", "dev/null", false).
+		// ghc wants /var/lib/ghc
+		WithBind("/var/lib/ghc", "var/lib/ghc", true).
 		// work dir
 		WithTmpfs("w", "size=8m,nr_inodes=4k").
 		// tmp dir
