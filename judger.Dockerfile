@@ -12,6 +12,10 @@ RUN go build -o /bin/judger
 
 FROM ubuntu:latest
 
+ENV TZ=America/New_York
+
+ENV DEBIAN_FRONTEND=noninteractive
+
 RUN apt-get update && apt-get install -y \
     python2.7 \
     python3 \
