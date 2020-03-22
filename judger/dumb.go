@@ -6,9 +6,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/criyle/go-judge-client/language"
+	"github.com/criyle/go-judge-client/problem"
 	"github.com/criyle/go-judge/file"
-	"github.com/criyle/go-judge/language"
-	"github.com/criyle/go-judge/problem"
 	"github.com/flynn/go-shlex"
 )
 

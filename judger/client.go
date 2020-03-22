@@ -8,10 +8,10 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/criyle/go-judge/client"
+	"github.com/criyle/go-judge-client/client"
+	"github.com/criyle/go-judge-client/problem"
 	"github.com/criyle/go-judge/file"
 	"github.com/criyle/go-judge/pkg/envexec"
-	"github.com/criyle/go-judge/problem"
 )
 
 type task struct {

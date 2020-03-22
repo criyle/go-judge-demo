@@ -13,9 +13,9 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/criyle/go-judge/judger"
-	"github.com/criyle/go-judge/runner"
-	"github.com/criyle/go-judge/taskqueue"
+	"github.com/criyle/go-judge-client/judger"
+	"github.com/criyle/go-judge-client/runner"
+	"github.com/criyle/go-judge-client/taskqueue"
 	"github.com/criyle/go-sandbox/container"
 	"github.com/criyle/go-sandbox/pkg/cgroup"
 	"github.com/criyle/go-sandbox/pkg/mount"
