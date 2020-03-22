@@ -13,18 +13,18 @@
     "fibers": "^4.0.2",
     "moment": "^2.24.0",
     "monaco-editor": "^0.19.3",
-    "sass": "^1.26.2",
+    "sass": "^1.26.3",
     "vue": "^2.6.11",
     "vue-material": "^1.0.0-beta-11",
     "vue-router": "^3.1.6"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^3.12.1",
-    "@vue/cli-plugin-eslint": "^3.12.1",
+    "@vue/cli-plugin-eslint": "^4.2.3",
     "@vue/cli-service": "^4.2.3",
     "babel-eslint": "^10.1.0",
     "eslint": "^6.8.0",
-    "eslint-plugin-vue": "^6.2.1",
+    "eslint-plugin-vue": "^6.2.2",
     "node-sass": "^4.13.1",
     "sass-loader": "^8.0.2",
     "vue-template-compiler": "^2.6.11"

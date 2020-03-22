@@ -32,8 +32,8 @@ func (t *task) Param() *client.JudgeTask {
 			Code:     file.NewMemFile("code", []byte(t.j.Source)),
 			Language: string(buff.Bytes()),
 		},
-		TimeLimit:   time.Second, // 1s
-		MemoryLimit: 256 << 20,   // 256 M
+		TimeLimit:   3 * time.Second / 2, // 1.5s
+		MemoryLimit: 256 << 20,           // 256 M
 	}
 }
 

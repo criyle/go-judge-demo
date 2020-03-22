@@ -28,6 +28,7 @@ RUN apt-get update && apt-get install -y \
     rustc \
     ruby \
     node-typescript \
+    mono-mcs \
     perl6 \
     perl \
     ocaml \

@@ -78,9 +78,9 @@ func main() {
 		// ghc wants /var/lib/ghc
 		WithBind("/var/lib/ghc", "var/lib/ghc", true).
 		// work dir
-		WithTmpfs("w", "size=8m,nr_inodes=4k").
+		WithTmpfs("w", "size=16m,nr_inodes=4k").
 		// tmp dir
-		WithTmpfs("tmp", "size=8m,nr_inodes=4k").
+		WithTmpfs("tmp", "size=16m,nr_inodes=4k").
 		// finished
 		Build(true)
 

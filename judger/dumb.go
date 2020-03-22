@@ -53,7 +53,7 @@ func (l *dumbLang) Get(n string, t language.Type) language.ExecParam {
 			Env:               compileEnv,
 			SourceFileName:    d.SourceFileName,
 			CompiledFileNames: strings.Split(d.Executables, " "),
-			TimeLimit:         10 * time.Second,
+			TimeLimit:         20 * time.Second,
 			MemoryLimit:       512 << 20,
 			ProcLimit:         100,
 			OutputLimit:       64 << 10,
