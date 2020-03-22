@@ -75,6 +75,8 @@ func main() {
 		WithBind("/etc/fpc.cfg", "etc/fpc.cfg", true).
 		// go wants /dev/null
 		WithBind("/dev/null", "dev/null", false).
+		// javaScript wants /dev/urandom
+		WithBind("/dev/urandom", "dev/urandom", true).
 		// ghc wants /var/lib/ghc
 		WithBind("/var/lib/ghc", "var/lib/ghc", true).
 		// work dir
