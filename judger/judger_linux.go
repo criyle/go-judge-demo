@@ -5,6 +5,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	_ "net/http/pprof" // for pprof
 	"os"
 	"os/signal"
 	"runtime"

@@ -22,6 +22,7 @@ yarn-error.log*
 
 # Test Files
 judger/run
+*.lua
 
 # Editor directories and files
 .idea
