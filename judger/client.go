@@ -16,8 +16,9 @@ import (
 )
 
 var taskMetrics = prometheus.NewHistogramVec(prometheus.HistogramOpts{
-	Name: "judger_case_execute_time",
-	Help: "Time for single processed case",
+	Name:    "judger_case_execute_time",
+	Help:    "Time for single processed case",
+	Buckets: prometheus.ExponentialBuckets(time.Millisecond.Seconds(), 1.4, 30), // 1 ms -> 10s
 }, []string{"status"})
 
 func init() {
@@ -81,11 +82,11 @@ func (t *task) Finished(rt *client.JudgeResult) {
 	if len(rt.SubTasks) > 0 {
 		status = rt.SubTasks[0].Cases[0].ExecStatus.String()
 		for _, ca := range rt.SubTasks[0].Cases {
-			var ex string
+			var l string
 			if ca.ExecStatus != envexec.StatusAccepted {
 				status = ca.ExecStatus.String()
-				ex = ca.Error
-				log.Println(status, ex)
+				l = string(ca.SPJOutput) + " " + ca.Error
+				log.Println("error", status, l)
 			}
 			r = append(r, Result{
 				Time:   uint64(ca.Time.Round(time.Millisecond) / time.Millisecond),
@@ -93,7 +94,7 @@ func (t *task) Finished(rt *client.JudgeResult) {
 				Stdin:  string(ca.Input),
 				Stdout: string(ca.UserOutput),
 				Stderr: string(ca.UserError),
-				Log:    string(ca.SPJOutput) + " " + ca.Error + " " + ex,
+				Log:    l,
 			})
 			taskMetrics.With(prometheus.Labels{"status": status}).Observe(ca.Time.Seconds())
 		}
