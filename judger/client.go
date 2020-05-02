@@ -12,7 +12,17 @@ import (
 	"github.com/criyle/go-judge-client/problem"
 	"github.com/criyle/go-judge/file"
 	"github.com/criyle/go-judge/pkg/envexec"
+	"github.com/prometheus/client_golang/prometheus"
 )
+
+var taskMetrics = prometheus.NewHistogramVec(prometheus.HistogramOpts{
+	Name: "judger_case_execute_time",
+	Help: "Time for single processed case",
+}, []string{"status"})
+
+func init() {
+	prometheus.MustRegister(taskMetrics)
+}
 
 type task struct {
 	j    job
@@ -74,7 +84,8 @@ func (t *task) Finished(rt *client.JudgeResult) {
 			var ex string
 			if ca.ExecStatus != envexec.StatusAccepted {
 				status = ca.ExecStatus.String()
-				ex = ca.ExecStatus.String()
+				ex = ca.Error
+				log.Println(status, ex)
 			}
 			r = append(r, Result{
 				Time:   uint64(ca.Time.Round(time.Millisecond) / time.Millisecond),
@@ -82,8 +93,9 @@ func (t *task) Finished(rt *client.JudgeResult) {
 				Stdin:  string(ca.Input),
 				Stdout: string(ca.UserOutput),
 				Stderr: string(ca.UserError),
-				Log:    string(ca.SPJOutput) + ca.Error + ex,
+				Log:    string(ca.SPJOutput) + " " + ca.Error + " " + ex,
 			})
+			taskMetrics.With(prometheus.Labels{"status": status}).Observe(ca.Time.Seconds())
 		}
 	} else {
 		status = "compile failed"

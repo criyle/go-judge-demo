@@ -4,6 +4,7 @@ import (
 	"flag"
 	"io/ioutil"
 	"log"
+	"net/http"
 	"os"
 	"os/signal"
 	"runtime"
@@ -16,9 +17,11 @@ import (
 	"github.com/criyle/go-judge-client/judger"
 	"github.com/criyle/go-judge-client/runner"
 	"github.com/criyle/go-judge-client/taskqueue"
+	"github.com/criyle/go-judge/pkg/pool"
 	"github.com/criyle/go-sandbox/container"
 	"github.com/criyle/go-sandbox/pkg/cgroup"
 	"github.com/criyle/go-sandbox/pkg/mount"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 const (
@@ -45,6 +48,12 @@ func main() {
 		}
 		defer pprof.StopCPUProfile()
 	}
+
+	// collect metrics
+	go func() {
+		http.Handle("/metrics", promhttp.Handler())
+		http.ListenAndServe(":2112", nil)
+	}()
 
 	var wg sync.WaitGroup
 
@@ -99,12 +108,13 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	cb := pool.NewFakeCgroupPool(cgb)
+	bu := pool.NewEnvBuilder(b, cb)
 	log.Printf("Initialized cgroup: %v", cgb)
 	r := &runner.Runner{
-		Builder:       b,
-		Queue:         q,
-		CgroupBuilder: cgb,
-		Language:      &dumbLang{},
+		Builder:  bu,
+		Queue:    q,
+		Language: &dumbLang{},
 	}
 
 	for i := 0; i < parallism; i++ {

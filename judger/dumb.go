@@ -97,7 +97,7 @@ func (b *dumbBuilder) Build([]file.File) (problem.Config, error) {
 	return problem.Config{
 		Type: "standard",
 		Subtasks: []problem.SubTask{
-			problem.SubTask{
+			{
 				ScoringType: "sum",
 				Score:       100,
 				Cases:       c,
