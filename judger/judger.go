@@ -327,6 +327,7 @@ func judgeLoop(client pb.ExecutorClient, input <-chan job, output chan<- Model) 
 				ret := response.Results[0]
 				err = diff.Compare(bytes.NewBufferString(ansContent), bytes.NewBuffer(ret.Files["stdout"]))
 				if err != nil {
+					ret.Status = pb.Response_Result_WrongAnswer
 					runResult[i].Log = err.Error()
 				}
 				runResult[i].Time = ret.Time / 1e6
