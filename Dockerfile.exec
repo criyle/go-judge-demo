@@ -1,14 +1,15 @@
-FROM golang:latest AS builder
+# run this docker file under github.com/criyle/go-judge
+FROM golang:latest AS build 
 
-WORKDIR /go/judger
+WORKDIR /go/judge
 
-COPY go.mod go.sum /go/judger/
+COPY go.mod go.sum /go/judge/
 
 RUN go mod download
 
-COPY judger /go/judger/
+COPY ./ /go/judge
 
-RUN go build -o /bin/judger
+RUN go build -o executorserver ./cmd/executorserver
 
 FROM ubuntu:latest
 
@@ -34,8 +35,10 @@ RUN apt-get update && apt-get install -y \
     ocaml \
     && rm -rf /var/lib/apt/lists/*
 
-COPY --from=builder /bin/judger /opt/bin/judger
+WORKDIR /opt
 
-WORKDIR /opt/go/judger
+COPY --from=build /go/judge/executorserver /go/judge/mount.yaml /opt/
 
-ENTRYPOINT ["/opt/bin/judger"]
+EXPOSE 5050/tcp 5051/tcp
+
+ENTRYPOINT ["./executorserver"]
