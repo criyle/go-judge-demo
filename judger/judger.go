@@ -224,6 +224,15 @@ func judgeLoop(client pb.ExecutorClient, input <-chan job, output chan<- Model) 
 			Stderr: string(cRet.Files["stderr"]),
 		})
 
+		// remove exec file
+		defer func() {
+			for _, fid := range cRet.FileIDs {
+				client.FileDelete(context.TODO(), &pb.FileID{
+					FileID: fid,
+				})
+			}
+		}()
+
 		if cRet.Status != pb.Response_Result_Accepted {
 			output <- Model{
 				ID:      in.ID,
