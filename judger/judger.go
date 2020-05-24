@@ -204,11 +204,11 @@ func judgeSingle(client pb.ExecutorClient, in job, output chan<- Model) {
 	}
 	compileRet, err := client.Exec(context.TODO(), compileReq)
 	if err != nil {
-		output <- Model{ID: in.ID, Type: "finished", Status: fmt.Sprintf("Compile %v", err)}
+		output <- Model{ID: in.ID, Type: "finished", Status: fmt.Sprintf("Compile Error %v", err)}
 		return
 	}
 	if compileRet.Error != "" {
-		output <- Model{ID: in.ID, Type: "finished", Status: fmt.Sprintf("Compile %v", compileRet.Error)}
+		output <- Model{ID: in.ID, Type: "finished", Status: fmt.Sprintf("Compile Error %v", compileRet.Error)}
 		return
 	}
 	cRet := compileRet.Results[0]
@@ -332,7 +332,7 @@ func judgeSingle(client pb.ExecutorClient, in job, output chan<- Model) {
 			}
 			ret := response.Results[0]
 			err = diff.Compare(bytes.NewBufferString(ansContent), bytes.NewBuffer(ret.Files["stdout"]))
-			if err != nil {
+			if err != nil && ret.Status == pb.Response_Result_Accepted {
 				ret.Status = pb.Response_Result_WrongAnswer
 				runResult[i].Log = err.Error()
 			}
