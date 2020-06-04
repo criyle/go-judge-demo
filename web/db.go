@@ -56,6 +56,14 @@ type JudgerUpdate struct {
 	Results  []Result   `json:"results,omitempty"`
 }
 
+// ShellStore stores shell interaction
+type ShellStore struct {
+	ID *primitive.ObjectID `json:"id" bson:"_id,omitempty"`
+
+	Stdin  string `bson:"stdin"`
+	Stdout string `bson:"stdout"`
+}
+
 type db struct {
 	client   *mongo.Client
 	database *mongo.Database
@@ -63,6 +71,7 @@ type db struct {
 
 const (
 	colName         = "submission3"
+	colName2        = "shell1"
 	defaultURI      = "mongodb://localhost:27017/admin"
 	defaultDatabase = "test1"
 	envMongoURI     = "MONGODB_URI"
@@ -167,4 +176,10 @@ func (d *db) Query(id string) ([]Model, error) {
 		rt = append(rt, el)
 	}
 	return rt, nil
+}
+
+func (d *db) Store(ss *ShellStore) error {
+	c := d.database.Collection(colName2)
+	_, err := c.InsertOne(context.TODO(), ss)
+	return err
 }

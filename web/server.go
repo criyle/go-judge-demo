@@ -6,7 +6,9 @@ import (
 	"os"
 	"time"
 
+	"github.com/criyle/go-judge/pb"
 	"github.com/gorilla/websocket"
+	"google.golang.org/grpc"
 )
 
 var upgrader = websocket.Upgrader{}
@@ -21,6 +23,17 @@ func main() {
 	// connect to database
 	db := getDB()
 
+	grpcAddr := "localhost:5051"
+	if s := os.Getenv("GRPC_SERVER"); s != "" {
+		grpcAddr = s
+	}
+
+	conn, err := grpc.Dial(grpcAddr, grpc.WithInsecure())
+	if err != nil {
+		log.Fatalln("client", err)
+	}
+	client := pb.NewExecutorClient(conn)
+
 	// creates client hub
 	ch := newClientHub()
 	go ch.loop()
@@ -30,6 +43,10 @@ func main() {
 	jh := newJudgerHub(db, ch)
 	go jh.loop()
 	http.HandleFunc("/jws", jh.handleJudgerWS)
+
+	// creates shell handle
+	sh := &shell{db: db, client: client}
+	http.HandleFunc("/shell", sh.handleShellWS)
 
 	// REST api
 	a := api{db: db, judgerHub: jh}

@@ -3,6 +3,7 @@ import VueRouter from 'vue-router';
 
 import OnlineJudger from './components/OnlineJudger.vue';
 import Submission from './components/Submission.vue';
+import Terminal from './components/Terminal.vue';
 
 Vue.use(VueRouter);
 
@@ -14,6 +15,10 @@ const routes = [
     {
         path: '/submissions',
         component: Submission,
+    },
+    {
+        path: '/terminal',
+        component: Terminal,
     },
     {
         path: '*',

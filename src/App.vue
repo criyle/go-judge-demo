@@ -9,6 +9,10 @@
           md-label="Submissions"
           to="/submissions"
         ></md-tab>
+        <md-tab
+          md-label="Terminal"
+          to="/terminal"
+        ></md-tab>
       </md-tabs>
     </md-toolbar>
     <div class="container">
