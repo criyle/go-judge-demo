@@ -73,18 +73,30 @@ func (sc *shellCoon) writeLoop() {
 	defer ticker.Stop()
 
 	for {
-		b, ok := <-sc.write
-		sc.output = append(sc.output, b...)
-		if !ok {
-			return
+		select {
+		case b, ok := <-sc.write:
+			sc.conn.SetWriteDeadline(time.Now().Add(writeWait))
+			if !ok {
+				sc.conn.WriteMessage(websocket.CloseMessage, nil)
+				return
+			}
+			sc.output = append(sc.output, b...)
+
+			writer, err := sc.conn.NextWriter(websocket.TextMessage)
+			if err != nil {
+				log.Println("shell write", err)
+				return
+			}
+			writer.Write(b)
+			writer.Close()
+
+		case <-ticker.C:
+			sc.conn.SetWriteDeadline(time.Now().Add(writeWait))
+			if err := sc.conn.WriteMessage(websocket.PingMessage, nil); err != nil {
+				return
+			}
 		}
-		writer, err := sc.conn.NextWriter(websocket.TextMessage)
-		if err != nil {
-			log.Println("shell write", err)
-			return
-		}
-		writer.Write(b)
-		writer.Close()
+
 	}
 }
 
