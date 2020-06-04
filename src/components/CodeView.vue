@@ -9,7 +9,7 @@
 </template>
 
 <script>
-import MonacoHighlighter from "./MonacoHighlighter.vue";
+const MonacoHighlighter = () => import("./MonacoHighlighter.vue");
 
 export default {
   name: "CodeView",

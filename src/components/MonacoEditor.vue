@@ -12,7 +12,7 @@ export default {
     value: String,
     language: String
   },
-  mounted: function() {
+  mounted() {
     this.$editor = monaco.editor.create(this.$el, {
       value: this.value,
       language: this.language,
@@ -22,7 +22,7 @@ export default {
       this.$emit("input", this.$editor.getValue());
     });
   },
-  beforeDestory: function() {
+  beforeDestory() {
     this.$editor.dispose();
   },
   watch: {

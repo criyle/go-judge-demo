@@ -50,7 +50,7 @@
 </template>
 
 <script>
-import MonacoEditor from "./MonacoEditor.vue";
+const MonacoEditor = () => import("./MonacoEditor.vue");
 import axios from "axios";
 import router from "../routes.js";
 

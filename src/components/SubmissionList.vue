@@ -10,7 +10,9 @@
         <div class="md-list-item-text list-item">
           <span>
             <span class="status">{{(s.status)}}</span>
-            <span>{{s.date | date}}</span>
+            <span>
+              <Date :date="s.date" />
+            </span>
           </span>
         </div>
         <div slot="md-expand">
@@ -107,13 +109,15 @@
 <script>
 import CodeView from "./CodeView.vue";
 import PropertyView from "./PropertyView";
+const Date = () => import("./Date.vue");
 
 export default {
   name: "SubmissionList",
   props: ["submission"],
   components: {
     CodeView,
-    PropertyView
+    PropertyView,
+    Date
   }
 };
 </script>
