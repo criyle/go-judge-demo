@@ -5,3 +5,13 @@
 !go.mod
 !go.sum
 !judger/
+
+!package.json
+!package-lock.json 
+!babel.config.js
+!vue.config.js 
+!webpack.config.js 
+!src
+!web
+!public
+

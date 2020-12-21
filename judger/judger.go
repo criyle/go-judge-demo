@@ -37,7 +37,6 @@ const (
 	runDir      = "run"
 	pathEnv     = "PATH=/usr/local/bin:/usr/bin:/bin"
 	noCase      = 6
-	parallism   = 2
 )
 
 var (

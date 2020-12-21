@@ -221,7 +221,6 @@ var (
 					File: &pb.Request_File_StreamIn{
 						StreamIn: &pb.Request_StreamInput{
 							Name: "i",
-							Tty:  true,
 						},
 					},
 				},
@@ -244,6 +243,7 @@ var (
 			RealCPULimit: uint64(sessionLimit),
 			MemoryLimit:  memoryLimit,
 			ProcLimit:    procLimit,
+			Tty:          true,
 		}},
 	}
 )
