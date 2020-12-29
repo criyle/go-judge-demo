@@ -1,0 +1,103 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+
+package pb;
+
+option go_package = "github.com/criyle/go-judger-demo/pb";
+
+service DemoBackend {
+  rpc Submission(SubmissionRequest) returns(SubmissionResponse);
+  rpc Submit(SubmitRequest) returns(SubmitResponse);
+  rpc Updates(google.protobuf.Empty) returns(stream JudgeUpdate);
+  rpc Judge(stream JudgeClientResponse) returns(stream JudgeClientRequest);
+  rpc Shell(stream ShellInput) returns(stream ShellOutput);
+};
+
+message SubmissionRequest { string id = 1; }
+
+message SubmissionResponse { repeated Submission submissions = 1; }
+
+message Submission {
+  string id = 1;
+  Language language = 2;
+  string source = 3;
+  google.protobuf.Timestamp date = 4;
+  string status = 5;
+  uint64 totalTime = 6; // ms
+  uint64 maxMemory = 7; // kb
+  repeated Result results = 8;
+}
+
+message Language {
+  string name = 1;
+  string sourceFileName = 2;
+  string compileCmd = 3;
+  string executables = 4;
+  string runCmd = 5;
+}
+
+message Result {
+  uint64 time = 1;   // ms
+  uint64 memory = 2; // kb
+  string stdin = 3;
+  string stdout = 4;
+  string stderr = 5;
+  string log = 6;
+}
+
+message SubmitRequest {
+  Language language = 1;
+  string source = 2;
+}
+
+message SubmitResponse { string id = 1; }
+
+message JudgeUpdate {
+  string id = 1;
+  string type = 2;
+  string status = 3;
+  google.protobuf.Timestamp date = 4;
+  Language language = 5;
+  repeated Result results = 6;
+  string source = 7;
+}
+
+message JudgeClientRequest {
+  string id = 1;
+  Language language = 2;
+  string source = 3;
+}
+
+message JudgeClientResponse {
+  string id = 1;
+  string type = 2;
+  string status = 3;
+  google.protobuf.Timestamp date = 4;
+  Language language = 5;
+  repeated Result results = 6;
+  string source = 7;
+}
+
+message Input {
+  bytes content = 1;
+}
+
+message Resize {
+  uint32 rows = 1;
+  uint32 cols = 2;
+  uint32 x = 3;
+  uint32 y = 4;
+}
+
+message ShellInput {
+  oneof request {
+    Input input = 1;
+    Resize resize = 2;
+  }
+}
+
+message ShellOutput {
+  bytes content = 2;
+}

@@ -1,23 +1,22 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 // const WebpackCdnPlugin = require('webpack-cdn-plugin');
+const httpProxyMiddleware = require('http-proxy-middleware');
 
 module.exports = {
   lintOnSave: false,
   devServer: {
     proxy: {
-      '/ws': {
-        target: 'http://localhost:5000/',
-        ws: true,
-        changeOrigin: false,
-      },
-      '/shell': {
-        target: 'http://localhost:5000/',
-        ws: true,
-        changeOrigin: false,
-      },
       '/api/*': {
         target: 'http://localhost:5000',
       }
+    },
+    after(app) {
+      const wsProxy = httpProxyMiddleware({
+        target: 'http://localhost:5000/',
+        ws: true,
+        changeOrigin: false,
+      });
+      app.use('/api/ws/judge', wsProxy);
     }
   },
   configureWebpack: {

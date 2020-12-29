@@ -41,7 +41,7 @@ export default {
       document.domain +
       ":" +
       location.port +
-      "/ws";
+      "/api/ws/judge";
     const ws = new WebSocket(url);
     ws.addEventListener("message", event => {
       const data = JSON.parse(event.data);

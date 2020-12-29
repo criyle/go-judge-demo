@@ -1,0 +1,21 @@
+FROM golang:latest AS builder
+
+WORKDIR /build
+
+COPY go.mod go.sum ./
+
+RUN go mod download
+
+COPY pb pb
+
+COPY demoserver demoserver 
+
+RUN go build -o /bin/demoserver ./demoserver
+
+FROM ubuntu:latest
+
+COPY --from=builder /bin/demoserver /demoserver
+
+WORKDIR /
+
+ENTRYPOINT ["/demoserver"]

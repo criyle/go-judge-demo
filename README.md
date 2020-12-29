@@ -1,18 +1,89 @@
 # go-sandbox-demo
 
-A simple demo site for the [go-sandbox](https://github.com/criyle/go-sandbox), deployed on [heroku](https://go-judger.herokuapp.com).
+A simple demo site for the [go-judge](https://github.com/criyle/go-judge), deployed on [heroku](https://go-judger.herokuapp.com).
 Under development...
 
+Components:
+
 + Frontend: Vue.js
++ APIGateway: GO
 + Backend: GO
-+ Backend Refresher: Air
 + Judger Client: GO
++ Dev Server Compiler: Air
 
-Benchmark (docker desktop on MacOS): 4 concurrent thread -> 172 op/s
+## API Gateway
 
-## API
+### Interface
 
-### Database Model
+- GET /api/submission?id=_id: Query history submissions
+- POST /api/submit: Submit judge request
+- WS /api/ws/judge: Broadcast judge updates
+- WS /api/ws/shell: Interactive shell
+- GET /: SPA HTML & JS -> /dist
+
+## Backend
+
+Token-based gRPC
+
+- submission(id)
+- submit(request)
+- updates(): stream judge updates
+- judge(): stream for judge client
+- shell(): stream for interactive shell
+
+default ports: 
+
+- gRPC: `:5081`
+- metrics: `:5082`
+
+## Judge Client
+
+Connect to backend with judge()
+
+-metrics: `:2112`
+
+## Development
+
+```bash
+# front end
+npm run serve
+# apigateway 
+air
+# demoserver
+air -c .air.demoserver.conf
+# judger
+air -c .air.judger.conf
+# mongoDB
+docker run -p 27017:27017 mongo
+# exec server
+air
+```
+
+## Docker build
+
+```bash
+docker build -t apigateway -f Dockerfile.apigateway .
+docker build -t judger -f Dockerfile.judger .
+docker build -t demoserver -f Dockerfile.demoserver .
+
+docker build -t judger_exec -f Dockerfile.test .
+```
+
+## Docker run
+
+```bash
+docker run --name mongo -d -p 27017:27017 mongo
+
+docker run --name demo --link mongo -d -e TOKEN=token -e GRPC_ADDR=:6081 -e MONGODB_URI=mongodb://mongo:27017/admin -e RELEASE=1 -p 6081:6081 -p 5082:5082 demoserver
+
+docker run --name apigateway --link demo -d -e TOKEN=token -e DEMO_SERVER=demo:6081 -e RELEASE=1 -p 5000:5000 apigateway
+
+docker run --name exec -d --privileged -e ES_AUTH_TOKEN=token -e ES_ENABLE_GRPC=1 -e ES_ENABLE_METRICS=1 -e ES_ENABLE_DEBUG=1 -e ES_GRPC_ADDR=:6051 -e ES_HTTP_ADDR=:6050 -p 6051:6051 -p 6050:6050 judger_exec
+
+docker run --name judger --link exec --link demo -d -e TOKEN=token -e DEMO_SERVER=demo:6081 -e EXEC_SERVER=exec:6051 -e RELEASE=1 -p 2112:2112 judger
+```
+
+## Data Model
 
 Language:
 
@@ -26,7 +97,7 @@ Language:
 }
 ```
 
-Model:
+Result:
 
 ``` json
 {
@@ -50,9 +121,7 @@ Model:
 }
 ```
 
-### Rest API
-
-#### POST /api/submit
+### POST /api/submit
 
 Request:
 
@@ -81,6 +150,7 @@ S -> C:
   "status": "<status>",
   "date": "<date>",
   "language": "language name",
+  "results": "results[]"
 }
 ```
 

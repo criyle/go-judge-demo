@@ -64,8 +64,13 @@ type ShellStore struct {
 	Stdout string `bson:"stdout"`
 }
 
+// ClientSubmit is the job submit model uploaded by client ws
+type ClientSubmit struct {
+	Lang   Language `json:"language"`
+	Source string   `json:"source"`
+}
+
 type db struct {
-	client   *mongo.Client
 	database *mongo.Database
 }
 
@@ -74,7 +79,6 @@ const (
 	colName2        = "shell1"
 	defaultURI      = "mongodb://localhost:27017/admin"
 	defaultDatabase = "test1"
-	envMongoURI     = "MONGODB_URI"
 )
 
 func getDB() *db {
@@ -101,12 +105,11 @@ func getDB() *db {
 		return nil
 	}
 	return &db{
-		client:   client,
 		database: client.Database(database),
 	}
 }
 
-func (d *db) Add(cs *ClientSubmit) (*Model, error) {
+func (d *db) Add(ctx context.Context, cs *ClientSubmit) (*Model, error) {
 	c := d.database.Collection(colName)
 	t := time.Now()
 	m := &Model{
@@ -114,7 +117,7 @@ func (d *db) Add(cs *ClientSubmit) (*Model, error) {
 		Source: cs.Source,
 		Date:   &t,
 	}
-	i, err := c.InsertOne(nil, m)
+	i, err := c.InsertOne(ctx, m)
 	if err != nil {
 		return nil, err
 	}
@@ -123,7 +126,7 @@ func (d *db) Add(cs *ClientSubmit) (*Model, error) {
 	return m, nil
 }
 
-func (d *db) Update(m *JudgerUpdate) (*JudgerUpdate, error) {
+func (d *db) Update(ctx context.Context, m *JudgerUpdate) (*JudgerUpdate, error) {
 	c := d.database.Collection(colName)
 
 	filter := bson.D{{Key: "_id", Value: m.ID}}
@@ -135,14 +138,14 @@ func (d *db) Update(m *JudgerUpdate) (*JudgerUpdate, error) {
 		{Key: "$set", Value: update},
 	}
 
-	_, err := c.UpdateOne(nil, filter, updateCmd)
+	_, err := c.UpdateOne(ctx, filter, updateCmd)
 	if err != nil {
 		return nil, err
 	}
 	return m, nil
 }
 
-func (d *db) Query(id string) ([]Model, error) {
+func (d *db) Query(ctx context.Context, id string) ([]Model, error) {
 	c := d.database.Collection(colName)
 
 	findOption := options.Find()
@@ -161,7 +164,7 @@ func (d *db) Query(id string) ([]Model, error) {
 		})
 	}
 
-	cursor, err := c.Find(nil, filter, findOption)
+	cursor, err := c.Find(ctx, filter, findOption)
 	if err != nil {
 		return nil, err
 	}
@@ -178,8 +181,8 @@ func (d *db) Query(id string) ([]Model, error) {
 	return rt, nil
 }
 
-func (d *db) Store(ss *ShellStore) error {
+func (d *db) Store(ctx context.Context, ss *ShellStore) error {
 	c := d.database.Collection(colName2)
-	_, err := c.InsertOne(context.TODO(), ss)
+	_, err := c.InsertOne(ctx, ss)
 	return err
 }

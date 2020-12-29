@@ -12,15 +12,17 @@ RUN npm run build
 
 FROM golang:latest AS backend
 
-WORKDIR /web
+WORKDIR /build
 
 COPY go.mod go.sum ./
 
 RUN go mod download
 
-COPY web ./web
+COPY pb pb
 
-RUN go build -o /bin/web ./web
+COPY apigateway apigateway
+
+RUN go build -o /bin/apigateway ./apigateway
 
 FROM ubuntu:latest
 
@@ -28,6 +30,6 @@ WORKDIR /web
 
 COPY --from=frontend /app/dist ./dist
 
-COPY --from=backend /bin/web ./web
+COPY --from=backend /bin/apigateway ./apigateway
 
-ENTRYPOINT ["./web"]
+ENTRYPOINT ["./apigateway"]

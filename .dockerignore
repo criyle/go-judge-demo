@@ -1,17 +1,3 @@
-# Ignore everything
-**
-
-# Allow some of the file
-!go.mod
-!go.sum
-!judger/
-
-!package.json
-!package-lock.json 
-!babel.config.js
-!vue.config.js 
-!webpack.config.js 
-!src
-!web
-!public
-
+dist/
+node_modules/
+tmp/

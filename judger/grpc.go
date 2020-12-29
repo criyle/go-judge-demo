@@ -3,14 +3,8 @@ package main
 import (
 	"bytes"
 	"context"
-	"flag"
 	"fmt"
 	"log"
-	"net/http"
-	_ "net/http/pprof" // for pprof
-	"os"
-	"os/signal"
-	"runtime/pprof"
 	"strconv"
 	"strings"
 	"sync/atomic"
@@ -18,141 +12,104 @@ import (
 
 	"github.com/criyle/go-judge-client/pkg/diff"
 	"github.com/criyle/go-judge/pb"
+	demopb "github.com/criyle/go-judger-demo/pb"
 	"github.com/flynn/go-shlex"
-	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
-	"github.com/prometheus/client_golang/prometheus"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"golang.org/x/sync/errgroup"
-	"google.golang.org/grpc"
 )
 
-const (
-	envWebURL        = "WEB_URL"
-	envExecServerURL = "EXEC_SERVER_ADDR"
-)
+type judger struct {
+	execClient pb.ExecutorClient
+	demoClient demopb.DemoBackendClient
 
-const (
-	outputLimit = 64 << 10  // 64k
-	memoryLimit = 256 << 20 // 256m
-	runDir      = "run"
-	pathEnv     = "PATH=/usr/local/bin:/usr/bin:/bin"
-	noCase      = 6
-)
-
-var (
-	taskHist = prometheus.NewHistogramVec(prometheus.HistogramOpts{
-		Name:    "judger_task_execute_time_seconds",
-		Help:    "Time for whole processed case",
-		Buckets: prometheus.ExponentialBuckets(time.Millisecond.Seconds(), 1.4, 30), // 1 ms -> 10s
-	}, []string{"status"})
-
-	taskSummry = prometheus.NewSummaryVec(prometheus.SummaryOpts{
-		Name:       "judger_task_execute_time",
-		Help:       "Summary for the whole process case time",
-		Objectives: map[float64]float64{0.5: 0.05, 0.9: 0.01, 0.99: 0.001},
-	}, []string{"status"})
-)
-
-func init() {
-	prometheus.MustRegister(taskHist, taskSummry)
+	request  chan *demopb.JudgeClientRequest
+	response chan *demopb.JudgeClientResponse
 }
 
-var env = []string{
-	pathEnv,
-	"HOME=/tmp",
-}
+func newJudger(execClient pb.ExecutorClient, demoClient demopb.DemoBackendClient) *judger {
+	return &judger{
+		execClient: execClient,
+		demoClient: demoClient,
 
-var cpuprofile = flag.String("cpuprofile", "", "write cpu profile to file")
-
-func main() {
-	flag.Parse()
-	if *cpuprofile != "" {
-		f, err := os.Create(*cpuprofile)
-		if err != nil {
-			log.Fatal("could not create CPU profile: ", err)
-		}
-		defer f.Close() // error handling omitted for example
-		if err := pprof.StartCPUProfile(f); err != nil {
-			log.Fatal("could not start CPU profile: ", err)
-		}
-		defer pprof.StopCPUProfile()
+		request:  make(chan *demopb.JudgeClientRequest, 64),
+		response: make(chan *demopb.JudgeClientResponse, 64),
 	}
+}
 
-	// collect metrics
+func (j *judger) Start() {
+	go j.demoLoop()
+	go j.judgeLoop()
+}
+
+func (j *judger) demoLoop() {
+	for {
+		logger.Sugar().Info("connect to demo")
+		j.reportLoop()
+		logger.Sugar().Info("disconnected to demo")
+		time.Sleep(5 * time.Second)
+	}
+}
+
+func (j *judger) reportLoop() error {
+	ctx, cancel := context.WithCancel(context.TODO())
+	defer cancel()
+
+	r, err := j.demoClient.Judge(ctx)
+	if err != nil {
+		return err
+	}
+	// read loop
 	go func() {
-		http.Handle("/metrics", promhttp.Handler())
-		http.ListenAndServe(":2112", nil)
+		for {
+			req, err := r.Recv()
+			logger.Sugar().Debug("request:", req)
+			if err != nil {
+				cancel()
+				return
+			}
+			j.request <- req
+		}
 	}()
 
-	execServer := "localhost:5051"
-	if e := os.Getenv(envExecServerURL); e != "" {
-		execServer = e
-	}
+	// write loop
+	go func() {
+		for {
+			select {
+			case <-ctx.Done():
+				return
 
-	conn, err := grpc.Dial(execServer, grpc.WithInsecure(),
-		grpc.WithUnaryInterceptor(grpc_prometheus.UnaryClientInterceptor),
-		grpc.WithStreamInterceptor(grpc_prometheus.StreamClientInterceptor),
-	)
-	if err != nil {
-		log.Fatalln("client", err)
-	}
-	client := pb.NewExecutorClient(conn)
-
-	input := make(chan job, 64)
-	output := make(chan Model, 64)
-
-	go judgeLoop(client, input, output)
-	go clientLoop(input, output)
-
-	sig := make(chan os.Signal, 1)
-	signal.Notify(sig, os.Interrupt)
-	<-sig
-
-	log.Println("interrupted")
-}
-
-func clientLoop(input chan<- job, output <-chan Model) {
-	for {
-		j, err := dialWS(os.Getenv(envWebURL))
-		if err != nil {
-			log.Println("ws:", err)
-			time.Sleep(time.Second * 3)
-			continue
+			case resp := <-j.response:
+				logger.Sugar().Debug("response:", resp)
+				if err := r.Send(resp); err != nil {
+					cancel()
+					return
+				}
+			}
 		}
-		connLoop(j, input, output)
-	}
+	}()
+	<-ctx.Done()
+	return nil
 }
 
-func connLoop(j *judgerWS, input chan<- job, output <-chan Model) {
+func (j *judger) judgeLoop() {
 	for {
-		select {
-		case <-j.disconnet:
-			log.Println("ws: disconnected")
-			return
-
-		case s := <-j.submit:
-			log.Println("ws: input", s)
-			input <- s
-
-		case o := <-output:
-			j.update <- o
-		}
+		req := <-j.request
+		j.judgeSingle(req)
 	}
 }
 
-func judgeSingle(client pb.ExecutorClient, in job, output chan<- Model) {
+func (j *judger) judgeSingle(req *demopb.JudgeClientRequest) {
 	sTime := time.Now()
 
-	output <- Model{
-		ID:     in.ID,
+	j.response <- &demopb.JudgeClientResponse{
+		Id:     req.Id,
 		Type:   "progress",
 		Status: "Compiling",
 	}
 
 	// Compile
-	args, err := shlex.Split(in.Lang.CompileCmd)
+	args, err := shlex.Split(req.Language.CompileCmd)
 	if err != nil {
-		output <- Model{ID: in.ID, Type: "finished", Status: fmt.Sprintf("Invalid CompileCmd %v", err)}
+		j.response <- &demopb.JudgeClientResponse{Id: req.Id, Type: "finished", Status: fmt.Sprintf("Invalid CompileCmd %v", err)}
 		return
 	}
 	compileReq := &pb.Request{
@@ -189,31 +146,31 @@ func judgeSingle(client pb.ExecutorClient, in job, output chan<- Model) {
 			MemoryLimit:  memoryLimit,
 			ProcLimit:    50,
 			CopyIn: map[string]*pb.Request_File{
-				in.Lang.SourceFileName: {
+				req.Language.SourceFileName: {
 					File: &pb.Request_File_Memory{
 						Memory: &pb.Request_MemoryFile{
-							Content: []byte(in.Source),
+							Content: []byte(req.Source),
 						},
 					},
 				},
 			},
 			CopyOut:       []string{"stdout", "stderr"},
-			CopyOutCached: strings.Split(in.Lang.Executables, " "),
+			CopyOutCached: strings.Split(req.Language.Executables, " "),
 		}},
 	}
-	compileRet, err := client.Exec(context.TODO(), compileReq)
+	compileRet, err := j.execClient.Exec(context.TODO(), compileReq)
 	if err != nil {
-		output <- Model{ID: in.ID, Type: "finished", Status: fmt.Sprintf("Compile Error %v", err)}
+		j.response <- &demopb.JudgeClientResponse{Id: req.Id, Type: "finished", Status: fmt.Sprintf("Compile Error %v", err)}
 		return
 	}
 	if compileRet.Error != "" {
-		output <- Model{ID: in.ID, Type: "finished", Status: fmt.Sprintf("Compile Error %v", compileRet.Error)}
+		j.response <- &demopb.JudgeClientResponse{Id: req.Id, Type: "finished", Status: fmt.Sprintf("Compile Error %v", compileRet.Error)}
 		return
 	}
 	cRet := compileRet.Results[0]
-	var result []Result
-	result = append(result, Result{
-		Time:   cRet.Time / 1e6,
+	var result []*demopb.Result
+	result = append(result, &demopb.Result{
+		Time:   uint64(time.Duration(cRet.Time).Round(time.Millisecond) / time.Millisecond),
 		Memory: cRet.Memory >> 10,
 		Stdout: string(cRet.Files["stdout"]),
 		Stderr: string(cRet.Files["stderr"]),
@@ -223,15 +180,15 @@ func judgeSingle(client pb.ExecutorClient, in job, output chan<- Model) {
 	defer func() {
 		log.Println("file delete", cRet.FileIDs)
 		for _, fid := range cRet.FileIDs {
-			client.FileDelete(context.TODO(), &pb.FileID{
+			j.execClient.FileDelete(context.TODO(), &pb.FileID{
 				FileID: fid,
 			})
 		}
 	}()
 
 	if cRet.Status != pb.Response_Result_Accepted {
-		output <- Model{
-			ID:      in.ID,
+		j.response <- &demopb.JudgeClientResponse{
+			Id:      req.Id,
 			Type:    "finished",
 			Status:  fmt.Sprintf("Compile %v", compileRet.Error),
 			Results: result,
@@ -239,15 +196,18 @@ func judgeSingle(client pb.ExecutorClient, in job, output chan<- Model) {
 		return
 	}
 
-	output <- Model{
-		ID:     in.ID,
+	j.response <- &demopb.JudgeClientResponse{
+		Id:     req.Id,
 		Type:   "progress",
 		Status: "Compiled",
 	}
 
 	var completed int32
 
-	runResult := make([]Result, noCase)
+	runResult := make([]*demopb.Result, noCase)
+	for i := range runResult {
+		runResult[i] = new(demopb.Result)
+	}
 	runStatus := make([]pb.Response_Result_StatusType, noCase)
 	var eg errgroup.Group
 	for i := 0; i < noCase; i++ {
@@ -260,7 +220,7 @@ func judgeSingle(client pb.ExecutorClient, in job, output chan<- Model) {
 				}
 			}()
 
-			args, err := shlex.Split(in.Lang.RunCmd)
+			args, err := shlex.Split(req.Language.RunCmd)
 			if err != nil {
 				return err
 			}
@@ -269,7 +229,7 @@ func judgeSingle(client pb.ExecutorClient, in job, output chan<- Model) {
 			// java, go, node needs more threads.. need a better way
 			// may be add cpu bandwidth on cgroup..
 			var procLimit uint64 = 1
-			switch in.Lang.Name {
+			switch req.Language.Name {
 			case "java":
 				procLimit = 25
 			case "go", "javascript", "typescript", "ruby", "csharp", "perl":
@@ -322,7 +282,7 @@ func judgeSingle(client pb.ExecutorClient, in job, output chan<- Model) {
 					CopyOut:      []string{"stdout", "stderr"},
 				}},
 			}
-			response, err := client.Exec(context.TODO(), execReq)
+			response, err := j.execClient.Exec(context.TODO(), execReq)
 			if err != nil {
 				return err
 			}
@@ -343,8 +303,8 @@ func judgeSingle(client pb.ExecutorClient, in job, output chan<- Model) {
 			runStatus[i] = ret.Status
 
 			n := atomic.AddInt32(&completed, 1)
-			output <- Model{
-				ID:     in.ID,
+			j.response <- &demopb.JudgeClientResponse{
+				Id:     req.Id,
 				Type:   "progress",
 				Status: fmt.Sprintf("Judging (%d / %d)", n, noCase),
 			}
@@ -367,18 +327,10 @@ func judgeSingle(client pb.ExecutorClient, in job, output chan<- Model) {
 	taskHist.WithLabelValues(status.String()).Observe(t.Seconds())
 	taskSummry.WithLabelValues(status.String()).Observe(t.Seconds())
 
-	output <- Model{
-		ID:      in.ID,
+	j.response <- &demopb.JudgeClientResponse{
+		Id:      req.Id,
 		Type:    "finished",
 		Status:  status.String(),
 		Results: result,
-	}
-}
-
-func judgeLoop(client pb.ExecutorClient, input <-chan job, output chan<- Model) {
-	for {
-		// received
-		in := <-input
-		judgeSingle(client, in, output)
 	}
 }

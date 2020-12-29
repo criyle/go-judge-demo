@@ -1,19 +1,21 @@
 FROM golang:latest AS builder
 
-WORKDIR /go/judger
+WORKDIR /build
 
-COPY go.mod go.sum /go/judger/
+COPY go.mod go.sum ./
 
 RUN go mod download
 
-COPY judger /go/judger/
+COPY pb pb
 
-RUN go build -o /bin/judger
+COPY judger judger 
+
+RUN go build -o /bin/judger ./judger
 
 FROM ubuntu:latest
 
-COPY --from=builder /bin/judger /opt/bin/judger
+COPY --from=builder /bin/judger /judger
 
-WORKDIR /opt/go/judger
+WORKDIR /
 
-ENTRYPOINT ["/opt/bin/judger"]
+ENTRYPOINT ["/judger"]
