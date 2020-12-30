@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"log"
 	"strconv"
 	"strings"
 	"sync/atomic"
@@ -178,7 +177,6 @@ func (j *judger) judgeSingle(req *demopb.JudgeClientRequest) {
 
 	// remove exec file
 	defer func() {
-		log.Println("file delete", cRet.FileIDs)
 		for _, fid := range cRet.FileIDs {
 			j.execClient.FileDelete(context.TODO(), &pb.FileID{
 				FileID: fid,

@@ -1,8 +1,11 @@
 package main
 
 import (
+	"bytes"
 	"context"
+	"time"
 
+	execpb "github.com/criyle/go-judge/pb"
 	"github.com/criyle/go-judger-demo/pb"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.uber.org/zap"
@@ -14,6 +17,7 @@ type demoServer struct {
 	pb.UnimplementedDemoBackendServer
 	db     *db
 	logger *zap.Logger
+	client execpb.ExecutorClient
 
 	submit chan *pb.JudgeClientRequest
 	update chan *pb.JudgeClientResponse
@@ -23,10 +27,11 @@ type demoServer struct {
 	observers  map[*observer]bool
 }
 
-func newDemoServer(db *db, logger *zap.Logger) *demoServer {
+func newDemoServer(db *db, client execpb.ExecutorClient, logger *zap.Logger) *demoServer {
 	ds := &demoServer{
 		db:         db,
 		logger:     logger,
+		client:     client,
 		submit:     make(chan *pb.JudgeClientRequest, 64),
 		update:     make(chan *pb.JudgeClientResponse, 64),
 		register:   make(chan *observer, 64),
@@ -107,6 +112,8 @@ func (s *demoServer) Judge(js pb.DemoBackend_JudgeServer) error {
 			resp, err := js.Recv()
 			s.logger.Sugar().Info("judge response: ", req, err)
 			if err != nil {
+				// If encouters error, do not consume this
+				s.submit <- req
 				return err
 			}
 			s.update <- resp
@@ -140,6 +147,102 @@ func (s *demoServer) Updates(_ *emptypb.Empty, us pb.DemoBackend_UpdatesServer) 
 }
 
 func (s *demoServer) Shell(ss pb.DemoBackend_ShellServer) error {
+	ctx, cancel := context.WithCancel(ss.Context())
+	defer cancel()
+
+	sc, err := s.client.ExecStream(ctx)
+	if err != nil {
+		return err
+	}
+	err = sc.Send(&execpb.StreamRequest{
+		Request: &execpb.StreamRequest_ExecRequest{
+			ExecRequest: &execpb.Request{
+				Cmd: []*execpb.Request_CmdType{{
+					Args: []string{"/bin/bash"},
+					Env:  []string{"PATH=/usr/local/bin:/usr/bin:/bin", "HOME=/w", "TERM=xterm-256color"},
+					Files: []*execpb.Request_File{
+						{File: &execpb.Request_File_StreamIn{StreamIn: &execpb.Request_StreamInput{Name: "i"}}},
+						{File: &execpb.Request_File_StreamOut{StreamOut: &execpb.Request_StreamOutput{Name: "o"}}},
+						{File: &execpb.Request_File_StreamOut{StreamOut: &execpb.Request_StreamOutput{Name: "o"}}},
+					},
+					Tty:          true,
+					CPULimit:     uint64(30 * time.Second),
+					RealCPULimit: uint64(30 * time.Minute),
+					MemoryLimit:  256 << 20,
+					ProcLimit:    50,
+				}},
+			},
+		},
+	})
+	if err != nil {
+		return err
+	}
+	input := new(bytes.Buffer)
+	output := new(bytes.Buffer)
+
+	go func() {
+		defer cancel()
+
+		for {
+			msg, err := sc.Recv()
+			s.logger.Sugar().Debug("sc recv: ", msg)
+			if err != nil {
+				return
+			}
+			switch msg := msg.Response.(type) {
+			case *execpb.StreamResponse_ExecOutput:
+				output.Write(msg.ExecOutput.Content)
+				err = ss.Send(&pb.ShellOutput{Content: msg.ExecOutput.Content})
+				if err != nil {
+					return
+				}
+
+			case *execpb.StreamResponse_ExecResponse:
+				err = ss.Send(&pb.ShellOutput{Content: []byte(msg.ExecResponse.String())})
+				if err != nil {
+					return
+				}
+				return
+			}
+		}
+	}()
+
+	go func() {
+		defer cancel()
+
+		for {
+			msg, err := ss.Recv()
+			s.logger.Sugar().Debug("ss recv: ", msg)
+			if err != nil {
+				return
+			}
+			switch msg := msg.Request.(type) {
+			case *pb.ShellInput_Input:
+				input.Write(msg.Input.Content)
+				err = sc.Send(&execpb.StreamRequest{Request: &execpb.StreamRequest_ExecInput{ExecInput: &execpb.StreamRequest_Input{
+					Name: "i", Content: msg.Input.Content,
+				}}})
+				if err != nil {
+					return
+				}
+
+			case *pb.ShellInput_Resize:
+				err = sc.Send(&execpb.StreamRequest{Request: &execpb.StreamRequest_ExecResize{ExecResize: &execpb.StreamRequest_Resize{
+					Name: "i",
+					Rows: msg.Resize.Rows,
+					Cols: msg.Resize.Cols,
+					X:    msg.Resize.X,
+					Y:    msg.Resize.Y,
+				}}})
+			}
+		}
+	}()
+	<-ctx.Done()
+
+	s.db.Store(context.TODO(), &ShellStore{
+		Stdin:  input.String(),
+		Stdout: output.String(),
+	})
 	return nil
 }
 

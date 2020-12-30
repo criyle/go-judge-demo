@@ -2,17 +2,17 @@ package main
 
 import (
 	"context"
-	"flag"
 	"log"
 	"net/http"
 	_ "net/http/pprof" // for pprof
 	"os"
 	"os/signal"
-	"runtime/pprof"
 	"time"
 
 	execpb "github.com/criyle/go-judge/pb"
 	demopb "github.com/criyle/go-judger-demo/pb"
+	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
+	grpc_zap "github.com/grpc-ecosystem/go-grpc-middleware/logging/zap"
 	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -46,8 +46,6 @@ var env = []string{
 }
 
 var (
-	cpuprofile = flag.String("cpuprofile", "", "write cpu profile to file")
-
 	taskHist = prometheus.NewHistogramVec(prometheus.HistogramOpts{
 		Name:    "judger_task_execute_time_seconds",
 		Help:    "Time for whole processed case",
@@ -68,8 +66,6 @@ func init() {
 }
 
 func main() {
-	flag.Parse()
-
 	_, release := os.LookupEnv(envRelease)
 	var err error
 	if release {
@@ -81,18 +77,6 @@ func main() {
 	}
 	if err != nil {
 		log.Fatalln("init logger", err)
-	}
-
-	if *cpuprofile != "" {
-		f, err := os.Create(*cpuprofile)
-		if err != nil {
-			log.Fatal("could not create CPU profile: ", err)
-		}
-		defer f.Close() // error handling omitted for example
-		if err := pprof.StartCPUProfile(f); err != nil {
-			log.Fatal("could not start CPU profile: ", err)
-		}
-		defer pprof.StopCPUProfile()
 	}
 
 	// collect metrics
@@ -142,8 +126,15 @@ func createDemoClient(execServer, token string) demopb.DemoBackendClient {
 
 func createGRPCConnection(addr, token string) (*grpc.ClientConn, error) {
 	opts := []grpc.DialOption{grpc.WithInsecure(),
-		grpc.WithUnaryInterceptor(grpc_prometheus.UnaryClientInterceptor),
-		grpc.WithStreamInterceptor(grpc_prometheus.StreamClientInterceptor)}
+		grpc.WithUnaryInterceptor(grpc_middleware.ChainUnaryClient(
+			grpc_prometheus.UnaryClientInterceptor,
+			grpc_zap.UnaryClientInterceptor(logger),
+		)),
+		grpc.WithStreamInterceptor(
+			grpc_middleware.ChainStreamClient(
+				grpc_prometheus.StreamClientInterceptor,
+				grpc_zap.StreamClientInterceptor(logger),
+			))}
 	if token != "" {
 		opts = append(opts, grpc.WithPerRPCCredentials(newTokenAuth(token)))
 	}

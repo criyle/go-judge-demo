@@ -12,6 +12,9 @@ import (
 	ginzap "github.com/gin-contrib/zap"
 	"github.com/gin-gonic/contrib/static"
 	"github.com/gin-gonic/gin"
+	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
+	grpc_zap "github.com/grpc-ecosystem/go-grpc-middleware/logging/zap"
+	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 	"google.golang.org/grpc"
@@ -47,7 +50,16 @@ func main() {
 		srvAddr = e
 	}
 
-	opts := []grpc.DialOption{grpc.WithInsecure()}
+	opts := []grpc.DialOption{grpc.WithInsecure(),
+		grpc.WithUnaryInterceptor(grpc_middleware.ChainUnaryClient(
+			grpc_prometheus.UnaryClientInterceptor,
+			grpc_zap.UnaryClientInterceptor(logger),
+		)),
+		grpc.WithStreamInterceptor(
+			grpc_middleware.ChainStreamClient(
+				grpc_prometheus.StreamClientInterceptor,
+				grpc_zap.StreamClientInterceptor(logger),
+			))}
 	if token != "" {
 		opts = append(opts, grpc.WithPerRPCCredentials(newTokenAuth(token)))
 	}
@@ -71,6 +83,8 @@ func main() {
 	wsGroup := r.Group("/api/ws")
 	ju := newJudgeUpdater(client, logger)
 	ju.Register(wsGroup)
+	sh := &shellHandle{client: client, logger: logger}
+	sh.Register(wsGroup)
 
 	addr := ":5000"
 	if port := os.Getenv("PORT"); port != "" {

@@ -9,6 +9,7 @@ import (
 	"os"
 	"os/signal"
 
+	execpb "github.com/criyle/go-judge/pb"
 	"github.com/criyle/go-judger-demo/pb"
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	grpc_auth "github.com/grpc-ecosystem/go-grpc-middleware/auth"
@@ -20,14 +21,16 @@ import (
 	"go.uber.org/zap/zapcore"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/status"
 )
 
 const (
-	envGRPCAddr = "GRPC_ADDR"
-	envToken    = "TOKEN"
-	envRelease  = "RELEASE"
-	envMongoURI = "MONGODB_URI"
+	envGRPCAddr   = "GRPC_ADDR"
+	envExecServer = "EXEC_SERVER"
+	envToken      = "TOKEN"
+	envRelease    = "RELEASE"
+	envMongoURI   = "MONGODB_URI"
 )
 
 func main() {
@@ -53,7 +56,12 @@ func main() {
 	if grpcAddr == "" {
 		grpcAddr = ":5081"
 	}
-	ds := newDemoServer(db, logger)
+	execServerAddr := os.Getenv(envExecServer)
+	if execServerAddr == "" {
+		execServerAddr = "localhost:5051"
+	}
+	execClient := createExecClient(execServerAddr, token, logger)
+	ds := newDemoServer(db, execClient, logger)
 
 	var grpcServer *grpc.Server
 	grpc_zap.ReplaceGrpcLoggerV2(logger)
@@ -114,4 +122,48 @@ func grpcTokenAuth(token string) func(context.Context) (context.Context, error) 
 		}
 		return ctx, nil
 	}
+}
+
+func createExecClient(execServer, token string, logger *zap.Logger) execpb.ExecutorClient {
+	conn, err := createGRPCConnection(execServer, token, logger)
+	if err != nil {
+		log.Fatalln("client", err)
+	}
+	return execpb.NewExecutorClient(conn)
+}
+
+func createGRPCConnection(addr, token string, logger *zap.Logger) (*grpc.ClientConn, error) {
+	opts := []grpc.DialOption{grpc.WithInsecure(),
+		grpc.WithUnaryInterceptor(grpc_middleware.ChainUnaryClient(
+			grpc_prometheus.UnaryClientInterceptor,
+			grpc_zap.UnaryClientInterceptor(logger),
+		)),
+		grpc.WithStreamInterceptor(
+			grpc_middleware.ChainStreamClient(
+				grpc_prometheus.StreamClientInterceptor,
+				grpc_zap.StreamClientInterceptor(logger),
+			))}
+	if token != "" {
+		opts = append(opts, grpc.WithPerRPCCredentials(newTokenAuth(token)))
+	}
+	return grpc.Dial(addr, opts...)
+}
+
+type tokenAuth struct {
+	token string
+}
+
+func newTokenAuth(token string) credentials.PerRPCCredentials {
+	return &tokenAuth{token: token}
+}
+
+// Return value is mapped to request headers.
+func (t *tokenAuth) GetRequestMetadata(ctx context.Context, in ...string) (map[string]string, error) {
+	return map[string]string{
+		"authorization": "Bearer " + t.token,
+	}, nil
+}
+
+func (*tokenAuth) RequireTransportSecurity() bool {
+	return false
 }

@@ -19,7 +19,7 @@ export default {
       document.domain +
       ":" +
       location.port +
-      "/shell";
+      "/api/ws/shell";
     this.$ws = new WebSocket(url);
 
     this.$ws.binaryType = "arraybuffer";

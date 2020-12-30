@@ -12,57 +12,64 @@ import axios from "axios";
 export default {
   name: "Submission",
   data: () => ({
-    submission: []
+    submission: [],
   }),
   components: {
-    SubmissionList
+    SubmissionList,
   },
   methods: {
     loadMore() {
       const p =
         this.submission.length > 0
           ? {
-              id: this.submission[this.submission.length - 1].id
+              id: this.submission[this.submission.length - 1].id,
             }
           : {};
       axios
         .get("/api/submission", {
-          params: p
+          params: p,
         })
-        .then(r => {
+        .then((r) => {
           this.submission.push(...r.data);
         });
-    }
+    },
+    createWS() {
+      const url =
+        (location.protocol == "https:" ? "wss" : "ws") +
+        "://" +
+        document.domain +
+        ":" +
+        location.port +
+        "/api/ws/judge";
+      const ws = new WebSocket(url);
+      ws.addEventListener("message", (event) => {
+        const data = JSON.parse(event.data);
+        const idx = this.submission.findIndex((s) => s.id === data.id);
+        if (idx >= 0) {
+          this.$set(this.submission, idx, {
+            ...this.submission[idx],
+            status: data.status,
+            results: data.results || this.submission[idx].results,
+          });
+        } else {
+          this.submission.unshift(data);
+        }
+      });
+      ws.addEventListener("close", (event) => {
+        // reconnect after 1000 ms
+        setTimeout(this.createWS, 1000);
+      });
+      this.$ws = ws;
+    },
   },
-  mounted: function() {
-    const url =
-      (location.protocol == "https:" ? "wss" : "ws") +
-      "://" +
-      document.domain +
-      ":" +
-      location.port +
-      "/api/ws/judge";
-    const ws = new WebSocket(url);
-    ws.addEventListener("message", event => {
-      const data = JSON.parse(event.data);
-      const idx = this.submission.findIndex(s => s.id === data.id);
-      if (idx >= 0) {
-        this.$set(this.submission, idx, {
-          ...this.submission[idx],
-          status: data.status,
-          results: data.results || this.submission[idx].results
-        });
-      } else {
-        this.submission.unshift(data);
-      }
-    });
-    this.$ws = ws;
+  mounted: function () {
+    this.createWS();
   },
-  created: function() {
+  created: function () {
     this.loadMore();
   },
-  beforeDestory: function() {
+  beforeDestory: function () {
     this.$ws.close();
-  }
+  },
 };
 </script>
