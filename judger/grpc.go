@@ -140,10 +140,10 @@ func (j *judger) judgeSingle(req *demopb.JudgeClientRequest) {
 					},
 				},
 			},
-			CPULimit:     uint64(10 * time.Second),
-			RealCPULimit: uint64(12 * time.Second),
-			MemoryLimit:  memoryLimit,
-			ProcLimit:    50,
+			CpuTimeLimit:   uint64(10 * time.Second),
+			ClockTimeLimit: uint64(12 * time.Second),
+			MemoryLimit:    memoryLimit,
+			ProcLimit:      50,
 			CopyIn: map[string]*pb.Request_File{
 				req.Language.SourceFileName: {
 					File: &pb.Request_File_Memory{
@@ -272,12 +272,12 @@ func (j *judger) judgeSingle(req *demopb.JudgeClientRequest) {
 							},
 						},
 					},
-					CPULimit:     uint64(3 * time.Second),
-					RealCPULimit: uint64(3 * time.Second),
-					MemoryLimit:  memoryLimit,
-					ProcLimit:    procLimit,
-					CopyIn:       copyin,
-					CopyOut:      []string{"stdout", "stderr"},
+					CpuTimeLimit:   uint64(3 * time.Second),
+					ClockTimeLimit: uint64(3 * time.Second),
+					MemoryLimit:    memoryLimit,
+					ProcLimit:      procLimit,
+					CopyIn:         copyin,
+					CopyOut:        []string{"stdout", "stderr"},
 				}},
 			}
 			response, err := j.execClient.Exec(context.TODO(), execReq)
