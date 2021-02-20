@@ -63,10 +63,10 @@ air
 
 ```bash
 docker build -t apigateway -f Dockerfile.apigateway .
-docker build -t judger -f Dockerfile.judger .
 docker build -t demoserver -f Dockerfile.demoserver .
 
-docker build -t judger_exec -f Dockerfile.test .
+docker build -t judger -f Dockerfile.judger .
+docker build -t judger_exec -f Dockerfile.exec .
 ```
 
 ## Docker run

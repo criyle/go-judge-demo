@@ -25,11 +25,10 @@ export default {
     this.$ws.binaryType = "arraybuffer";
 
     this.$ws.onmessage = ev => {
-      this.$terminal.write(ev.data);
+      this.$terminal.write(new Uint8Array(ev.data));
     };
 
     this.$terminal.onData(data => {
-      // console.log(JSON.stringify(data));
       this.$ws.send(data);
     });
 

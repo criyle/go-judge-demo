@@ -2,11 +2,14 @@ FROM criyle/executorserver:latest AS executorserver
 
 FROM ubuntu:latest
 
-ENV TZ=America/New_York
+ENV TZ=America/Vancouver
 
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get update && apt-get install -y \
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+    gcc \
+    g++ \
     python2.7 \
     python3 \
     fpc \
@@ -22,8 +25,11 @@ RUN apt-get update && apt-get install -y \
     perl6 \
     perl \
     ocaml \
-    && rm -rf /var/lib/apt/lists/*
-
+    vim \
+    nano \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/* 
+    
 WORKDIR /opt
 
 COPY --from=executorserver /opt/executorserver /opt/mount.yaml /opt/

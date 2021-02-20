@@ -106,7 +106,7 @@ func (s *shell) writeLoop() {
 				s.conn.WriteMessage(websocket.CloseMessage, nil)
 				return
 			}
-			err := s.conn.WriteMessage(websocket.TextMessage, msg.GetContent())
+			err := s.conn.WriteMessage(websocket.BinaryMessage, msg.GetContent())
 			if err != nil {
 				return
 			}
