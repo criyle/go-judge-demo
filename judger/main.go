@@ -33,7 +33,6 @@ const (
 )
 
 const (
-	outputLimit = 64 << 10  // 64k
 	memoryLimit = 256 << 20 // 256m
 	runDir      = "run"
 	pathEnv     = "PATH=/usr/local/bin:/usr/bin:/bin"

@@ -5,11 +5,11 @@ Under development...
 
 Components:
 
-+ Frontend: Vue.js
-+ APIGateway: GO
-+ Backend: GO
-+ Judger Client: GO
-+ Dev Server Compiler: Air
+- Frontend: Vue.js
+- APIGateway: GO
+- Backend: GO
+- Judger Client: GO
+- Dev Server Compiler: Air
 
 ## API Gateway
 
@@ -31,7 +31,7 @@ Token-based gRPC
 - judge(): stream for judge client
 - shell(): stream for interactive shell
 
-default ports: 
+default ports:
 
 - gRPC: `:5081`
 - metrics: `:5082`

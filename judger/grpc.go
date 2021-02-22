@@ -127,7 +127,7 @@ func (j *judger) judgeSingle(req *demopb.JudgeClientRequest) {
 					File: &pb.Request_File_Pipe{
 						Pipe: &pb.Request_PipeCollector{
 							Name: "stdout",
-							Max:  1024,
+							Max:  4096,
 						},
 					},
 				},
@@ -135,7 +135,7 @@ func (j *judger) judgeSingle(req *demopb.JudgeClientRequest) {
 					File: &pb.Request_File_Pipe{
 						Pipe: &pb.Request_PipeCollector{
 							Name: "stderr",
-							Max:  1024,
+							Max:  4096,
 						},
 					},
 				},
@@ -188,7 +188,7 @@ func (j *judger) judgeSingle(req *demopb.JudgeClientRequest) {
 		j.response <- &demopb.JudgeClientResponse{
 			Id:      req.Id,
 			Type:    "finished",
-			Status:  fmt.Sprintf("Compile %v", compileRet.Error),
+			Status:  fmt.Sprintf("Compile %v %v", cRet.Status.String(), compileRet.Error),
 			Results: result,
 		}
 		return
@@ -259,7 +259,7 @@ func (j *judger) judgeSingle(req *demopb.JudgeClientRequest) {
 							File: &pb.Request_File_Pipe{
 								Pipe: &pb.Request_PipeCollector{
 									Name: "stdout",
-									Max:  1024,
+									Max:  4096,
 								},
 							},
 						},
@@ -267,7 +267,7 @@ func (j *judger) judgeSingle(req *demopb.JudgeClientRequest) {
 							File: &pb.Request_File_Pipe{
 								Pipe: &pb.Request_PipeCollector{
 									Name: "stderr",
-									Max:  1024,
+									Max:  4096,
 								},
 							},
 						},
