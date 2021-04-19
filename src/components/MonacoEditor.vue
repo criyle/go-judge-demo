@@ -22,7 +22,7 @@ export default {
       this.$emit("input", this.$editor.getValue());
     });
   },
-  beforeDestory() {
+  beforeDestroy() {
     this.$editor.dispose();
   },
   watch: {

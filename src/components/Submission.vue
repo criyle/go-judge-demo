@@ -68,7 +68,7 @@ export default {
   created: function () {
     this.loadMore();
   },
-  beforeDestory: function () {
+  beforeDestroy: function () {
     this.$ws.close();
   },
 };
