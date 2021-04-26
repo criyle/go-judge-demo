@@ -273,7 +273,7 @@ func (j *judger) judgeSingle(req *demopb.JudgeClientRequest) {
 						},
 					},
 					CpuTimeLimit:   uint64(3 * time.Second),
-					ClockTimeLimit: uint64(3 * time.Second),
+					ClockTimeLimit: uint64(6 * time.Second),
 					MemoryLimit:    memoryLimit,
 					ProcLimit:      procLimit,
 					CopyIn:         copyin,

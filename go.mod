@@ -3,8 +3,8 @@ module github.com/criyle/go-judger-demo
 go 1.16
 
 require (
-	github.com/aws/aws-sdk-go v1.38.21 // indirect
-	github.com/criyle/go-judge v1.1.6
+	github.com/aws/aws-sdk-go v1.38.25 // indirect
+	github.com/criyle/go-judge v1.1.7
 	github.com/criyle/go-judge-client v0.1.1
 	github.com/flynn/go-shlex v0.0.0-20150515145356-3f9db97f8568
 	github.com/gin-contrib/zap v0.0.1
@@ -12,7 +12,7 @@ require (
 	github.com/gin-gonic/gin v1.7.1
 	github.com/golang/protobuf v1.5.2
 	github.com/gorilla/websocket v1.4.2
-	github.com/grpc-ecosystem/go-grpc-middleware v1.2.2
+	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0
 	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0
 	github.com/klauspost/compress v1.12.1 // indirect
 	github.com/prometheus/client_golang v1.10.0
