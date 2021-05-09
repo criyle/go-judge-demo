@@ -1,6 +1,6 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 // const WebpackCdnPlugin = require('webpack-cdn-plugin');
-const httpProxyMiddleware = require('http-proxy-middleware');
+const { createProxyMiddleware } = require('http-proxy-middleware');
 
 module.exports = {
   lintOnSave: false,
@@ -11,7 +11,7 @@ module.exports = {
       }
     },
     after(app) {
-      const wsProxy = httpProxyMiddleware({
+      const wsProxy = createProxyMiddleware({
         target: 'http://localhost:5000/',
         ws: true,
         changeOrigin: false,
