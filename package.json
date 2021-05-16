@@ -12,12 +12,12 @@
     "cache-loader": "^4.1.0",
     "core-js": "^3.12.1",
     "moment": "^2.29.1",
-    "monaco-editor": "^0.23.0",
-    "sass": "^1.32.12",
+    "monaco-editor": "^0.24.0",
+    "sass": "^1.32.13",
     "vue": "^2.6.12",
     "vue-material": "^1.0.0-beta-15",
     "vue-router": "^3.5.1",
-    "xterm": "^4.11.0"
+    "xterm": "^4.12.0"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^4.5.13",
