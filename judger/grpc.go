@@ -111,6 +111,13 @@ func (j *judger) judgeSingle(req *demopb.JudgeClientRequest) {
 		j.response <- &demopb.JudgeClientResponse{Id: req.Id, Type: "finished", Status: fmt.Sprintf("Invalid CompileCmd %v", err)}
 		return
 	}
+
+	copyOutFiles := strings.Split(req.Language.Executables, " ")
+	copyOut := make([]*pb.Request_CmdCopyOutFile, 0, len(copyOutFiles))
+	for _, f := range copyOutFiles {
+		copyOut = append(copyOut, &pb.Request_CmdCopyOutFile{Name: f})
+	}
+
 	compileReq := &pb.Request{
 		Cmd: []*pb.Request_CmdType{{
 			Args: args,
@@ -153,8 +160,8 @@ func (j *judger) judgeSingle(req *demopb.JudgeClientRequest) {
 					},
 				},
 			},
-			CopyOut:       []string{"stdout", "stderr"},
-			CopyOutCached: strings.Split(req.Language.Executables, " "),
+			CopyOut:       []*pb.Request_CmdCopyOutFile{{Name: "stdout"}, {Name: "stderr"}},
+			CopyOutCached: copyOut,
 		}},
 	}
 	compileRet, err := j.execClient.Exec(context.TODO(), compileReq)
@@ -277,7 +284,7 @@ func (j *judger) judgeSingle(req *demopb.JudgeClientRequest) {
 					MemoryLimit:    memoryLimit,
 					ProcLimit:      procLimit,
 					CopyIn:         copyin,
-					CopyOut:        []string{"stdout", "stderr"},
+					CopyOut:        []*pb.Request_CmdCopyOutFile{{Name: "stdout"}, {Name: "stderr"}},
 				}},
 			}
 			response, err := j.execClient.Exec(context.TODO(), execReq)

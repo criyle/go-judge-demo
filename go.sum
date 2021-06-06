@@ -100,8 +100,8 @@ github.com/creack/pty v1.1.7/go.mod h1:lj5s0c3V2DBrqTV7llrYr5NG6My20zk30Fl46Y7Do
 github.com/creack/pty v1.1.9/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ33E=
 github.com/creack/pty v1.1.13/go.mod h1:MOBLtS5ELjhRRrroQr9kyvTxUAFNvYEK993ew/Vr4O4=
 github.com/criyle/go-judge v0.3.0/go.mod h1:oI2hyCp63Tq2s0c/EvoB4S9drCRT1R90ZJMdUqkILGw=
-github.com/criyle/go-judge v1.1.10 h1:krEwNEO9BV+4tmvZYs1RpS7OiwLbTxximyOEFvCgaLo=
-github.com/criyle/go-judge v1.1.10/go.mod h1:NiAFj+dv7rCDk+HFfTkCtEtGdjQb/NSHiFet8+RrmzI=
+github.com/criyle/go-judge v1.2.0 h1:vS6z2DSHJzGGhRk2jEWR3knYMdqGqd/iTipey/VR6og=
+github.com/criyle/go-judge v1.2.0/go.mod h1:NiAFj+dv7rCDk+HFfTkCtEtGdjQb/NSHiFet8+RrmzI=
 github.com/criyle/go-judge-client v0.1.1 h1:ZNm3z2ILizq96TXGzgicnIVyQ0XN9t/WxFSXHhpYYfo=
 github.com/criyle/go-judge-client v0.1.1/go.mod h1:Kg7MTrtdC8AzxZtNyTbDsKEvMirWVMPqBSaAPxJFSrc=
 github.com/criyle/go-sandbox v0.3.1/go.mod h1:Dn0/RUjRolP3Swt3QkxOoF8zK7q6B2bB9nB73IEGlnI=

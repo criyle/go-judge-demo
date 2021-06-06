@@ -4,7 +4,7 @@ go 1.16
 
 require (
 	github.com/aws/aws-sdk-go v1.38.55 // indirect
-	github.com/criyle/go-judge v1.1.10
+	github.com/criyle/go-judge v1.2.0
 	github.com/criyle/go-judge-client v0.1.1
 	github.com/flynn/go-shlex v0.0.0-20150515145356-3f9db97f8568
 	github.com/gin-contrib/zap v0.0.1
