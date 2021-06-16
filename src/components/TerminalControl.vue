@@ -3,11 +3,12 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from "@vue/runtime-core";
 import { Terminal } from "xterm";
 import "xterm/css/xterm.css";
 
-export default {
+export default defineComponent({
   name: "TerminalControl",
   mounted() {
     this.$terminal = new Terminal();
@@ -36,9 +37,9 @@ export default {
     //   // console.log(data);
     // });
   },
-  beforeDestroy() {
+  beforeUnmount() {
     this.$ws.close();
     this.$terminal.dispose();
   }
-};
+});
 </script>

@@ -5,13 +5,16 @@
 </template>
 
 <script>
+import { defineAsyncComponent } from "@vue/runtime-core";
 // import TerminalControl from "./TerminalControl.vue";
-const TerminalControl = () => import("./TerminalControl.vue");
+const TerminalControl = defineAsyncComponent(() =>
+  import("./TerminalControl.vue")
+);
 
 export default {
   name: "Terminal",
   components: {
-    TerminalControl
-  }
+    TerminalControl,
+  },
 };
 </script>

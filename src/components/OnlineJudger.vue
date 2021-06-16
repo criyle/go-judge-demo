@@ -1,56 +1,61 @@
 <template>
   <div>
     <div style="display: flex">
-      <md-field style="max-width: 240px">
-        <label>Language</label>
-        <md-select v-model="selectedOption">
-          <md-option
-            v-for="(option, name) in languageOptions"
-            :key="name"
-            :value="name"
-          >
-            {{name}}
-          </md-option>
-        </md-select>
-      </md-field>
-      <div style="flex: 1 0 "></div>
-      <md-button
-        class="md-raised"
-        @click="submit"
-      >Submit</md-button>
+      <sui-dropdown
+        selection
+        button
+        floating
+        labeled
+        search
+        icon="world"
+        text="Language"
+        v-model="selectedOption"
+        :options="
+          Object.entries(languageOptions).map(([k, v]) => ({
+            text: v.name,
+            value: k,
+          }))
+        "
+      />
+      <div style="flex: 1 0"></div>
+      <sui-button @click="submit">Submit</sui-button>
     </div>
-    <div class="inputs">
-      <md-field class="input">
-        <label>Language Name</label>
-        <md-input v-model="language"></md-input>
-      </md-field>
-      <md-field class="input">
-        <label>Source File Name</label>
-        <md-input v-model="sourceFileName"></md-input>
-      </md-field>
-      <md-field class="input">
-        <label>Compile Cmd</label>
-        <md-input v-model="compileCmd"></md-input>
-      </md-field>
-      <md-field class="input">
-        <label>Executable File Name</label>
-        <md-input v-model="executables"></md-input>
-      </md-field>
-      <md-field class="input">
-        <label>Exec Cmd</label>
-        <md-input v-model="runCmd"></md-input>
-      </md-field>
-    </div>
-    <monaco-editor
-      class="code-editor-editor md-elevation-1 editor"
-      v-model="source"
-      :language="language"
-    ></monaco-editor>
+    <sui-form>
+      <div class="inputs">
+        <sui-form-field>
+          <label>Language Name</label>
+          <sui-input v-model="language" />
+        </sui-form-field>
+        <sui-form-field>
+          <label>Source File Name</label>
+          <sui-input v-model="sourceFileName" />
+        </sui-form-field>
+        <sui-form-field>
+          <label>Compile Cmd</label>
+          <sui-input v-model="compileCmd" />
+        </sui-form-field>
+        <sui-form-field>
+          <label>Executable File Name</label>
+          <sui-input v-model="executables" />
+        </sui-form-field>
+        <sui-form-field>
+          <label>Exec Cmd</label>
+          <sui-input v-model="runCmd" />
+        </sui-form-field>
+      </div>
+    </sui-form>
+    <sui-segment>
+      <monaco-editor
+        class="code-editor-editor editor"
+        v-model="source"
+        :language="language"
+      ></monaco-editor>
+    </sui-segment>
   </div>
 </template>
 
 <script>
-const MonacoEditor = () => import("./MonacoEditor.vue");
+import { defineAsyncComponent } from 'vue';
 import axios from "axios";
 import router from "../routes.js";
 
@@ -177,7 +182,7 @@ const languageOptions = {
     compileCmd: "/usr/bin/gcc -O2 -o a a.c",
     executables: "a",
     runCmd: "a",
-    defaultSource: cSource
+    defaultSource: cSource,
   },
   "c++": {
     name: "cpp",
@@ -185,7 +190,7 @@ const languageOptions = {
     compileCmd: "/usr/bin/g++ -O2 -std=c++11 -o a a.cc",
     executables: "a",
     runCmd: "a",
-    defaultSource: cppSource
+    defaultSource: cppSource,
   },
   go: {
     name: "go",
@@ -193,7 +198,7 @@ const languageOptions = {
     compileCmd: "/usr/bin/go build -o a a.go",
     executables: "a",
     runCmd: "a",
-    defaultSource: goSource
+    defaultSource: goSource,
   },
   javascript: {
     name: "javascript",
@@ -201,7 +206,7 @@ const languageOptions = {
     compileCmd: "/bin/echo compile",
     executables: "a.js",
     runCmd: "/usr/bin/node a.js",
-    defaultSource: nodeSource
+    defaultSource: nodeSource,
   },
   typescript: {
     name: "typescript",
@@ -209,7 +214,7 @@ const languageOptions = {
     compileCmd: "/usr/bin/tsc a.ts",
     executables: "a.js",
     runCmd: "/usr/bin/node a.js",
-    defaultSource: nodeSource
+    defaultSource: nodeSource,
   },
   java: {
     name: "java",
@@ -217,7 +222,7 @@ const languageOptions = {
     compileCmd: "/usr/bin/javac Main.java",
     executables: "Main.class",
     runCmd: "/usr/bin/java Main",
-    defaultSource: javaSource
+    defaultSource: javaSource,
   },
   pascal: {
     name: "pascal",
@@ -225,7 +230,7 @@ const languageOptions = {
     compileCmd: "/usr/bin/fpc -O2 a.pas",
     executables: "a",
     runCmd: "a",
-    defaultSource: pascalSource
+    defaultSource: pascalSource,
   },
   python2: {
     name: "python",
@@ -234,7 +239,7 @@ const languageOptions = {
       "/usr/bin/python -c \"import py_compile; py_compile.compile('a.py', 'a.pyc', doraise=True)\"",
     executables: "a.py a.pyc",
     runCmd: "/usr/bin/python2 a.py",
-    defaultSource: python2Source
+    defaultSource: python2Source,
   },
   python: {
     name: "python",
@@ -243,7 +248,7 @@ const languageOptions = {
       "/usr/bin/python3 -c \"import py_compile; py_compile.compile('a.py', 'a.pyc', doraise=True)\"",
     executables: "a.py a.pyc",
     runCmd: "/usr/bin/python3 a.py",
-    defaultSource: python3Source
+    defaultSource: python3Source,
   },
   haskell: {
     name: "haskell",
@@ -251,7 +256,7 @@ const languageOptions = {
     compileCmd: "/usr/bin/ghc -o a a.hs",
     executables: "a",
     runCmd: "a",
-    defaultSource: haskellSource
+    defaultSource: haskellSource,
   },
   rust: {
     name: "rust",
@@ -259,7 +264,7 @@ const languageOptions = {
     compileCmd: "/usr/bin/rustc -o a a.rs",
     executables: "a",
     runCmd: "a",
-    defaultSource: rustSource
+    defaultSource: rustSource,
   },
   ruby: {
     name: "ruby",
@@ -267,7 +272,7 @@ const languageOptions = {
     compileCmd: "/bin/echo compiled",
     executables: "a.rb",
     runCmd: "/usr/bin/ruby a.rb",
-    defaultSource: rubySource
+    defaultSource: rubySource,
   },
   php: {
     name: "php",
@@ -275,7 +280,7 @@ const languageOptions = {
     compileCmd: "/bin/echo compiled",
     executables: "a.php",
     runCmd: "/usr/bin/php a.php",
-    defaultSource: phpSource
+    defaultSource: phpSource,
   },
   "c#": {
     name: "csharp",
@@ -283,7 +288,7 @@ const languageOptions = {
     compileCmd: "/usr/bin/mcs -optimize+ -out:a a.cs",
     executables: "a",
     runCmd: "/usr/bin/mono a",
-    defaultSource: csharpSource
+    defaultSource: csharpSource,
   },
   perl: {
     name: "perl",
@@ -291,7 +296,7 @@ const languageOptions = {
     compileCmd: "/bin/echo compiled",
     executables: "a.pl",
     runCmd: "/usr/bin/perl a.pl",
-    defaultSource: perlSource
+    defaultSource: perlSource,
   },
   perl6: {
     name: "perl",
@@ -299,7 +304,7 @@ const languageOptions = {
     compileCmd: "/bin/echo compiled",
     executables: "a.pl",
     runCmd: "/usr/bin/perl6 a.pl",
-    defaultSource: perl6Source
+    defaultSource: perl6Source,
   },
   ocaml: {
     name: "ocaml",
@@ -307,9 +312,11 @@ const languageOptions = {
     compileCmd: "/usr/bin/ocamlc str.cma -o a a.ml",
     executables: "a",
     runCmd: "a",
-    defaultSource: ocamlSource
-  }
+    defaultSource: ocamlSource,
+  },
 };
+
+const MonacoEditor = defineAsyncComponent(() => import("./MonacoEditor.vue"));
 
 export default {
   name: "OnlineJudger",
@@ -321,10 +328,10 @@ export default {
     executables: "a",
     runCmd: "a",
     languageOptions: languageOptions,
-    selectedOption: "c++"
+    selectedOption: "c++",
   }),
   components: {
-    MonacoEditor
+    MonacoEditor,
   },
   methods: {
     submit() {
@@ -336,25 +343,25 @@ export default {
             sourceFileName: this.sourceFileName,
             compileCmd: this.compileCmd,
             executables: this.executables,
-            runCmd: this.runCmd
-          }
+            runCmd: this.runCmd,
+          },
         })
         .then(() => {
           router.push("/submissions");
         });
-    }
+    },
   },
   watch: {
-    selectedOption: function(v) {
-      const option = languageOptions[v];
+    selectedOption: function (v) {
+      const option = languageOptions[v.value];
       this.language = option.name;
       this.sourceFileName = option.sourceFileName;
       this.compileCmd = option.compileCmd;
       this.executables = option.executables;
       this.runCmd = option.runCmd;
       this.source = option.defaultSource;
-    }
-  }
+    },
+  },
 };
 </script>
 

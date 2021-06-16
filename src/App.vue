@@ -1,55 +1,43 @@
 <template>
   <div id="app">
-    <md-toolbar class="toolbar">
-      <router-link to="/">
-        <h3 class="md-title">GO Judger</h3>
+    <sui-menu class="toolbar">
+      <router-link to="/" v-slot="{ isExactActive }">
+        <sui-menu-item header :active="isExactActive">
+          GO Judger
+        </sui-menu-item>
       </router-link>
-      <md-tabs md-sync-route>
-        <md-tab
-          md-label="Submissions"
-          to="/submissions"
-        ></md-tab>
-        <md-tab
-          md-label="Terminal"
-          to="/terminal"
-        ></md-tab>
-      </md-tabs>
-    </md-toolbar>
+
+      <router-link to="/submissions" v-slot="{ isExactActive }">
+        <sui-menu-item :active="isExactActive">
+          Submissions
+        </sui-menu-item>
+      </router-link>
+
+      <router-link to="/terminal" v-slot="{ isExactActive }">
+        <sui-menu-item :active="isExactActive"> Terminal </sui-menu-item>
+      </router-link>
+
+      <!-- <sui-menu-item md-label="Submissions" to="/submissions"
+        >Submissions</sui-menu-item
+      >
+      <sui-menu-item md-label="Terminal" to="/terminal">Terminal</sui-menu-item> -->
+    </sui-menu>
     <div class="container">
-      <keep-alive>
-        <router-view></router-view>
-      </keep-alive>
+      <router-view v-slot="{ Component }">
+        <keep-alive>
+          <component :is="Component" />
+        </keep-alive>
+      </router-view>
     </div>
   </div>
 </template>
 
-<style lang="scss">
-@import "~vue-material/dist/theme/engine"; // Import the theme engine
-@include md-register-theme(
-  "default",
-  (
-    primary: md-get-palette-color(blue, A200),
-    accent: md-get-palette-color(red, A200),
-    theme: light
-  )
-);
-@import "~vue-material/dist/theme/all"; // Apply the theme
-#app {
-  font-family: "Avenir", Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  color: #2c3e50;
-}
-
+<style lang="css">
 .container {
   width: 100%;
   max-width: 1100px;
   margin: auto;
   margin-top: 10px;
   margin-bottom: 10px;
-}
-
-.toolbar {
-  min-height: 48px !important;
 }
 </style>

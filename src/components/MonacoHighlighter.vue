@@ -1,23 +1,29 @@
 <template>
-  <div
-    class="code"
-    :data-lang="language"
-  >{{ value }}</div>
+  <div class="code" :data-lang="language" ref="root">{{ value }}</div>
 </template>
 
 <script>
+import { ref, onMounted } from "vue";
+import { defineComponent } from "@vue/runtime-core";
 import * as monaco from "monaco-editor";
 
-export default {
+export default defineComponent({
   name: "MonacoHighlighter",
   props: {
     value: String,
-    language: String
+    language: String,
   },
-  mounted: function() {
-    monaco.editor.colorizeElement(this.$el);
-  }
-};
+  setup() {
+    const root = ref(null);
+    onMounted(() => {
+      monaco.editor.colorizeElement(root.value);
+    });
+
+    return {
+      root
+    };
+  },
+});
 </script>
 
 <style scoped>

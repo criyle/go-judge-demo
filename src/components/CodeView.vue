@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="md-caption">{{label}}</div>
+    <div class="md-caption">{{ label }}</div>
     <monaco-highlighter
       :value="value"
       :language="language"
@@ -9,17 +9,20 @@
 </template>
 
 <script>
-const MonacoHighlighter = () => import("./MonacoHighlighter.vue");
+import { defineAsyncComponent, defineComponent } from "@vue/runtime-core";
+const MonacoHighlighter = defineAsyncComponent(() =>
+  import("./MonacoHighlighter.vue")
+);
 
-export default {
+export default defineComponent({
   name: "CodeView",
   props: {
     value: String,
     language: String,
-    label: String
+    label: String,
   },
   components: {
-    MonacoHighlighter
-  }
-};
+    MonacoHighlighter,
+  },
+});
 </script>

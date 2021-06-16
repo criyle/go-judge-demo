@@ -1,32 +1,14 @@
-import Vue from 'vue';
+import { createApp } from 'vue';
 import App from './App.vue';
-import VueMaterial from 'vue-material';
-import 'vue-material/dist/vue-material.min.css';
-import 'vue-material/dist/theme/default.css';
+
+import FomanticUI from 'vue-fomantic-ui'
+import 'fomantic-ui-css/semantic.min.css'
 
 import router from './routes';
 
-Vue.use(VueMaterial);
+const app = createApp(App);
 
-Vue.config.productionTip = false;
+app.use(router);
+app.use(FomanticUI);
 
-Vue.filter('cpu', function (value) {
-  if (value) {
-    return value + ' ms';
-  } else {
-    return '0 ms';
-  }
-});
-
-Vue.filter('memory', function (value) {
-  if (value) {
-    return value + ' kB';
-  } else {
-    return '0 kB';
-  }
-});
-
-new Vue({
-  render: h => h(App),
-  router,
-}).$mount('#app');
+app.mount("#app");

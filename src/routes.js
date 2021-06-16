@@ -1,11 +1,8 @@
-import Vue from 'vue';
-import VueRouter from 'vue-router';
+import { createRouter, createWebHashHistory, createWebHistory } from 'vue-router';
 
 import OnlineJudger from './components/OnlineJudger.vue';
 import Submission from './components/Submission.vue';
 import Terminal from './components/Terminal.vue';
-
-Vue.use(VueRouter);
 
 const routes = [
     {
@@ -21,13 +18,13 @@ const routes = [
         component: Terminal,
     },
     {
-        path: '*',
+        path: '/:pathMatch(.*)',
         redirect: '/',
     },
 ];
 
-const router = new VueRouter({
-    mode: 'history',
+const router = createRouter({
+    history: createWebHistory(),
     routes,
 });
 

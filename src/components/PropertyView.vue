@@ -1,7 +1,7 @@
 <template>
   <div>
-    <div class="md-caption">{{label}}</div>
-    <div>{{value}}</div>
+    <div class="ui sub header">{{ label }}</div>
+    <span>{{ value }}</span>
   </div>
 </template>
 
@@ -10,7 +10,7 @@ export default {
   name: "PropertyView",
   props: {
     label: String,
-    value: String
-  }
+    value: String,
+  },
 };
 </script>

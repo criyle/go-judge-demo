@@ -30,7 +30,12 @@ export default {
           params: p,
         })
         .then((r) => {
-          this.submission.push(...r.data);
+          r.data.forEach((data) => {
+            const idx = this.submission.findIndex((s) => s.id === data.id);
+            if (idx == -1) {
+              this.submission.push(data);
+            }
+          });
         });
     },
     createWS() {
@@ -46,16 +51,16 @@ export default {
         const data = JSON.parse(event.data);
         const idx = this.submission.findIndex((s) => s.id === data.id);
         if (idx >= 0) {
-          this.$set(this.submission, idx, {
+          this.submission[idx] = {
             ...this.submission[idx],
             status: data.status,
             results: data.results || this.submission[idx].results,
-          });
+          };
         } else {
           this.submission.unshift(data);
         }
       });
-      ws.addEventListener("close", (event) => {
+      ws.addEventListener("close", () => {
         // reconnect after 1000 ms
         setTimeout(this.createWS, 1000);
       });

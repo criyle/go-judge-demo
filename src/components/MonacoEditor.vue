@@ -1,40 +1,54 @@
 <template>
-  <div>
-  </div>
+  <div ref="root"></div>
 </template>
 
 <script>
+import { ref, onMounted, onBeforeUnmount, toRefs, watch } from "vue";
 import * as monaco from "monaco-editor";
 
 export default {
   name: "MonacoEditor",
   props: {
-    value: String,
-    language: String
+    modelValue: String,
+    language: String,
   },
-  mounted() {
-    this.$editor = monaco.editor.create(this.$el, {
-      value: this.value,
-      language: this.language,
-      automaticLayout: true
+  setup(props, { emit }) {
+    const root = ref(null);
+    let editor = null;
+    const { modelValue, language } = toRefs(props);
+
+    onMounted(() => {
+      editor = monaco.editor.create(root.value, {
+        value: modelValue.value,
+        language: language.value,
+        automaticLayout: true,
+      });
+      editor.onDidChangeModelContent(() => {
+        const val = editor.getValue();
+        if (val !== modelValue.value) {
+          emit("update:modelValue", editor.getValue());
+        }
+      });
     });
-    this.$editor.onDidChangeModelContent(() => {
-      this.$emit("input", this.$editor.getValue());
+
+    onBeforeUnmount(() => {
+      editor.dispose();
     });
-  },
-  beforeDestroy() {
-    this.$editor.dispose();
-  },
-  watch: {
-    language: function(newVal) {
-      monaco.editor.setModelLanguage(this.$editor.getModel(), newVal);
-    },
-    value: function(newVal) {
-      const curVal = this.$editor.getValue();
+
+    watch(language, (newVal) => {
+      monaco.editor.setModelLanguage(editor.getModel(), newVal);
+    });
+
+    watch(modelValue, (newVal) => {
+      const curVal = editor.getValue();
       if (newVal !== curVal) {
-        this.$editor.setValue(newVal);
+        editor.setValue(newVal);
       }
-    }
-  }
+    });
+
+    return {
+      root,
+    };
+  },
 };
 </script>
