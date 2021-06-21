@@ -1,61 +1,72 @@
 <template>
-  <div>
-    <div style="display: flex">
-      <sui-dropdown
-        selection
-        button
-        floating
-        labeled
-        search
-        icon="world"
-        text="Language"
-        v-model="selectedOption"
-        :options="
-          Object.entries(languageOptions).map(([k, v]) => ({
-            text: v.name,
-            value: k,
-          }))
-        "
-      />
-      <div style="flex: 1 0"></div>
-      <sui-button @click="submit">Submit</sui-button>
-    </div>
-    <sui-form>
-      <div class="inputs">
-        <sui-form-field>
-          <label>Language Name</label>
-          <sui-input v-model="language" />
-        </sui-form-field>
-        <sui-form-field>
-          <label>Source File Name</label>
-          <sui-input v-model="sourceFileName" />
-        </sui-form-field>
-        <sui-form-field>
-          <label>Compile Cmd</label>
-          <sui-input v-model="compileCmd" />
-        </sui-form-field>
-        <sui-form-field>
-          <label>Executable File Name</label>
-          <sui-input v-model="executables" />
-        </sui-form-field>
-        <sui-form-field>
-          <label>Exec Cmd</label>
-          <sui-input v-model="runCmd" />
-        </sui-form-field>
-      </div>
-    </sui-form>
-    <sui-segment>
-      <monaco-editor
-        class="code-editor-editor editor"
-        v-model="source"
-        :language="language"
-      ></monaco-editor>
-    </sui-segment>
-  </div>
+  <n-form label-placement="top">
+    <n-grid :span="24" :x-gap="24">
+      <n-form-item-gi :span="12" label="Language">
+        <n-select
+          placeholder="Language"
+          v-model:value="selectedOption"
+          :options="
+            Object.entries(languageOptions).map(([k, v]) => ({
+              label: v.name,
+              value: k,
+            }))
+          "
+        />
+      </n-form-item-gi>
+      <n-gi :span="12">
+        <div style="display: flex; justify-content: flex-end">
+          <n-button @click="submit" round type="primary">Submit</n-button>
+        </div>
+      </n-gi>
+
+      <n-form-item-gi :span="4" label="Language Name">
+        <n-input v-model:value="language" />
+      </n-form-item-gi>
+
+      <n-form-item-gi :span="4" label="Source File Name">
+        <n-input v-model:value="sourceFileName" />
+      </n-form-item-gi>
+
+      <n-form-item-gi :span="8" label="Compile Cmd">
+        <n-input v-model:value="compileCmd" />
+      </n-form-item-gi>
+
+      <n-form-item-gi :span="4" label="Executable File Name">
+        <n-input v-model:value="executables" />
+      </n-form-item-gi>
+
+      <n-form-item-gi :span="4" label="Exec Cmd">
+        <n-input v-model:value="runCmd" />
+      </n-form-item-gi>
+
+      <n-gi :span="24" class="editor">
+        <n-element style="height: 100%">
+          <template v-slot:default="{ themeVars }">
+            <monaco-editor
+              class="code-editor-editor"
+              v-model="source"
+              :language="language"
+              :theme="themeVars"
+            ></monaco-editor>
+          </template>
+        </n-element>
+      </n-gi>
+    </n-grid>
+  </n-form>
 </template>
 
 <script>
-import { defineAsyncComponent } from 'vue';
+import { defineAsyncComponent } from "vue";
+import {
+  NElement,
+  NForm,
+  NFormItemGi,
+  NSelect,
+  NGrid,
+  NGi,
+  NButton,
+  NInput,
+} from "naive-ui";
 import axios from "axios";
 import router from "../routes.js";
 
@@ -88,6 +99,7 @@ func main() {
   fmt.Printf("%d", a + b)
 }
 `;
+
 const nodeSource = `const fs = require('fs');
 const [a, b] = fs.readFileSync(0, 'utf-8').split(' ').map(s => parseInt(s));
 process.stdout.write(a + b + '\\n');
@@ -331,6 +343,14 @@ export default {
     selectedOption: "c++",
   }),
   components: {
+    NElement,
+    NForm,
+    NFormItemGi,
+    NSelect,
+    NGrid,
+    NGi,
+    NButton,
+    NInput,
     MonacoEditor,
   },
   methods: {
@@ -353,7 +373,7 @@ export default {
   },
   watch: {
     selectedOption: function (v) {
-      const option = languageOptions[v.value];
+      const option = languageOptions[v];
       this.language = option.name;
       this.sourceFileName = option.sourceFileName;
       this.compileCmd = option.compileCmd;

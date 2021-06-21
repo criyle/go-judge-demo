@@ -12,6 +12,7 @@ import (
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the grpc package it is being compiled against.
+// Requires gRPC-Go v1.32.0 or later.
 const _ = grpc.SupportPackageIsVersion7
 
 // DemoBackendClient is the client API for DemoBackend service.
@@ -52,7 +53,7 @@ func (c *demoBackendClient) Submit(ctx context.Context, in *SubmitRequest, opts 
 }
 
 func (c *demoBackendClient) Updates(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (DemoBackend_UpdatesClient, error) {
-	stream, err := c.cc.NewStream(ctx, &_DemoBackend_serviceDesc.Streams[0], "/pb.DemoBackend/Updates", opts...)
+	stream, err := c.cc.NewStream(ctx, &DemoBackend_ServiceDesc.Streams[0], "/pb.DemoBackend/Updates", opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -84,7 +85,7 @@ func (x *demoBackendUpdatesClient) Recv() (*JudgeUpdate, error) {
 }
 
 func (c *demoBackendClient) Judge(ctx context.Context, opts ...grpc.CallOption) (DemoBackend_JudgeClient, error) {
-	stream, err := c.cc.NewStream(ctx, &_DemoBackend_serviceDesc.Streams[1], "/pb.DemoBackend/Judge", opts...)
+	stream, err := c.cc.NewStream(ctx, &DemoBackend_ServiceDesc.Streams[1], "/pb.DemoBackend/Judge", opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -115,7 +116,7 @@ func (x *demoBackendJudgeClient) Recv() (*JudgeClientRequest, error) {
 }
 
 func (c *demoBackendClient) Shell(ctx context.Context, opts ...grpc.CallOption) (DemoBackend_ShellClient, error) {
-	stream, err := c.cc.NewStream(ctx, &_DemoBackend_serviceDesc.Streams[2], "/pb.DemoBackend/Shell", opts...)
+	stream, err := c.cc.NewStream(ctx, &DemoBackend_ServiceDesc.Streams[2], "/pb.DemoBackend/Shell", opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -186,7 +187,7 @@ type UnsafeDemoBackendServer interface {
 }
 
 func RegisterDemoBackendServer(s grpc.ServiceRegistrar, srv DemoBackendServer) {
-	s.RegisterService(&_DemoBackend_serviceDesc, srv)
+	s.RegisterService(&DemoBackend_ServiceDesc, srv)
 }
 
 func _DemoBackend_Submission_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -298,7 +299,10 @@ func (x *demoBackendShellServer) Recv() (*ShellInput, error) {
 	return m, nil
 }
 
-var _DemoBackend_serviceDesc = grpc.ServiceDesc{
+// DemoBackend_ServiceDesc is the grpc.ServiceDesc for DemoBackend service.
+// It's only intended for direct use with grpc.RegisterService,
+// and not to be introspected or modified (even as a copy)
+var DemoBackend_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "pb.DemoBackend",
 	HandlerType: (*DemoBackendServer)(nil),
 	Methods: []grpc.MethodDesc{

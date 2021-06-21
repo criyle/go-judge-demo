@@ -1,27 +1,42 @@
 <template>
-  <div ref="root"></div>
+  <div ref="root" style="height: 100%"></div>
 </template>
 
 <script>
-import { ref, onMounted, onBeforeUnmount, toRefs, watch } from "vue";
+import {
+  ref,
+  onMounted,
+  onBeforeUnmount,
+  toRefs,
+  watch,
+  defineComponent,
+} from "vue";
 import * as monaco from "monaco-editor";
 
-export default {
+import { darkTheme } from "naive-ui";
+
+export default defineComponent({
   name: "MonacoEditor",
   props: {
     modelValue: String,
     language: String,
+    theme: Object,
   },
+  inject: [],
   setup(props, { emit }) {
     const root = ref(null);
     let editor = null;
-    const { modelValue, language } = toRefs(props);
+    const { modelValue, language, theme } = toRefs(props);
+
+    const getTheme = () =>
+      theme.value.baseColor === darkTheme.common.baseColor ? "vs-dark" : "vs";
 
     onMounted(() => {
       editor = monaco.editor.create(root.value, {
         value: modelValue.value,
         language: language.value,
         automaticLayout: true,
+        theme: getTheme(),
       });
       editor.onDidChangeModelContent(() => {
         const val = editor.getValue();
@@ -46,9 +61,13 @@ export default {
       }
     });
 
+    watch(theme, () => {
+      monaco.editor.setTheme(getTheme());
+    });
+
     return {
       root,
     };
   },
-};
+});
 </script>

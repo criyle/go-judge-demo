@@ -1,8 +1,9 @@
-import { createRouter, createWebHashHistory, createWebHistory } from 'vue-router';
+import {defineAsyncComponent } from 'vue';
+import { createRouter, createWebHistory } from 'vue-router';
 
-import OnlineJudger from './components/OnlineJudger.vue';
-import Submission from './components/Submission.vue';
-import Terminal from './components/Terminal.vue';
+const OnlineJudger = () => import("./components/OnlineJudger.vue");
+const Submission = () => import('./components/Submission.vue');
+const Terminal = () => import('./components/Terminal.vue');
 
 const routes = [
     {

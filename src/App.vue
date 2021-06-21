@@ -1,36 +1,132 @@
 <template>
   <div id="app">
-    <sui-menu class="toolbar">
-      <router-link to="/" v-slot="{ isExactActive }">
-        <sui-menu-item header :active="isExactActive">
-          GO Judger
-        </sui-menu-item>
-      </router-link>
+    <n-config-provider :theme="themeRef">
+      <n-global-style />
+      <n-loading-bar-provider>
+        <n-layout position="absolute" class="root-layout">
+          <n-layout-header
+            bordered
+            style="
+              display: grid;
+              grid-template-columns: 1fr auto;
+              padding: 0 32px 0 0;
+            "
+          >
+            <div>
+              <n-menu
+                :value="menuValue"
+                :options="options"
+                mode="horizontal"
+                @update:value="handleMenuUpdateValue"
+              />
+            </div>
 
-      <router-link to="/submissions" v-slot="{ isExactActive }">
-        <sui-menu-item :active="isExactActive">
-          Submissions
-        </sui-menu-item>
-      </router-link>
+            <div style="display: flex; align-items: center">
+              <n-button @click="handelThemeChange">{{ themeName }}</n-button>
+            </div>
+          </n-layout-header>
 
-      <router-link to="/terminal" v-slot="{ isExactActive }">
-        <sui-menu-item :active="isExactActive"> Terminal </sui-menu-item>
-      </router-link>
-
-      <!-- <sui-menu-item md-label="Submissions" to="/submissions"
-        >Submissions</sui-menu-item
-      >
-      <sui-menu-item md-label="Terminal" to="/terminal">Terminal</sui-menu-item> -->
-    </sui-menu>
-    <div class="container">
-      <router-view v-slot="{ Component }">
-        <keep-alive>
-          <component :is="Component" />
-        </keep-alive>
-      </router-view>
-    </div>
+          <n-layout-content :native-scrollbar="false" position="absolute" style="top: 48px; bottom: 0px">
+            <div class="container">
+              <router-view v-slot="{ Component }">
+                <keep-alive>
+                  <component :is="Component" />
+                </keep-alive>
+              </router-view>
+            </div>
+          </n-layout-content>
+        </n-layout>
+      </n-loading-bar-provider>
+    </n-config-provider>
   </div>
 </template>
+
+<script lang="ts">
+import { computed, defineComponent, ref, watch } from "vue";
+import {
+  darkTheme,
+  NConfigProvider,
+  NDivider,
+  NGlobalStyle,
+  NLayout,
+  NLayoutHeader,
+  NLayoutContent,
+  NLoadingBarProvider,
+  NMenu,
+  useOsTheme,
+} from "naive-ui";
+import { useRoute, useRouter } from "vue-router";
+
+export default defineComponent({
+  components: {
+    NConfigProvider,
+    NDivider,
+    NGlobalStyle,
+    NLayout,
+    NLayoutHeader,
+    NLayoutContent,
+    NLoadingBarProvider,
+    NMenu,
+  },
+  setup() {
+    const route = useRoute();
+    const router = useRouter();
+    const menuOptions = [
+      {
+        label: "GO Judge",
+        key: "home",
+        path: "/",
+      },
+      {
+        label: "Submission",
+        key: "submission",
+        path: "/submissions",
+      },
+      {
+        label: "Terminal",
+        key: "terminal",
+        path: "/terminal",
+      },
+    ];
+
+    const menuValue = computed(() => {
+      const option = menuOptions.filter((v) => v.path === route.path);
+      if (option.length > 0) {
+        return option[0].key;
+      }
+      return "home";
+    });
+
+    const osThemeRef = useOsTheme();
+    const themeRef = ref(osThemeRef.value === "dark" ? darkTheme : null);
+
+    watch(osThemeRef, (newVal) => {
+      themeRef.value = newVal === "dark" ? darkTheme : null;
+    });
+
+    const isDarkTheme = () =>
+      themeRef.value &&
+      themeRef.value.common.baseColor === darkTheme.common.baseColor;
+
+    const themeName = computed(() => (isDarkTheme() ? "Dark" : "Light"));
+
+    const handelThemeChange = () => {
+      themeRef.value = isDarkTheme() ? null : darkTheme;
+    };
+
+    return {
+      options: menuOptions,
+      menuValue,
+      themeRef,
+      themeName,
+      handleMenuUpdateValue: (_, option) => {
+        router.push(option.path);
+      },
+      handelThemeChange,
+    };
+  },
+});
+</script>
 
 <style lang="css">
 .container {

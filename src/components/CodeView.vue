@@ -1,15 +1,19 @@
 <template>
-  <div>
-    <div class="md-caption">{{ label }}</div>
-    <monaco-highlighter
-      :value="value"
-      :language="language"
-    ></monaco-highlighter>
-  </div>
+  <n-element>
+    <template v-slot:default="{ themeVars }">
+      <monaco-highlighter
+        :value="value"
+        :language="language"
+        :theme="themeVars"
+      ></monaco-highlighter>
+    </template>
+  </n-element>
 </template>
 
 <script>
-import { defineAsyncComponent, defineComponent } from "@vue/runtime-core";
+import { defineAsyncComponent, defineComponent } from "vue";
+import { NElement } from "naive-ui";
+
 const MonacoHighlighter = defineAsyncComponent(() =>
   import("./MonacoHighlighter.vue")
 );
@@ -22,6 +26,7 @@ export default defineComponent({
     label: String,
   },
   components: {
+    NElement,
     MonacoHighlighter,
   },
 });

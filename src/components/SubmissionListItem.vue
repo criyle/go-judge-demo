@@ -1,85 +1,81 @@
 <template>
-  <div :class="{ active, title: true }" @click="active = !active">
-    <i class="dropdown icon"></i>
-    <span class="status">{{ s.status }}</span>
-    <span class="date"><date :date="s.date"></date></span>
-  </div>
-  <div :class="{ active, content: true }">
-    <div>
-      <div class="info properties">
-        <property-view label="_id" :value="s.id"></property-view>
-        <property-view
-          label="language name"
-          :value="s.language.name"
-        ></property-view>
-        <property-view
-          label="source file name"
-          :value="s.language.sourceFileName"
-        ></property-view>
-        <property-view
-          label="compile cmd"
-          :value="s.language.compileCmd"
-        ></property-view>
-        <property-view
-          label="executable file names"
-          :value="s.language.executables"
-        ></property-view>
-        <property-view
-          label="exec cmd"
-          :value="s.language.runCmd"
-        ></property-view>
-      </div>
-      <div class="info">
+  <n-collapse-item>
+    <template #header>
+      <span class="status">{{ s.status }}</span>
+      <span class="date"><date :date="s.date"></date></span>
+    </template>
+    <n-descriptions label-placement="top" :column="6">
+      <n-descriptions-item>
+        <template #label>_id</template>
+        {{ s.id }}
+      </n-descriptions-item>
+      <n-descriptions-item>
+        <template #label>language name</template>
+        {{ s.language.name }}
+      </n-descriptions-item>
+      <n-descriptions-item>
+        <template #label>source file name</template>
+        {{ s.language.sourceFileName }}
+      </n-descriptions-item>
+      <n-descriptions-item>
+        <template #label>compile cmd</template>
+        {{ s.language.compileCmd }}
+      </n-descriptions-item>
+      <n-descriptions-item>
+        <template #label>executable file names</template>
+        {{ s.language.executables }}
+      </n-descriptions-item>
+      <n-descriptions-item>
+        <template #label>exec cmd</template>
+        {{ s.language.runCmd }}
+      </n-descriptions-item>
+
+      <n-descriptions-item :span="6">
+        <template #label>code</template>
         <code-view
           label="code"
           :value="s.source"
           :language="s.language.name"
         ></code-view>
-      </div>
-      <div v-for="(u, index) in s.results" :key="index">
-        <sui-divider />
-        <div class="info properties">
-          <property-view label="cpu" :value="cpu(u.time)"></property-view>
-          <property-view
-            label="memory"
-            :value="memory(u.memory)"
-          ></property-view>
-        </div>
-        <div class="info">
-          <code-view
-            v-if="u.stdin"
-            label="stdin"
-            :value="u.stdin"
-            language="text"
-          ></code-view>
-          <code-view
-            v-if="u.stdout"
-            label="stdout"
-            :value="u.stdout"
-            language="text"
-          ></code-view>
-          <code-view
-            v-if="u.stderr"
-            label="stderr"
-            :value="u.stderr"
-            language="text"
-          ></code-view>
-          <code-view
-            v-if="u.log"
-            label="log"
-            :value="u.log"
-            language="text"
-          ></code-view>
-        </div>
-      </div>
-    </div>
-  </div>
+      </n-descriptions-item>
+    </n-descriptions>
+    <template v-for="(u, index) in s.results" :key="index">
+      <n-divider />
+      <n-descriptions :column="2">
+        <n-descriptions-item>
+          <template #label>cpu</template>
+          {{ cpu(u.time) }}
+        </n-descriptions-item>
+        <n-descriptions-item>
+          <template #label>memory</template>
+          {{ memory(u.memory) }}
+        </n-descriptions-item>
+      </n-descriptions>
+      <template v-for="name in ['stdin', 'stdout', 'stderr', 'log']">
+        <n-descriptions v-if="u[name]">
+          <n-descriptions-item>
+            <template #label>{{ name }}</template>
+            <code-view
+              :label="name"
+              :value="u[name]"
+              language="text"
+            ></code-view>
+          </n-descriptions-item>
+        </n-descriptions>
+      </template>
+    </template>
+  </n-collapse-item>
 </template>
 
 <script>
-import { defineAsyncComponent, defineComponent } from "@vue/runtime-core";
+import { defineAsyncComponent, defineComponent } from "vue";
+import {
+  NCollapseItem,
+  NDescriptions,
+  NDescriptionsItem,
+  NDivider,
+} from "naive-ui";
 import CodeView from "./CodeView.vue";
-import PropertyView from "./PropertyView.vue";
 const Date = defineAsyncComponent(() => import("./Date.vue"));
 
 export default defineComponent({
@@ -89,8 +85,11 @@ export default defineComponent({
     active: false,
   }),
   components: {
+    NCollapseItem,
+    NDescriptions,
+    NDescriptionsItem,
+    NDivider,
     CodeView,
-    PropertyView,
     Date,
   },
   methods: {

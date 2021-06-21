@@ -1,14 +1,15 @@
 import { createApp } from 'vue';
+
 import App from './App.vue';
-
-import FomanticUI from 'vue-fomantic-ui'
-import 'fomantic-ui-css/semantic.min.css'
-
 import router from './routes';
+
+// General Font
+import 'vfonts/Lato.css'
+// Monospace Font
+import 'vfonts/FiraCode.css'
 
 const app = createApp(App);
 
 app.use(router);
-app.use(FomanticUI);
 
 app.mount("#app");

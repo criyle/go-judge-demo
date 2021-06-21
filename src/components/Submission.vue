@@ -8,8 +8,9 @@
 <script>
 import SubmissionList from "./SubmissionList.vue";
 import axios from "axios";
+import { defineComponent } from "vue";
 
-export default {
+export default defineComponent({
   name: "Submission",
   data: () => ({
     submission: [],
@@ -64,17 +65,19 @@ export default {
         // reconnect after 1000 ms
         setTimeout(this.createWS, 1000);
       });
+      ws.addEventListener("open", () => {
+        if (this.submission.length === 0) {
+          this.loadMore();
+        }
+      });
       this.$ws = ws;
     },
   },
   mounted: function () {
     this.createWS();
   },
-  created: function () {
-    this.loadMore();
-  },
   beforeDestroy: function () {
     this.$ws.close();
   },
-};
+});
 </script>

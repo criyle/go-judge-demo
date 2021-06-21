@@ -1,10 +1,11 @@
 <template>
-  <div class="code" :data-lang="language" ref="root">{{ value }}</div>
+  <div class="code" v-html="html"></div>
 </template>
 
 <script>
-import { ref, onMounted } from "vue";
-import { defineComponent } from "@vue/runtime-core";
+import { ref, toRefs } from "vue";
+import { darkTheme } from "naive-ui";
+import { defineComponent, watch } from "@vue/runtime-core";
 import * as monaco from "monaco-editor";
 
 export default defineComponent({
@@ -12,15 +13,26 @@ export default defineComponent({
   props: {
     value: String,
     language: String,
+    theme: Object,
   },
-  setup() {
-    const root = ref(null);
-    onMounted(() => {
-      monaco.editor.colorizeElement(root.value);
-    });
+  setup(props) {
+    const html = ref("");
+    const { theme, value, language } = toRefs(props);
+
+    const getTheme = () =>
+      theme.value.baseColor === darkTheme.common.baseColor ? "vs-dark" : "vs";
+
+    const render = async () => {
+      monaco.editor.setTheme(getTheme());
+      html.value = await monaco.editor.colorize(value.value, language.value);
+    };
+
+    render();
+
+    watch([theme, value, language], render);
 
     return {
-      root
+      html,
     };
   },
 });
