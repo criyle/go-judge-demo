@@ -1,18 +1,14 @@
 <template>
-  <n-element>
-    <template v-slot:default="{ themeVars }">
-      <monaco-highlighter
-        :value="value"
-        :language="language"
-        :theme="themeVars"
-      ></monaco-highlighter>
-    </template>
-  </n-element>
+  <monaco-highlighter
+    :value="value"
+    :language="language"
+    :theme="themeVars"
+  ></monaco-highlighter>
 </template>
 
 <script>
 import { defineAsyncComponent, defineComponent } from "vue";
-import { NElement } from "naive-ui";
+import { useThemeVars } from "naive-ui";
 
 const MonacoHighlighter = defineAsyncComponent(() =>
   import("./MonacoHighlighter.vue")
@@ -26,8 +22,10 @@ export default defineComponent({
     label: String,
   },
   components: {
-    NElement,
     MonacoHighlighter,
   },
+  data: () => ({
+    themeVars: useThemeVars(),
+  })
 });
 </script>

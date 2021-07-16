@@ -45,6 +45,7 @@
 import { computed, defineComponent, ref, watch } from "vue";
 import {
   darkTheme,
+  NButton,
   NConfigProvider,
   NDivider,
   NGlobalStyle,
@@ -59,6 +60,7 @@ import { useRoute, useRouter } from "vue-router";
 
 export default defineComponent({
   components: {
+    NButton,
     NConfigProvider,
     NDivider,
     NGlobalStyle,

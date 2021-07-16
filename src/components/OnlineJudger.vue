@@ -40,16 +40,12 @@
       </n-form-item-gi>
 
       <n-gi :span="24" class="editor">
-        <n-element style="height: 100%">
-          <template v-slot:default="{ themeVars }">
-            <monaco-editor
-              class="code-editor-editor"
-              v-model="source"
-              :language="language"
-              :theme="themeVars"
-            ></monaco-editor>
-          </template>
-        </n-element>
+        <monaco-editor
+          class="code-editor-editor"
+          v-model="source"
+          :language="language"
+          :theme="themeVars"
+        ></monaco-editor>
       </n-gi>
     </n-grid>
   </n-form>
@@ -58,7 +54,6 @@
 <script>
 import { defineAsyncComponent } from "vue";
 import {
-  NElement,
   NForm,
   NFormItemGi,
   NSelect,
@@ -66,6 +61,7 @@ import {
   NGi,
   NButton,
   NInput,
+  useThemeVars,
 } from "naive-ui";
 import axios from "axios";
 import router from "../routes.js";
@@ -341,9 +337,9 @@ export default {
     runCmd: "a",
     languageOptions: languageOptions,
     selectedOption: "c++",
+    themeVars: useThemeVars(),
   }),
   components: {
-    NElement,
     NForm,
     NFormItemGi,
     NSelect,
