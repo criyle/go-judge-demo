@@ -1,4 +1,4 @@
-FROM node:15 AS frontend 
+FROM node:latest AS frontend 
 
 WORKDIR /app 
 
