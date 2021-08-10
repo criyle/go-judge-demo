@@ -7,7 +7,7 @@
           v-model:value="selectedOption"
           :options="
             Object.entries(languageOptions).map(([k, v]) => ({
-              label: v.name,
+              label: k,
               value: k,
             }))
           "
