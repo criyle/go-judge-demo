@@ -3,7 +3,7 @@ module github.com/criyle/go-judger-demo
 go 1.17
 
 require (
-	github.com/criyle/go-judge v1.3.6
+	github.com/criyle/go-judge v1.3.8
 	github.com/criyle/go-judge-client v0.1.1
 	github.com/flynn/go-shlex v0.0.0-20150515145356-3f9db97f8568
 	github.com/gin-contrib/zap v0.0.1
@@ -48,10 +48,10 @@ require (
 	github.com/youmark/pkcs8 v0.0.0-20201027041543-1326539a0a0a // indirect
 	go.uber.org/atomic v1.9.0 // indirect
 	go.uber.org/multierr v1.7.0 // indirect
-	golang.org/x/crypto v0.0.0-20211108221036-ceb1ce70b4fa // indirect
-	golang.org/x/net v0.0.0-20211111160137-58aab5ef257a // indirect
-	golang.org/x/sys v0.0.0-20211111213525-f221eed1c01e // indirect
+	golang.org/x/crypto v0.0.0-20211117183948-ae814b36b871 // indirect
+	golang.org/x/net v0.0.0-20211118161319-6a13c67c3ce4 // indirect
+	golang.org/x/sys v0.0.0-20211117180635-dee7805ff2e1 // indirect
 	golang.org/x/text v0.3.7 // indirect
-	google.golang.org/genproto v0.0.0-20211111162719-482062a4217b // indirect
+	google.golang.org/genproto v0.0.0-20211118181313-81c1377c94b1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 )
