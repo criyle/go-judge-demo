@@ -46,7 +46,7 @@ Connect to backend with judge()
 
 ```bash
 # front end
-npm run serve
+npm run dev
 # apigateway 
 air
 # demoserver
