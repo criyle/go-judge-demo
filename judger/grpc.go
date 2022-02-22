@@ -150,7 +150,7 @@ func (j *judger) judgeSingle(req *demopb.JudgeClientRequest) {
 			CpuTimeLimit:   uint64(10 * time.Second),
 			ClockTimeLimit: uint64(12 * time.Second),
 			MemoryLimit:    memoryLimit,
-			ProcLimit:      50,
+			ProcLimit:      100,
 			CopyIn: map[string]*pb.Request_File{
 				req.Language.SourceFileName: {
 					File: &pb.Request_File_Memory{
