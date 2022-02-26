@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"strconv"
 	"strings"
 	"sync/atomic"
 	"time"
@@ -209,14 +208,16 @@ func (j *judger) judgeSingle(req *demopb.JudgeClientRequest) {
 
 	var completed int32
 
-	runResult := make([]*demopb.Result, noCase)
+	io := req.GetInputAnswer()
+	runResult := make([]*demopb.Result, len(io))
 	for i := range runResult {
 		runResult[i] = new(demopb.Result)
 	}
-	runStatus := make([]pb.Response_Result_StatusType, noCase)
+	runStatus := make([]pb.Response_Result_StatusType, len(io))
 	var eg errgroup.Group
-	for i := 0; i < noCase; i++ {
+	for i, inputOutput := range io {
 		i := i
+		inputOutput := inputOutput
 		eg.Go(func() (err error) {
 			defer func() {
 				if err != nil {
@@ -229,8 +230,8 @@ func (j *judger) judgeSingle(req *demopb.JudgeClientRequest) {
 			if err != nil {
 				return err
 			}
-			input := strconv.Itoa(i) + " " + strconv.Itoa(i)
-			ansContent := strconv.Itoa(i + i)
+			input := inputOutput.Input
+			ansContent := inputOutput.Answer
 			// java, go, node needs more threads.. need a better way
 			// may be add cpu bandwidth on cgroup..
 			var procLimit uint64 = 1
@@ -311,7 +312,7 @@ func (j *judger) judgeSingle(req *demopb.JudgeClientRequest) {
 			j.response <- &demopb.JudgeClientResponse{
 				Id:     req.Id,
 				Type:   "progress",
-				Status: fmt.Sprintf("Judging (%d / %d)", n, noCase),
+				Status: fmt.Sprintf("Judging (%d / %d)", n, len(io)),
 			}
 			return nil
 		})

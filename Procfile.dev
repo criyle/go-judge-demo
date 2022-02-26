@@ -1,0 +1,3 @@
+apigateway: air -c .air.apigateway.toml
+demoserver: air -c .air.demoserver.toml
+judger: air -c .air.judger.toml

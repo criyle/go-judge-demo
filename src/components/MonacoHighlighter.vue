@@ -5,7 +5,7 @@
 <script>
 import { ref, toRefs } from "vue";
 import { darkTheme } from "naive-ui";
-import { defineComponent, watch } from "@vue/runtime-core";
+import { defineComponent, watch } from "vue";
 import * as monaco from "monaco-editor";
 
 export default defineComponent({

@@ -22,6 +22,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials"
+	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/status"
 )
 
@@ -133,7 +134,8 @@ func createExecClient(execServer, token string, logger *zap.Logger) execpb.Execu
 }
 
 func createGRPCConnection(addr, token string, logger *zap.Logger) (*grpc.ClientConn, error) {
-	opts := []grpc.DialOption{grpc.WithInsecure(),
+	opts := []grpc.DialOption{
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
 		grpc.WithUnaryInterceptor(grpc_middleware.ChainUnaryClient(
 			grpc_prometheus.UnaryClientInterceptor,
 			grpc_zap.UnaryClientInterceptor(logger),

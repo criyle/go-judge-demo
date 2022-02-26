@@ -47,9 +47,15 @@ message Result {
   string log = 6;
 }
 
+message InputAnswer {
+  string input = 1;
+  string answer = 2;
+}
+
 message SubmitRequest {
   Language language = 1;
   string source = 2;
+  repeated InputAnswer inputAnswer = 3;
 }
 
 message SubmitResponse { string id = 1; }
@@ -68,6 +74,7 @@ message JudgeClientRequest {
   string id = 1;
   Language language = 2;
   string source = 3;
+  repeated InputAnswer inputAnswer = 4;
 }
 
 message JudgeClientResponse {

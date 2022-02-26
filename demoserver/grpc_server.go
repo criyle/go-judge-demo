@@ -77,9 +77,10 @@ func (s *demoServer) Submit(ctx context.Context, req *pb.SubmitRequest) (*pb.Sub
 		return nil, err
 	}
 	s.submit <- &pb.JudgeClientRequest{
-		Id:       m.ID.Hex(),
-		Language: req.GetLanguage(),
-		Source:   req.GetSource(),
+		Id:          m.ID.Hex(),
+		Language:    req.GetLanguage(),
+		Source:      req.GetSource(),
+		InputAnswer: req.GetInputAnswer(),
 	}
 	s.update <- &pb.JudgeClientResponse{
 		Id:       m.ID.Hex(),
@@ -234,6 +235,9 @@ func (s *demoServer) Shell(ss pb.DemoBackend_ShellServer) error {
 					X:    msg.Resize.X,
 					Y:    msg.Resize.Y,
 				}}})
+				if err != nil {
+					return
+				}
 			}
 		}
 	}()

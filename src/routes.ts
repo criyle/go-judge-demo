@@ -1,11 +1,10 @@
-import {defineAsyncComponent } from 'vue';
-import { createRouter, createWebHistory } from 'vue-router';
+import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 
 const OnlineJudger = () => import("./components/OnlineJudger.vue");
 const Submission = () => import('./components/Submission.vue');
 const Terminal = () => import('./components/Terminal.vue');
 
-const routes = [
+const routes: RouteRecordRaw[] = [
     {
         path: '/',
         component: OnlineJudger,

@@ -168,10 +168,10 @@ func (d *db) Query(ctx context.Context, id string) ([]Model, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer cursor.Close(nil)
+	defer cursor.Close(ctx)
 
 	rt := make([]Model, 0, 10)
-	for cursor.Next(nil) {
+	for cursor.Next(ctx) {
 		el := Model{}
 		if err = cursor.Decode(&el); err != nil {
 			return nil, err

@@ -11,6 +11,11 @@ Components:
 - Judger Client: GO
 - Dev Server Compiler: Air
 
+Tools:
+
+- <https://github.com/cosmtrek/air>
+- <https://github.com/DarthSim/overmind>
+
 ## API Gateway
 
 ### Interface
@@ -48,11 +53,10 @@ Connect to backend with judge()
 # front end
 npm run dev
 # apigateway 
-air
 # demoserver
-air -c .air.demoserver.conf
 # judger
-air -c .air.judger.conf
+overmind start -f Procfile.dev
+
 # mongoDB
 docker run -p 27017:27017 mongo
 # exec server

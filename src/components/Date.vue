@@ -3,9 +3,10 @@
 </template>
 
 <script>
+import { defineComponent } from "vue";
 import moment from "moment";
 
-export default {
+export default defineComponent({
   name: "Date",
   props: ["date"],
   computed: {
@@ -14,5 +15,5 @@ export default {
       return moment(d).format("dddd, MMMM Do YYYY, kk:mm:ss.SSS ZZ");
     },
   },
-};
+});
 </script>
