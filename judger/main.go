@@ -20,6 +20,7 @@ import (
 	"go.uber.org/zap/zapcore"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 const (
@@ -123,7 +124,8 @@ func createDemoClient(execServer, token string) demopb.DemoBackendClient {
 }
 
 func createGRPCConnection(addr, token string) (*grpc.ClientConn, error) {
-	opts := []grpc.DialOption{grpc.WithInsecure(),
+	opts := []grpc.DialOption{
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
 		grpc.WithUnaryInterceptor(grpc_middleware.ChainUnaryClient(
 			grpc_prometheus.UnaryClientInterceptor,
 			grpc_zap.UnaryClientInterceptor(logger),
