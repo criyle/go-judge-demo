@@ -8,20 +8,20 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@vitejs/plugin-vue": "^2.3.3",
+    "@vitejs/plugin-vue": "^3.0.0",
     "axios": "^0.27.2",
-    "moment": "^2.29.3",
+    "moment": "^2.29.4",
     "monaco-editor": "^0.33.0",
-    "vue": "^3.2.36",
-    "vue-router": "^4.0.15",
-    "xterm": "^4.18.0"
+    "vue": "^3.2.37",
+    "vue-router": "^4.1.2",
+    "xterm": "^4.19.0"
   },
   "devDependencies": {
-    "naive-ui": "^2.29.0",
-    "stylus": "^0.57.0",
-    "typescript": "^4.6.4",
+    "naive-ui": "^2.31.0",
+    "stylus": "^0.58.1",
+    "typescript": "^4.7.4",
     "vfonts": "^0.1.0",
-    "vite": "^2.9.9"
+    "vite": "^3.0.0"
   },
   "author": "criyle",
   "license": "MIT"
