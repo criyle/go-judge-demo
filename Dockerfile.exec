@@ -22,7 +22,7 @@ RUN apt-get update \
     ruby \
     node-typescript \
     mono-mcs \
-    perl6 \
+    rakudo \
     perl \
     ocaml \
     vim \
