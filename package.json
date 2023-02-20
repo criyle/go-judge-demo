@@ -9,19 +9,19 @@
   },
   "dependencies": {
     "@vitejs/plugin-vue": "^4.0.0",
-    "axios": "^1.2.1",
+    "axios": "^1.3.3",
     "moment": "^2.29.4",
-    "monaco-editor": "^0.34.1",
-    "vue": "^3.2.45",
+    "monaco-editor": "^0.35.0",
+    "vue": "^3.2.47",
     "vue-router": "^4.1.6",
     "xterm": "^5.1.0"
   },
   "devDependencies": {
     "naive-ui": "^2.34.3",
     "stylus": "^0.59.0",
-    "typescript": "^4.9.4",
+    "typescript": "^4.9.5",
     "vfonts": "^0.1.0",
-    "vite": "^4.0.3"
+    "vite": "^4.1.2"
   },
   "author": "criyle",
   "license": "MIT"
