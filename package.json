@@ -21,7 +21,7 @@
     "stylus": "^0.59.0",
     "typescript": "^5.0.4",
     "vfonts": "^0.1.0",
-    "vite": "^4.2.1"
+    "vite": "^4.2.3"
   },
   "author": "criyle",
   "license": "MIT"
