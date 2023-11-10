@@ -1,4 +1,4 @@
-FROM criyle/executorserver:latest AS executorserver 
+FROM criyle/go-judge:latest AS go-judge 
 
 FROM ubuntu:latest
 
@@ -32,8 +32,8 @@ RUN apt-get update \
     
 WORKDIR /opt
 
-COPY --from=executorserver /opt/executorserver /opt/mount.yaml /opt/
+COPY --from=go-judge /opt/go-judge /opt/mount.yaml /opt/
 
 EXPOSE 5050/tcp 5051/tcp
 
-ENTRYPOINT ["./executorserver"]
+ENTRYPOINT ["./go-judge"]
