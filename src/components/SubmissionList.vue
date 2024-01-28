@@ -1,12 +1,7 @@
 <template>
   <div>
     <n-collapse>
-      <submission-list-item
-        v-for="(s, index) in submission"
-        :key="s.id"
-        :index="index"
-        :s="s"
-      ></submission-list-item>
+      <submission-list-item v-for="(s, index) in submission" :key="s.id" :index="index" :s="s"></submission-list-item>
     </n-collapse>
 
     <n-divider />

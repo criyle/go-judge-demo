@@ -2,19 +2,9 @@
   <n-tooltip trigger="hover">
     <template #trigger>
       <div>
-        <n-ellipsis
-          style="width: 100%; max-width: 1100px"
-          :line-clamp="20"
-          :tooltip="false"
-          expand-trigger="click"
-        >
-          <monaco-highlighter
-            style="word-wrap: break-word"
-            class="highlighter"
-            :value="value"
-            :language="language"
-            :theme="themeVars"
-          ></monaco-highlighter>
+        <n-ellipsis style="width: 100%; max-width: 1100px" :line-clamp="20" :tooltip="false" expand-trigger="click">
+          <monaco-highlighter style="word-wrap: break-word" class="highlighter" :value="value" :language="language"
+            :theme="themeVars"></monaco-highlighter>
         </n-ellipsis>
       </div>
     </template>

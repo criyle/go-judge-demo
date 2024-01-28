@@ -2,7 +2,9 @@
   <n-collapse-item>
     <template #header>
       <span class="status">{{ s.status }}</span>
-      <span class="date"><date :date="s.date"></date></span>
+      <span class="date">
+        <date :date="s.date"></date>
+      </span>
     </template>
     <n-descriptions label-placement="top" :column="6">
       <n-descriptions-item>
@@ -32,11 +34,7 @@
 
       <n-descriptions-item :span="6">
         <template #label>code</template>
-        <code-view
-          label="code"
-          :value="s.source"
-          :language="s.language.name"
-        ></code-view>
+        <code-view label="code" :value="s.source" :language="s.language.name"></code-view>
       </n-descriptions-item>
     </n-descriptions>
     <template v-for="(u, index) in s.results" :key="index">
@@ -55,11 +53,7 @@
         <n-descriptions v-if="u[name]">
           <n-descriptions-item>
             <template #label>{{ name }}</template>
-            <code-view
-              :label="name"
-              :value="u[name]"
-              language="text"
-            ></code-view>
+            <code-view :label="name" :value="u[name]" language="text"></code-view>
           </n-descriptions-item>
         </n-descriptions>
       </template>
@@ -122,7 +116,7 @@ export default defineComponent({
   flex-wrap: wrap;
 }
 
-.properties > div {
+.properties>div {
   padding-right: 10px;
 }
 

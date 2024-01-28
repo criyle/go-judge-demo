@@ -1,9 +1,19 @@
 import { defineConfig } from 'vite'
 import createVuePlugin from '@vitejs/plugin-vue'
+import { visualizer } from 'rollup-plugin-visualizer'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [createVuePlugin()],
+  plugins: [
+    createVuePlugin(),
+    visualizer({
+      gzipSize: true,
+      brotliSize: true,
+      emitFile: false,
+      filename: "tmp/analyzer.html",
+      open: true,
+    }),
+  ],
   server: {
     proxy: {
       '/api/ws/shell': {

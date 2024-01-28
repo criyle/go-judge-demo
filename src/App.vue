@@ -4,21 +4,13 @@
       <n-global-style />
       <n-loading-bar-provider>
         <n-layout position="absolute" class="root-layout">
-          <n-layout-header
-            bordered
-            style="
+          <n-layout-header bordered style="
               display: grid;
               grid-template-columns: 1fr auto;
               padding: 0 32px 0 0;
-            "
-          >
+            ">
             <div>
-              <n-menu
-                :value="menuValue"
-                :options="options"
-                mode="horizontal"
-                @update:value="handleMenuUpdateValue"
-              />
+              <n-menu :value="menuValue" :options="options" mode="horizontal" @update:value="handleMenuUpdateValue" />
             </div>
 
             <div style="display: flex; align-items: center">

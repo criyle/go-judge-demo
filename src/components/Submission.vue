@@ -1,8 +1,5 @@
 <template>
-  <submission-list
-    :submission="submission"
-    @loadMore="loadMore"
-  ></submission-list>
+  <submission-list :submission="submission" @loadMore="loadMore"></submission-list>
 </template>
 
 <script>
@@ -23,8 +20,8 @@ export default defineComponent({
       const p =
         this.submission.length > 0
           ? {
-              id: this.submission[this.submission.length - 1].id,
-            }
+            id: this.submission[this.submission.length - 1].id,
+          }
           : {};
       axios
         .get("/api/submission", {

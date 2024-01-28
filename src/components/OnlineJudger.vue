@@ -2,16 +2,11 @@
   <n-form label-placement="top">
     <n-grid :span="24" :x-gap="24">
       <n-form-item-gi :span="12" label="Language">
-        <n-select
-          placeholder="Language"
-          v-model:value="selectedOption"
-          :options="
-            Object.entries(languageOptions).map(([k, v]) => ({
-              label: k,
-              value: k,
-            }))
-          "
-        />
+        <n-select placeholder="Language" v-model:value="selectedOption" :options="Object.entries(languageOptions).map(([k, v]) => ({
+          label: k,
+          value: k,
+        }))
+          " />
       </n-form-item-gi>
       <n-gi :span="12">
         <div style="display: flex; justify-content: flex-end">
@@ -40,12 +35,8 @@
       </n-form-item-gi>
 
       <n-gi :span="24" class="editor">
-        <monaco-editor
-          class="code-editor-editor"
-          v-model="source"
-          :language="language"
-          :theme="themeVars"
-        ></monaco-editor>
+        <monaco-editor class="code-editor-editor" v-model="source" :language="language"
+          :theme="themeVars"></monaco-editor>
       </n-gi>
 
       <n-gi :span="24">
@@ -147,7 +138,7 @@ export default defineComponent({
   flex-wrap: wrap;
 }
 
-.inputs > .input {
+.inputs>.input {
   flex: 0 0 33%;
   min-height: unset;
 }
