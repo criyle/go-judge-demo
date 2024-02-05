@@ -7,7 +7,7 @@ import (
 
 	"github.com/criyle/go-judger-demo/pb"
 	"github.com/gin-gonic/gin"
-	"github.com/golang/protobuf/jsonpb"
+	"google.golang.org/protobuf/encoding/protojson"
 )
 
 const maxLimit = 64 << 10 // 64k
@@ -40,9 +40,13 @@ func (a *api) apiSubmit(c *gin.Context) {
 			fmt.Sprintf("Upload size too large: %d", c.Request.ContentLength))
 		return
 	}
-	body := &io.LimitedReader{R: c.Request.Body, N: maxLimit}
+	body, err := io.ReadAll(io.LimitReader(c.Request.Body, maxLimit))
+	if err != nil {
+		c.AbortWithError(http.StatusBadRequest, err)
+		return
+	}
 	var req pb.SubmitRequest
-	if err := jsonpb.Unmarshal(body, &req); err != nil {
+	if err := protojson.Unmarshal(body, &req); err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
 		return
 	}

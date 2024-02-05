@@ -92,13 +92,13 @@ func getDB() *db {
 		}
 		database = con.Database
 	}
-	client, err := mongo.NewClient(options.Client().ApplyURI(uri).SetRetryWrites(false))
+	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer cancel()
+
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(uri).SetRetryWrites(false))
 	if err != nil {
 		log.Fatal(err)
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
-	defer cancel()
-	err = client.Connect(ctx)
 
 	if err != nil {
 		log.Fatalln(err)

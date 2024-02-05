@@ -19,6 +19,7 @@ import (
 	"go.uber.org/zap/zapcore"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 const (
@@ -50,7 +51,7 @@ func main() {
 		srvAddr = e
 	}
 
-	opts := []grpc.DialOption{grpc.WithInsecure(),
+	opts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials()),
 		grpc.WithUnaryInterceptor(grpc_middleware.ChainUnaryClient(
 			grpc_prometheus.UnaryClientInterceptor,
 			grpc_zap.UnaryClientInterceptor(logger),
