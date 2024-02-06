@@ -24,8 +24,8 @@ github.com/chenzhuoyu/iasm v0.9.1 h1:tUHQJXo3NhBqw6s33wkGn9SP3bvrWLdlVIJ3hQBL7P0
 github.com/chenzhuoyu/iasm v0.9.1/go.mod h1:Xjy2NpN3h7aUqeqM+woSuuvxmIe6+DDsiNLIrkAmYog=
 github.com/client9/misspell v0.3.4/go.mod h1:qj6jICC3Q7zFZvVWo7KLAzC3yx5G7kyvSDkc90ppPyw=
 github.com/cncf/udpa/go v0.0.0-20191209042840-269d4d468f6f/go.mod h1:M8M6+tZqaGXZJjfX53e64911xZQV5JYwmTeXPW+k8Sc=
-github.com/criyle/go-judge v1.8.0 h1:mqXvLwBlf7BcY+6r6xXpqGOWVevWSlw3f6bVOBBAncs=
-github.com/criyle/go-judge v1.8.0/go.mod h1:bwfo5WntbjW4BImftCwoqepL5ICqAaXoDhqwHlYC8HQ=
+github.com/criyle/go-judge v1.8.1 h1:VI9OGz1MnLp9cv//gMVL8uruNwxSod5UmNwew8ZnfCA=
+github.com/criyle/go-judge v1.8.1/go.mod h1:yZepeuMTmQXEJnBgHZQIGVuytRYWlLhQBQHLaL84N5w=
 github.com/criyle/go-judge-client v0.1.2-0.20230413100353-d7b1f73b7e77 h1:CXd1BCe2Mdcfu5nMtNXfLtMQPQnisGWJY05ZLErsr94=
 github.com/criyle/go-judge-client v0.1.2-0.20230413100353-d7b1f73b7e77/go.mod h1:aGZGOpGJUeUwBcEzrVE7DNERJLqhDu/ca75iltMZXt0=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=

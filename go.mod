@@ -3,7 +3,7 @@ module github.com/criyle/go-judger-demo
 go 1.21
 
 require (
-	github.com/criyle/go-judge v1.8.0
+	github.com/criyle/go-judge v1.8.1
 	github.com/criyle/go-judge-client v0.1.2-0.20230413100353-d7b1f73b7e77
 	github.com/flynn/go-shlex v0.0.0-20150515145356-3f9db97f8568
 	github.com/gin-contrib/zap v0.2.0

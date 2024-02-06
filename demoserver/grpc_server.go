@@ -162,9 +162,9 @@ func (s *demoServer) Shell(ss pb.DemoBackend_ShellServer) error {
 					Args: []string{"/bin/bash"},
 					Env:  []string{"PATH=/usr/local/bin:/usr/bin:/bin", "HOME=/w", "TERM=xterm-256color"},
 					Files: []*execpb.Request_File{
-						{File: &execpb.Request_File_StreamIn{StreamIn: &execpb.Request_StreamInput{Name: "i"}}},
-						{File: &execpb.Request_File_StreamOut{StreamOut: &execpb.Request_StreamOutput{Name: "o"}}},
-						{File: &execpb.Request_File_StreamOut{StreamOut: &execpb.Request_StreamOutput{Name: "o"}}},
+						{File: &execpb.Request_File_StreamIn{}},
+						{File: &execpb.Request_File_StreamOut{}},
+						{File: &execpb.Request_File_StreamOut{}},
 					},
 					Tty:            true,
 					CpuTimeLimit:   uint64(30 * time.Second),
@@ -221,7 +221,7 @@ func (s *demoServer) Shell(ss pb.DemoBackend_ShellServer) error {
 			case *pb.ShellInput_Input:
 				input.Write(msg.Input.Content)
 				err = sc.Send(&execpb.StreamRequest{Request: &execpb.StreamRequest_ExecInput{ExecInput: &execpb.StreamRequest_Input{
-					Name: "i", Content: msg.Input.Content,
+					Content: msg.Input.Content,
 				}}})
 				if err != nil {
 					return
@@ -229,7 +229,6 @@ func (s *demoServer) Shell(ss pb.DemoBackend_ShellServer) error {
 
 			case *pb.ShellInput_Resize:
 				err = sc.Send(&execpb.StreamRequest{Request: &execpb.StreamRequest_ExecResize{ExecResize: &execpb.StreamRequest_Resize{
-					Name: "i",
 					Rows: msg.Resize.Rows,
 					Cols: msg.Resize.Cols,
 					X:    msg.Resize.X,
