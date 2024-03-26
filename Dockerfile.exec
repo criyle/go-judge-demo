@@ -1,6 +1,6 @@
 FROM criyle/go-judge:latest AS go-judge 
 
-FROM ubuntu:latest
+FROM debian:latest
 
 ENV TZ=America/Vancouver
 
@@ -10,10 +10,9 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends \
     gcc \
     g++ \
-    python2.7 \
     python3 \
     fpc \
-    openjdk-11-jdk \
+    openjdk-17-jdk \
     nodejs \
     golang-go \
     php-cli \

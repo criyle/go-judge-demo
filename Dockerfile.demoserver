@@ -1,5 +1,7 @@
 FROM golang:latest AS builder
 
+ENV CGO_ENABLE=0
+
 WORKDIR /build
 
 COPY go.mod go.sum ./
@@ -12,7 +14,7 @@ COPY demoserver demoserver
 
 RUN go build -o /bin/demoserver ./demoserver
 
-FROM ubuntu:latest
+FROM scratch
 
 COPY --from=builder /bin/demoserver /demoserver
 

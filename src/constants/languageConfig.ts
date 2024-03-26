@@ -46,10 +46,6 @@ const python3Source = `a, b = map(int, input().split())
 print(a + b)
 `;
 
-const python2Source = `a, b = map(int, raw_input().split())
-print a + b
-`;
-
 const javaSource = `import java.io.*;
 import java.util.*;
 
@@ -180,15 +176,6 @@ const languageOptions: Record<string, option> = {
     executables: "a",
     runCmd: "a",
     defaultSource: pascalSource,
-  },
-  python2: {
-    name: "python",
-    sourceFileName: "a.py",
-    compileCmd:
-      "/usr/bin/python -c \"import py_compile; py_compile.compile('a.py', 'a.pyc', doraise=True)\"",
-    executables: "a.py a.pyc",
-    runCmd: "/usr/bin/python2 a.py",
-    defaultSource: python2Source,
   },
   python: {
     name: "python",
