@@ -14,7 +14,7 @@ COPY demoserver demoserver
 
 RUN go build -o /bin/demoserver ./demoserver
 
-FROM scratch
+FROM debian:latest
 
 COPY --from=builder /bin/demoserver /demoserver
 

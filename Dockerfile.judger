@@ -14,7 +14,7 @@ COPY judger judger
 
 RUN go build -o /bin/judger ./judger
 
-FROM scratch
+FROM debian:latest
 
 COPY --from=builder /bin/judger /judger
 
