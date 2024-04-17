@@ -11,7 +11,7 @@ import (
 	"github.com/criyle/go-judge-client/pkg/diff"
 	"github.com/criyle/go-judge/pb"
 	demopb "github.com/criyle/go-judger-demo/pb"
-	"github.com/flynn/go-shlex"
+	"github.com/google/shlex"
 	"golang.org/x/sync/errgroup"
 )
 
