@@ -14,8 +14,8 @@ github.com/cloudwego/base64x v0.1.5/go.mod h1:0zlkT4Wn5C6NdauXdJRhSKRlJvmclQ1hhJ
 github.com/cloudwego/iasm v0.2.0/go.mod h1:8rXZaNYT2n95jn+zTI1sDr+IgcD2GVs0nlbbQPiEFhY=
 github.com/criyle/go-judge v1.8.5 h1:4G1kMvIdYQ5S9EajcrYNyCYovE80Rgkt8Pg0dCxb2EM=
 github.com/criyle/go-judge v1.8.5/go.mod h1:+0lDizAqZugQ4NQvpYmR5ujpVaRUqEl/9ZiZ84nrOIU=
-github.com/criyle/go-judge-client v0.1.2-0.20230413100353-d7b1f73b7e77 h1:CXd1BCe2Mdcfu5nMtNXfLtMQPQnisGWJY05ZLErsr94=
-github.com/criyle/go-judge-client v0.1.2-0.20230413100353-d7b1f73b7e77/go.mod h1:aGZGOpGJUeUwBcEzrVE7DNERJLqhDu/ca75iltMZXt0=
+github.com/criyle/go-judge-client v0.1.2 h1:U7L6O4d0cA9rwyLZduVjSctxjhC7f9FsynFUa3YCNLo=
+github.com/criyle/go-judge-client v0.1.2/go.mod h1:IAjUlJ1f1pXQwP0/uSE2x/XSxpR5pwcPFuYG6EcjCv0=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=

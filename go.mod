@@ -4,7 +4,7 @@ go 1.23
 
 require (
 	github.com/criyle/go-judge v1.8.5
-	github.com/criyle/go-judge-client v0.1.2-0.20230413100353-d7b1f73b7e77
+	github.com/criyle/go-judge-client v0.1.2
 	github.com/gin-contrib/zap v1.1.4
 	github.com/gin-gonic/contrib v0.0.0-20250113154928-93b827325fec
 	github.com/gin-gonic/gin v1.10.0
