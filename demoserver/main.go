@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net"
 	"net/http"
@@ -11,18 +12,20 @@ import (
 
 	execpb "github.com/criyle/go-judge/pb"
 	"github.com/criyle/go-judger-demo/pb"
-	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
-	grpc_auth "github.com/grpc-ecosystem/go-grpc-middleware/auth"
-	grpc_zap "github.com/grpc-ecosystem/go-grpc-middleware/logging/zap"
-	grpc_recovery "github.com/grpc-ecosystem/go-grpc-middleware/recovery"
-	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
+	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-middleware/providers/prometheus"
+	grpc_auth "github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/auth"
+	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
+	grpc_recovery "github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/recovery"
+	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
+	"go.uber.org/zap/zapgrpc"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/grpclog"
 	"google.golang.org/grpc/status"
 )
 
@@ -33,6 +36,43 @@ const (
 	envRelease    = "RELEASE"
 	envMongoURI   = "MONGODB_URI"
 )
+
+func InterceptorLogger(l *zap.Logger) logging.Logger {
+	return logging.LoggerFunc(func(ctx context.Context, lvl logging.Level, msg string, fields ...any) {
+		f := make([]zap.Field, 0, len(fields)/2)
+
+		for i := 0; i < len(fields); i += 2 {
+			key := fields[i]
+			value := fields[i+1]
+
+			switch v := value.(type) {
+			case string:
+				f = append(f, zap.String(key.(string), v))
+			case int:
+				f = append(f, zap.Int(key.(string), v))
+			case bool:
+				f = append(f, zap.Bool(key.(string), v))
+			default:
+				f = append(f, zap.Any(key.(string), v))
+			}
+		}
+
+		logger := l.WithOptions(zap.AddCallerSkip(1)).With(f...)
+
+		switch lvl {
+		case logging.LevelDebug:
+			logger.Debug(msg)
+		case logging.LevelInfo:
+			logger.Info(msg)
+		case logging.LevelWarn:
+			logger.Warn(msg)
+		case logging.LevelError:
+			logger.Error(msg)
+		default:
+			panic(fmt.Sprintf("unknown level %v", lvl))
+		}
+	})
+}
 
 func main() {
 	_, release := os.LookupEnv(envRelease)
@@ -65,15 +105,17 @@ func main() {
 	ds := newDemoServer(db, execClient, logger)
 
 	var grpcServer *grpc.Server
-	grpc_zap.ReplaceGrpcLoggerV2(logger)
+	prom := grpc_prometheus.NewServerMetrics(grpc_prometheus.WithServerHandlingTimeHistogram())
+	prometheus.MustRegister(prom)
+	grpclog.SetLoggerV2(zapgrpc.NewLogger(logger))
 	streamMiddleware := []grpc.StreamServerInterceptor{
-		grpc_prometheus.StreamServerInterceptor,
-		grpc_zap.StreamServerInterceptor(logger),
+		prom.StreamServerInterceptor(),
+		logging.StreamServerInterceptor(InterceptorLogger(logger)),
 		grpc_recovery.StreamServerInterceptor(),
 	}
 	unaryMiddleware := []grpc.UnaryServerInterceptor{
-		grpc_prometheus.UnaryServerInterceptor,
-		grpc_zap.UnaryServerInterceptor(logger),
+		prom.UnaryServerInterceptor(),
+		logging.UnaryServerInterceptor(InterceptorLogger(logger)),
 		grpc_recovery.UnaryServerInterceptor(),
 	}
 	if token != "" {
@@ -82,12 +124,10 @@ func main() {
 		unaryMiddleware = append(unaryMiddleware, grpc_auth.UnaryServerInterceptor(authFunc))
 	}
 	grpcServer = grpc.NewServer(
-		grpc.StreamInterceptor(grpc_middleware.ChainStreamServer(streamMiddleware...)),
-		grpc.UnaryInterceptor(grpc_middleware.ChainUnaryServer(unaryMiddleware...)),
+		grpc.ChainStreamInterceptor(streamMiddleware...),
+		grpc.ChainUnaryInterceptor(unaryMiddleware...),
 	)
 	pb.RegisterDemoBackendServer(grpcServer, ds)
-	grpc_prometheus.Register(grpcServer)
-	grpc_prometheus.EnableHandlingTimeHistogram()
 
 	lis, err := net.Listen("tcp", grpcAddr)
 	if err != nil {
@@ -134,21 +174,23 @@ func createExecClient(execServer, token string, logger *zap.Logger) execpb.Execu
 }
 
 func createGRPCConnection(addr, token string, logger *zap.Logger) (*grpc.ClientConn, error) {
+	prom := grpc_prometheus.NewClientMetrics(grpc_prometheus.WithClientHandlingTimeHistogram())
+	prometheus.MustRegister(prom)
+	grpclog.SetLoggerV2(zapgrpc.NewLogger(logger))
 	opts := []grpc.DialOption{
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
-		grpc.WithUnaryInterceptor(grpc_middleware.ChainUnaryClient(
-			grpc_prometheus.UnaryClientInterceptor,
-			grpc_zap.UnaryClientInterceptor(logger),
-		)),
-		grpc.WithStreamInterceptor(
-			grpc_middleware.ChainStreamClient(
-				grpc_prometheus.StreamClientInterceptor,
-				grpc_zap.StreamClientInterceptor(logger),
-			))}
+		grpc.WithChainUnaryInterceptor(
+			prom.UnaryClientInterceptor(),
+			logging.UnaryClientInterceptor(InterceptorLogger(logger)),
+		),
+		grpc.WithChainStreamInterceptor(
+			prom.StreamClientInterceptor(),
+			logging.StreamClientInterceptor(InterceptorLogger(logger)),
+		)}
 	if token != "" {
 		opts = append(opts, grpc.WithPerRPCCredentials(newTokenAuth(token)))
 	}
-	return grpc.Dial(addr, opts...)
+	return grpc.NewClient(addr, opts...)
 }
 
 type tokenAuth struct {
