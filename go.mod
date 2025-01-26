@@ -3,8 +3,8 @@ module github.com/criyle/go-judger-demo
 go 1.23
 
 require (
-	github.com/criyle/go-judge v1.8.5
-	github.com/criyle/go-judge-client v0.1.2
+	github.com/criyle/go-judge v1.8.6
+	github.com/criyle/go-judge-client v0.1.3
 	github.com/gin-contrib/zap v1.1.4
 	github.com/gin-gonic/contrib v0.0.0-20250113154928-93b827325fec
 	github.com/gin-gonic/gin v1.10.0
@@ -21,7 +21,6 @@ require (
 )
 
 require (
-	cloud.google.com/go/compute/metadata v0.6.0 // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
 	github.com/bytedance/sonic v1.12.7 // indirect
 	github.com/bytedance/sonic/loader v0.2.3 // indirect

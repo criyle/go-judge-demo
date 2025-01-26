@@ -1,3 +1,4 @@
+cloud.google.com/go/compute v1.23.4 h1:EBT9Nw4q3zyE7G45Wvv3MzolIrCJEuHys5muLY0wvAw=
 cloud.google.com/go/compute/metadata v0.6.0 h1:A6hENjEsCDtC1k8byVsgwvVcioamEHvZ4j01OwKxG9I=
 cloud.google.com/go/compute/metadata v0.6.0/go.mod h1:FjyFAW1MW0C203CEOMDTu3Dk1FlqW3Rga40jzHL4hfg=
 github.com/beorn7/perks v1.0.1 h1:VlbKKnNfV8bJzeqoa4cOKqO6bYr3WgKZxO8Z16+hsOM=
@@ -12,10 +13,10 @@ github.com/cespare/xxhash/v2 v2.3.0/go.mod h1:VGX0DQ3Q6kWi7AoAeZDth3/j3BFtOZR5XL
 github.com/cloudwego/base64x v0.1.5 h1:XPciSp1xaq2VCSt6lF0phncD4koWyULpl5bUxbfCyP4=
 github.com/cloudwego/base64x v0.1.5/go.mod h1:0zlkT4Wn5C6NdauXdJRhSKRlJvmclQ1hhJgA0rcu/8w=
 github.com/cloudwego/iasm v0.2.0/go.mod h1:8rXZaNYT2n95jn+zTI1sDr+IgcD2GVs0nlbbQPiEFhY=
-github.com/criyle/go-judge v1.8.5 h1:4G1kMvIdYQ5S9EajcrYNyCYovE80Rgkt8Pg0dCxb2EM=
-github.com/criyle/go-judge v1.8.5/go.mod h1:+0lDizAqZugQ4NQvpYmR5ujpVaRUqEl/9ZiZ84nrOIU=
-github.com/criyle/go-judge-client v0.1.2 h1:U7L6O4d0cA9rwyLZduVjSctxjhC7f9FsynFUa3YCNLo=
-github.com/criyle/go-judge-client v0.1.2/go.mod h1:IAjUlJ1f1pXQwP0/uSE2x/XSxpR5pwcPFuYG6EcjCv0=
+github.com/criyle/go-judge v1.8.6 h1:Dww27ze04BmnUomO6NIjKAbYKxZboeyvnm+iySUxel8=
+github.com/criyle/go-judge v1.8.6/go.mod h1:nH3cCXThwVGtPGJJtakR6zhmNYKiTrYALnQd4WEW32E=
+github.com/criyle/go-judge-client v0.1.3 h1:Uw9hhWgVKF7p+qZCQrEVtWeX+uLHlwG6iwZtTXS4jps=
+github.com/criyle/go-judge-client v0.1.3/go.mod h1:lmPYpaA3Y7ibxIREiW3Lq7G8pKW9Ul+tpuwcZ67ttpA=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
