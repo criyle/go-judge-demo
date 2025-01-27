@@ -61,9 +61,12 @@ var (
 )
 
 var logger *zap.Logger
+var prom *grpc_prometheus.ClientMetrics
 
 func init() {
 	prometheus.MustRegister(taskHist, taskSummry)
+	prom = grpc_prometheus.NewClientMetrics(grpc_prometheus.WithClientHandlingTimeHistogram())
+	prometheus.MustRegister(prom)
 }
 
 func main() {
@@ -163,8 +166,6 @@ func InterceptorLogger(l *zap.Logger) logging.Logger {
 }
 
 func createGRPCConnection(addr, token string) (*grpc.ClientConn, error) {
-	prom := grpc_prometheus.NewClientMetrics(grpc_prometheus.WithClientHandlingTimeHistogram())
-	prometheus.MustRegister(prom)
 	grpclog.SetLoggerV2(zapgrpc.NewLogger(logger))
 	opts := []grpc.DialOption{
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
