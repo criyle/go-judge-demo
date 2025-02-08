@@ -6,16 +6,15 @@ import (
 	"os"
 	"time"
 
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
-	"go.mongodb.org/mongo-driver/x/mongo/driver/connstring"
+	"go.mongodb.org/mongo-driver/v2/bson"
+	"go.mongodb.org/mongo-driver/v2/mongo"
+	"go.mongodb.org/mongo-driver/v2/mongo/options"
+	"go.mongodb.org/mongo-driver/v2/x/mongo/driver/connstring"
 )
 
 // Model is the database model as well as transfer model
 type Model struct {
-	ID *primitive.ObjectID `json:"id" bson:"_id,omitempty"`
+	ID *bson.ObjectID `json:"id" bson:"_id,omitempty"`
 
 	Lang      Language   `json:"language,omitempty" bson:"language,omitempty"`
 	Source    string     `json:"source,omitempty" bson:"source,omitempty"`
@@ -47,7 +46,7 @@ type Result struct {
 
 // JudgerUpdate is judger submitted updates
 type JudgerUpdate struct {
-	ID *primitive.ObjectID `json:"id" bson:"_id,omitempty"`
+	ID *bson.ObjectID `json:"id" bson:"_id,omitempty"`
 
 	Type     string     `json:"type"`
 	Status   string     `json:"status"`
@@ -58,7 +57,7 @@ type JudgerUpdate struct {
 
 // ShellStore stores shell interaction
 type ShellStore struct {
-	ID *primitive.ObjectID `json:"id" bson:"_id,omitempty"`
+	ID *bson.ObjectID `json:"id" bson:"_id,omitempty"`
 
 	Stdin  string `bson:"stdin"`
 	Stdout string `bson:"stdout"`
@@ -92,10 +91,8 @@ func getDB() *db {
 		}
 		database = con.Database
 	}
-	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
-	defer cancel()
 
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI(uri).SetRetryWrites(false))
+	client, err := mongo.Connect(options.Client().SetTimeout(3 * time.Second).ApplyURI(uri).SetRetryWrites(false))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -121,7 +118,7 @@ func (d *db) Add(ctx context.Context, cs *ClientSubmit) (*Model, error) {
 	if err != nil {
 		return nil, err
 	}
-	id := i.InsertedID.(primitive.ObjectID)
+	id := i.InsertedID.(bson.ObjectID)
 	m.ID = &id
 	return m, nil
 }
@@ -154,7 +151,7 @@ func (d *db) Query(ctx context.Context, id string) ([]Model, error) {
 
 	filter := bson.D{}
 	if len(id) > 0 {
-		oid, err := primitive.ObjectIDFromHex(id)
+		oid, err := bson.ObjectIDFromHex(id)
 		if err != nil {
 			return nil, err
 		}

@@ -7,7 +7,7 @@ import (
 
 	execpb "github.com/criyle/go-judge/pb"
 	"github.com/criyle/go-judger-demo/pb"
-	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.uber.org/zap"
 	"google.golang.org/protobuf/types/known/emptypb"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -268,7 +268,7 @@ func (s *demoServer) updateLoop() {
 				Source:   u.GetSource(),
 			}
 			// save to db
-			id, _ := primitive.ObjectIDFromHex(u.GetId())
+			id, _ := bson.ObjectIDFromHex(u.GetId())
 			s.db.Update(context.TODO(), &JudgerUpdate{
 				ID:      &id,
 				Type:    u.GetType(),
