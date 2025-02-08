@@ -10,20 +10,11 @@
   </div>
 </template>
 
-<script>
-import { defineComponent } from "vue";
-import { NCollapse, NButton, NDivider } from "naive-ui";
+<script setup lang="ts">
+import { NButton, NCollapse, NDivider } from "naive-ui";
 import SubmissionListItem from "./SubmissionListItem.vue";
 
-export default defineComponent({
-  name: "SubmissionList",
-  props: ["submission"],
-  components: {
-    NButton,
-    NCollapse,
-    NDivider,
-    SubmissionListItem,
-    Date,
-  },
-});
+const { submission } = defineProps([
+  "submission"
+]);
 </script>

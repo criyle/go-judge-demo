@@ -1,73 +1,63 @@
+<script setup lang="ts">
+import * as monaco from "monaco-editor";
+import { darkTheme } from "naive-ui";
+import {
+  onBeforeUnmount,
+  onMounted,
+  ref,
+  type VNodeRef,
+  watchEffect,
+} from "vue";
+
+const props = defineProps({
+  modelValue: String,
+  language: String,
+  theme: Object,
+});
+
+const emit = defineEmits(['update:modelValue']);
+
+const root = ref<VNodeRef | null>(null);
+let editor: monaco.editor.IStandaloneCodeEditor | null = null;
+
+const getTheme = () =>
+  props.theme?.baseColor === darkTheme.common.baseColor ? "vs-dark" : "vs";
+
+onMounted(() => {
+  editor = monaco.editor.create(root.value, {
+    value: props.modelValue,
+    language: props.language,
+    automaticLayout: true,
+    theme: getTheme(),
+  });
+  editor.onDidChangeModelContent(() => {
+    const val = editor?.getValue();
+    if (val !== props.modelValue) {
+      emit("update:modelValue", editor?.getValue());
+    }
+  });
+});
+
+onBeforeUnmount(() => {
+  editor?.dispose();
+});
+
+watchEffect(() => {
+  editor && monaco.editor.setModelLanguage(editor.getModel()!!, props.language!!);
+});
+
+watchEffect(() => {
+  const curVal = editor?.getValue();
+  if (props.modelValue !== curVal) {
+    editor?.setValue(props.modelValue as string);
+  }
+});
+
+watchEffect(() => {
+  monaco.editor.setTheme(getTheme());
+});
+</script>
+
 <template>
   <div ref="root" style="height: 100%"></div>
 </template>
-
-<script>
-import {
-  ref,
-  onMounted,
-  onBeforeUnmount,
-  toRefs,
-  watch,
-  defineComponent,
-} from "vue";
-import * as monaco from "monaco-editor";
-
-import { darkTheme } from "naive-ui";
-
-export default defineComponent({
-  name: "MonacoEditor",
-  props: {
-    modelValue: String,
-    language: String,
-    theme: Object,
-  },
-  inject: [],
-  setup(props, { emit }) {
-    const root = ref(null);
-    let editor = null;
-    const { modelValue, language, theme } = toRefs(props);
-
-    const getTheme = () =>
-      theme.value.baseColor === darkTheme.common.baseColor ? "vs-dark" : "vs";
-
-    onMounted(() => {
-      editor = monaco.editor.create(root.value, {
-        value: modelValue.value,
-        language: language.value,
-        automaticLayout: true,
-        theme: getTheme(),
-      });
-      editor.onDidChangeModelContent(() => {
-        const val = editor.getValue();
-        if (val !== modelValue.value) {
-          emit("update:modelValue", editor.getValue());
-        }
-      });
-    });
-
-    onBeforeUnmount(() => {
-      editor.dispose();
-    });
-
-    watch(language, (newVal) => {
-      monaco.editor.setModelLanguage(editor.getModel(), newVal);
-    });
-
-    watch(modelValue, (newVal) => {
-      const curVal = editor.getValue();
-      if (newVal !== curVal) {
-        editor.setValue(newVal);
-      }
-    });
-
-    watch(theme, () => {
-      monaco.editor.setTheme(getTheme());
-    });
-
-    return {
-      root,
-    };
-  },
-});
-</script>

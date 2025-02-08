@@ -2,18 +2,14 @@
   <span>{{ parseDate }}</span>
 </template>
 
-<script>
-import { defineComponent } from "vue";
+<script setup lang="ts">
 import moment from "moment";
+import { computed } from "vue";
 
-export default defineComponent({
-  name: "Date",
-  props: ["date"],
-  computed: {
-    parseDate() {
-      const d = new Date(this.date.seconds * 1000 + this.date.nanos / 1e6);
-      return moment(d).format("dddd, MMMM Do YYYY, kk:mm:ss.SSS ZZ");
-    },
-  },
+const { date } = defineProps(["date"]);
+
+const parseDate = computed(() => {
+  const d = new Date(date.seconds * 1000 + date.nanos / 1e6);
+  return moment(d).format("dddd, MMMM Do YYYY, kk:mm:ss.SSS ZZ");
 });
 </script>

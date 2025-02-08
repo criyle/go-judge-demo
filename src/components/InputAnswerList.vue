@@ -1,5 +1,5 @@
 <template>
-  <n-dynamic-input :value="value" @update:value="$emit('update:value', $event)" :on-create="onCreate">
+  <n-dynamic-input :value="model" @update:value="model = $event" :on-create="onCreate">
     <template #default="{ value }">
       <div style="display: flex; width: 100%">
         <n-input type="textarea" v-model:value="value.input" placeholder="Input" :autosize="{ minRows: 1 }"
@@ -11,30 +11,16 @@
   </n-dynamic-input>
 </template>
 
-<script>
-import { defineComponent, toRefs } from "vue";
+<script setup lang="ts">
 import { NDynamicInput, NInput } from "naive-ui";
 
-export default defineComponent({
-  components: {
-    NDynamicInput,
-    NInput,
-  },
-  props: ["value"],
-  emits: ["update:value"],
-  setup(props) {
-    const { value } = toRefs(props);
-    const onCreate = () => {
-      const v = value.value.length + 1;
-      return {
-        input: v.toString() + ' ' + v.toString(),
-        answer: (v * 2).toString(),
-      };
-    };
+const model = defineModel<any[]>();
 
-    return {
-      onCreate,
-    };
-  },
-});
+const onCreate = () => {
+  const v = model.value.length + 1;
+  return {
+    input: v.toString() + ' ' + v.toString(),
+    answer: (v * 2).toString(),
+  };
+};
 </script>

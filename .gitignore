@@ -32,3 +32,6 @@ judger/run
 *.njsproj
 *.sln
 *.sw?
+
+# overmind
+.overmind.sock

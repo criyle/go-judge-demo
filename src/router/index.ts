@@ -1,8 +1,8 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 
-const OnlineJudger = () => import("./components/OnlineJudger.vue");
-const Submission = () => import('./components/Submission.vue');
-const Terminal = () => import('./components/Terminal.vue');
+const OnlineJudger = () => import("../views/OnlineJudger.vue");
+const Submission = () => import('../views/Submission.vue');
+const Terminal = () => import('../views/Terminal.vue');
 
 const routes: RouteRecordRaw[] = [
     {

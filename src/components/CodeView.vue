@@ -10,36 +10,26 @@
     </template>
 
     <div v-once>
-      Total character: {{ value.length }} <br />
-      Total line: {{ value.split("\n").length }}
+      Total character: {{ value?.length }} <br />
+      Total line: {{ value?.split("\n").length }}
     </div>
   </n-tooltip>
 </template>
 
-<script>
-import { defineAsyncComponent, defineComponent } from "vue";
+<script setup lang="ts">
 import { NEllipsis, NTooltip, useThemeVars } from "naive-ui";
+import { defineAsyncComponent } from "vue";
 
 const MonacoHighlighter = defineAsyncComponent(() =>
   import("./MonacoHighlighter.vue")
 );
 
-export default defineComponent({
-  name: "CodeView",
-  props: {
-    value: String,
-    language: String,
-    label: String,
-  },
-  components: {
-    NEllipsis,
-    NTooltip,
-    MonacoHighlighter,
-  },
-  data: () => ({
-    themeVars: useThemeVars(),
-  }),
+const props = defineProps({
+  value: String,
+  language: String,
+  label: String,
 });
+const themeVars = useThemeVars();
 </script>
 
 <style scoped>

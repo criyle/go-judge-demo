@@ -1,12 +1,12 @@
 import { createApp } from 'vue';
 
 import App from './App.vue';
-import router from './routes';
+import router from './router';
 
 // General Font
-import 'vfonts/Lato.css'
+import 'vfonts/Lato.css';
 // Monospace Font
-import 'vfonts/FiraCode.css'
+import 'vfonts/FiraCode.css';
 
 const app = createApp(App);
 

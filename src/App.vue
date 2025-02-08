@@ -10,7 +10,8 @@
               padding: 0 32px 0 0;
             ">
             <div>
-              <n-menu :value="menuValue" :options="options" mode="horizontal" @update:value="handleMenuUpdateValue" />
+              <n-menu :value="menuValue" :options="menuOptions" mode="horizontal"
+                @update:value="handleMenuUpdateValue" />
             </div>
 
             <div style="display: flex; align-items: center">
@@ -33,93 +34,70 @@
   </div>
 </template>
 
-<script lang="ts">
-import { computed, defineComponent, ref, watch } from "vue";
+<script setup lang="ts">
 import {
   darkTheme,
   NButton,
   NConfigProvider,
-  NDivider,
   NGlobalStyle,
   NLayout,
-  NLayoutHeader,
   NLayoutContent,
+  NLayoutHeader,
   NLoadingBarProvider,
   NMenu,
   useOsTheme,
 } from "naive-ui";
+import { computed, ref, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
-export default defineComponent({
-  components: {
-    NButton,
-    NConfigProvider,
-    NDivider,
-    NGlobalStyle,
-    NLayout,
-    NLayoutHeader,
-    NLayoutContent,
-    NLoadingBarProvider,
-    NMenu,
+const route = useRoute();
+const router = useRouter();
+const menuOptions = [
+  {
+    label: "GO Judge",
+    key: "home",
+    path: "/",
   },
-  setup() {
-    const route = useRoute();
-    const router = useRouter();
-    const menuOptions = [
-      {
-        label: "GO Judge",
-        key: "home",
-        path: "/",
-      },
-      {
-        label: "Submission",
-        key: "submission",
-        path: "/submissions",
-      },
-      {
-        label: "Terminal",
-        key: "terminal",
-        path: "/terminal",
-      },
-    ];
-
-    const menuValue = computed(() => {
-      const option = menuOptions.filter((v) => v.path === route.path);
-      if (option.length > 0) {
-        return option[0].key;
-      }
-      return "home";
-    });
-
-    const osThemeRef = useOsTheme();
-    const themeRef = ref(osThemeRef.value === "dark" ? darkTheme : null);
-
-    watch(osThemeRef, (newVal) => {
-      themeRef.value = newVal === "dark" ? darkTheme : null;
-    });
-
-    const isDarkTheme = () =>
-      themeRef.value &&
-      themeRef.value.common.baseColor === darkTheme.common.baseColor;
-
-    const themeName = computed(() => (isDarkTheme() ? "Dark" : "Light"));
-
-    const handelThemeChange = () => {
-      themeRef.value = isDarkTheme() ? null : darkTheme;
-    };
-
-    return {
-      options: menuOptions,
-      menuValue,
-      themeRef,
-      themeName,
-      handleMenuUpdateValue: (_, option) => {
-        router.push(option.path);
-      },
-      handelThemeChange,
-    };
+  {
+    label: "Submission",
+    key: "submission",
+    path: "/submissions",
   },
+  {
+    label: "Terminal",
+    key: "terminal",
+    path: "/terminal",
+  },
+];
+
+const menuValue = computed(() => {
+  const option = menuOptions.filter((v) => v.path === route.path);
+  if (option.length > 0) {
+    return option[0].key;
+  }
+  return "home";
 });
+
+const osThemeRef = useOsTheme();
+const themeRef = ref(osThemeRef.value === "dark" ? darkTheme : null);
+
+watch(osThemeRef, (newVal) => {
+  themeRef.value = newVal === "dark" ? darkTheme : null;
+});
+
+const isDarkTheme = () =>
+  themeRef.value &&
+  themeRef.value.common.baseColor === darkTheme.common.baseColor;
+
+const themeName = computed(() => (isDarkTheme() ? "Dark" : "Light"));
+
+const handelThemeChange = () => {
+  themeRef.value = isDarkTheme() ? null : darkTheme;
+};
+
+const handleMenuUpdateValue = (_, option) => {
+  router.push(option.path);
+}
 </script>
 
 <style lang="css">

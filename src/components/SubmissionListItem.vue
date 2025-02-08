@@ -61,48 +61,34 @@
   </n-collapse-item>
 </template>
 
-<script>
-import { defineAsyncComponent, defineComponent } from "vue";
+<script setup lang="ts">
 import {
   NCollapseItem,
   NDescriptions,
   NDescriptionsItem,
   NDivider,
 } from "naive-ui";
+import { defineAsyncComponent } from "vue";
 import CodeView from "./CodeView.vue";
 const Date = defineAsyncComponent(() => import("./Date.vue"));
 
-export default defineComponent({
-  name: "SubmissionListItem",
-  props: ["index", "s"],
-  data: () => ({
-    active: false,
-  }),
-  components: {
-    NCollapseItem,
-    NDescriptions,
-    NDescriptionsItem,
-    NDivider,
-    CodeView,
-    Date,
-  },
-  methods: {
-    cpu: (value) => {
-      if (value) {
-        return value + " ms";
-      } else {
-        return "0 ms";
-      }
-    },
-    memory: (value) => {
-      if (value) {
-        return value + " kB";
-      } else {
-        return "0 kB";
-      }
-    },
-  },
-});
+const { index, s } = defineProps(["index", "s"])
+
+const cpu = (value) => {
+  if (value) {
+    return value + " ms";
+  } else {
+    return "0 ms";
+  }
+};
+
+const memory = (value) => {
+  if (value) {
+    return value + " kB";
+  } else {
+    return "0 kB";
+  }
+};
 </script>
 
 <style scoped>
