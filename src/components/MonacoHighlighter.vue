@@ -1,32 +1,24 @@
 <template>
-  <div class="code" v-html="html"></div>
+  <div v-once ref="root" :data-lang="language" class="code">{{ value }}</div>
 </template>
 
 <script setup lang="ts">
 import * as monaco from "monaco-editor";
-import { darkTheme } from "naive-ui";
-import { ref, toRefs, watch } from "vue";
+import { darkTheme, type ThemeCommonVars } from "naive-ui";
+import { onMounted, useTemplateRef, watchEffect } from "vue";
 
-const props = defineProps({
-  value: String,
-  language: String,
-  theme: Object,
-});
-
-const html = ref("");
-const { theme, value, language } = toRefs(props);
+const { value, language, theme } = defineProps<{ value: string, language: string, theme: ThemeCommonVars }>();
+const root = useTemplateRef("root");
 
 const getTheme = () =>
-  props.theme?.baseColor === darkTheme.common.baseColor ? "vs-dark" : "vs";
+  theme?.baseColor === darkTheme.common.baseColor ? "vs-dark" : "vs";
 
 const render = async () => {
-  monaco.editor.setTheme(getTheme());
-  html.value = await monaco.editor.colorize(props?.value || "", props?.language || "text", {});
+  root.value && await monaco.editor.colorizeElement(root.value, { theme: getTheme() })
 };
 
-render();
-
-watch([theme, value, language], render);
+watchEffect(() => value && language && theme && render());
+onMounted(() => render());
 </script>
 
 <style scoped>

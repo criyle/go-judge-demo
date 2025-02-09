@@ -1,43 +1,43 @@
 <template>
   <n-collapse-item>
     <template #header>
-      <span class="status">{{ s.status }}</span>
+      <span class="status">{{ submission.status }}</span>
       <span class="date">
-        <date :date="s.date"></date>
+        <date :date="submission.date"></date>
       </span>
     </template>
     <n-descriptions label-placement="top" :column="6">
       <n-descriptions-item>
         <template #label>_id</template>
-        {{ s.id }}
+        {{ submission.id }}
       </n-descriptions-item>
       <n-descriptions-item>
         <template #label>language name</template>
-        {{ s.language.name }}
+        {{ submission.language.name }}
       </n-descriptions-item>
       <n-descriptions-item>
         <template #label>source file name</template>
-        {{ s.language.sourceFileName }}
+        {{ submission.language.sourceFileName }}
       </n-descriptions-item>
       <n-descriptions-item>
         <template #label>compile cmd</template>
-        {{ s.language.compileCmd }}
+        {{ submission.language.compileCmd }}
       </n-descriptions-item>
       <n-descriptions-item>
         <template #label>executable file names</template>
-        {{ s.language.executables }}
+        {{ submission.language.executables }}
       </n-descriptions-item>
       <n-descriptions-item>
         <template #label>exec cmd</template>
-        {{ s.language.runCmd }}
+        {{ submission.language.runCmd }}
       </n-descriptions-item>
 
       <n-descriptions-item :span="6">
         <template #label>code</template>
-        <code-view label="code" :value="s.source" :language="s.language.name"></code-view>
+        <code-view label="code" :value="submission.source" :language="submission.language.name"></code-view>
       </n-descriptions-item>
     </n-descriptions>
-    <template v-for="(u, index) in s.results" :key="index">
+    <template v-for="(u, index) in submission.results" :key="index">
       <n-divider />
       <n-descriptions :column="2">
         <n-descriptions-item>
@@ -72,9 +72,9 @@ import { defineAsyncComponent } from "vue";
 import CodeView from "./CodeView.vue";
 const Date = defineAsyncComponent(() => import("./Date.vue"));
 
-const { index, s } = defineProps(["index", "s"])
+const { submission } = defineProps<{ submission: any }>()
 
-const cpu = (value) => {
+const cpu = (value: string) => {
   if (value) {
     return value + " ms";
   } else {
@@ -82,7 +82,7 @@ const cpu = (value) => {
   }
 };
 
-const memory = (value) => {
+const memory = (value: string) => {
   if (value) {
     return value + " kB";
   } else {

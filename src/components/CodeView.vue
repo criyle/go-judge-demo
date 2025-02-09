@@ -24,11 +24,7 @@ const MonacoHighlighter = defineAsyncComponent(() =>
   import("./MonacoHighlighter.vue")
 );
 
-const props = defineProps({
-  value: String,
-  language: String,
-  label: String,
-});
+const { value, language } = defineProps<{ value: string, language: string }>();
 const themeVars = useThemeVars();
 </script>
 

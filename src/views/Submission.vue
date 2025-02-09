@@ -1,5 +1,5 @@
 <template>
-  <submission-list :submission="submission" @loadMore="loadMore"></submission-list>
+  <submission-list :submissions="submissions" @loadMore="loadMore"></submission-list>
 </template>
 
 <script setup lang="ts">
@@ -7,14 +7,14 @@ import axios from "axios";
 import { onBeforeUnmount, onMounted, ref } from "vue";
 import SubmissionList from "../components/SubmissionList.vue";
 
-const submission = ref([]);
+const submissions = ref([]);
 let websocket: WebSocket = null;
 
 const loadMore = () => {
   const p =
-    submission.value.length > 0
+    submissions.value.length > 0
       ? {
-        id: submission[submission.value.length - 1].id,
+        id: submissions[submissions.value.length - 1].id,
       }
       : {};
   axios
@@ -23,9 +23,9 @@ const loadMore = () => {
     })
     .then((r) => {
       r.data.forEach((data) => {
-        const idx = submission.value.findIndex((s) => s.id === data.id);
+        const idx = submissions.value.findIndex((s) => s.id === data.id);
         if (idx == -1) {
-          submission.value.push(data);
+          submissions.value.push(data);
         }
       });
     });
@@ -40,15 +40,15 @@ const createWS = () => {
   const ws = new WebSocket(url);
   ws.addEventListener("message", (event) => {
     const data = JSON.parse(event.data);
-    const idx = submission.value.findIndex((s) => s.id === data.id);
+    const idx = submissions.value.findIndex((s) => s.id === data.id);
     if (idx >= 0) {
-      submission.value[idx] = {
-        ...submission.value[idx],
+      submissions.value[idx] = {
+        ...submissions.value[idx],
         status: data.status,
-        results: data.results || submission.value[idx].results,
+        results: data.results || submissions.value[idx].results,
       };
     } else {
-      submission.value.unshift(data);
+      submissions.value.unshift(data);
     }
   });
   ws.addEventListener("close", () => {
@@ -56,7 +56,7 @@ const createWS = () => {
     setTimeout(createWS, 1000);
   });
   ws.addEventListener("open", () => {
-    if (submission.value.length === 0) {
+    if (submissions.value.length === 0) {
       loadMore();
     }
   });

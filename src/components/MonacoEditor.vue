@@ -1,39 +1,34 @@
 <script setup lang="ts">
 import * as monaco from "monaco-editor";
-import { darkTheme } from "naive-ui";
+import { darkTheme, type ThemeCommonVars } from "naive-ui";
 import {
   onBeforeUnmount,
   onMounted,
-  ref,
-  type VNodeRef,
-  watchEffect,
+  useTemplateRef,
+  watch,
+  watchEffect
 } from "vue";
 
-const props = defineProps({
-  modelValue: String,
-  language: String,
-  theme: Object,
-});
+const modelValue = defineModel<string>();
+const { language, theme } = defineProps<{ modelValue: string, language: string, theme: ThemeCommonVars }>();
 
-const emit = defineEmits(['update:modelValue']);
-
-const root = ref<VNodeRef | null>(null);
+const root = useTemplateRef("root");
 let editor: monaco.editor.IStandaloneCodeEditor | null = null;
 
 const getTheme = () =>
-  props.theme?.baseColor === darkTheme.common.baseColor ? "vs-dark" : "vs";
+  theme?.baseColor === darkTheme.common.baseColor ? "vs-dark" : "vs";
 
 onMounted(() => {
-  editor = monaco.editor.create(root.value, {
-    value: props.modelValue,
-    language: props.language,
+  editor = monaco.editor.create(root.value!!, {
+    value: modelValue.value,
+    language: language,
     automaticLayout: true,
     theme: getTheme(),
   });
   editor.onDidChangeModelContent(() => {
     const val = editor?.getValue();
-    if (val !== props.modelValue) {
-      emit("update:modelValue", editor?.getValue());
+    if (val !== modelValue.value) {
+      modelValue.value = val;
     }
   });
 });
@@ -43,15 +38,15 @@ onBeforeUnmount(() => {
 });
 
 watchEffect(() => {
-  editor && monaco.editor.setModelLanguage(editor.getModel()!!, props.language!!);
+  language && editor && monaco.editor.setModelLanguage(editor.getModel()!!, language);
 });
 
-watchEffect(() => {
+watch(modelValue, (v) => {
   const curVal = editor?.getValue();
-  if (props.modelValue !== curVal) {
-    editor?.setValue(props.modelValue as string);
+  if (v != curVal) {
+    editor?.setValue(v!!);
   }
-});
+})
 
 watchEffect(() => {
   monaco.editor.setTheme(getTheme());

@@ -1,7 +1,8 @@
 <template>
   <div>
     <n-collapse>
-      <submission-list-item v-for="(s, index) in submission" :key="s.id" :index="index" :s="s"></submission-list-item>
+      <submission-list-item v-for="(submission, index) in submissions" :key="submission.id"
+        :submission="submission"></submission-list-item>
     </n-collapse>
 
     <n-divider />
@@ -14,7 +15,5 @@
 import { NButton, NCollapse, NDivider } from "naive-ui";
 import SubmissionListItem from "./SubmissionListItem.vue";
 
-const { submission } = defineProps([
-  "submission"
-]);
+const { submissions } = defineProps<{ submissions: any[] }>();
 </script>

@@ -1,21 +1,17 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from 'vue-router';
 
-const OnlineJudger = () => import("../views/OnlineJudger.vue");
-const Submission = () => import('../views/Submission.vue');
-const Terminal = () => import('../views/Terminal.vue');
-
 const routes: RouteRecordRaw[] = [
     {
         path: '/',
-        component: OnlineJudger,
+        component: () => import("../views/OnlineJudger.vue"),
     },
     {
         path: '/submissions',
-        component: Submission,
+        component: () => import('../views/Submission.vue'),
     },
     {
         path: '/terminal',
-        component: Terminal,
+        component: () => import('../views/Terminal.vue'),
     },
     {
         path: '/:pathMatch(.*)',
