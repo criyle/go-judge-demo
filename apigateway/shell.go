@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/criyle/go-judger-demo/pb"
+	"github.com/criyle/go-judge-demo/pb"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	"go.uber.org/zap"
@@ -71,13 +71,11 @@ func (s *shell) readLoop() {
 		if err != nil {
 			break
 		}
-		err = s.sc.Send(&pb.ShellInput{
-			Request: &pb.ShellInput_Input{
-				Input: &pb.Input{
-					Content: msg,
-				},
-			},
-		})
+		err = s.sc.Send(pb.ShellInput_builder{
+			Input: pb.Input_builder{
+				Content: msg,
+			}.Build(),
+		}.Build())
 		if err != nil {
 			break
 		}

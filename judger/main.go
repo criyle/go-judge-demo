@@ -10,8 +10,8 @@ import (
 	"os/signal"
 	"time"
 
+	demopb "github.com/criyle/go-judge-demo/pb"
 	execpb "github.com/criyle/go-judge/pb"
-	demopb "github.com/criyle/go-judger-demo/pb"
 	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-middleware/providers/prometheus"
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"
 	"github.com/prometheus/client_golang/prometheus"

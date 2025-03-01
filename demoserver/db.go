@@ -76,7 +76,7 @@ type db struct {
 const (
 	colName         = "submission3"
 	colName2        = "shell1"
-	defaultURI      = "mongodb://localhost:27017/admin"
+	defaultURI      = "mongodb://localhost:27017/test"
 	defaultDatabase = "test1"
 )
 

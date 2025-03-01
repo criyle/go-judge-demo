@@ -5,7 +5,7 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/criyle/go-judger-demo/pb"
+	"github.com/criyle/go-judge-demo/pb"
 	"github.com/gin-gonic/gin"
 	"google.golang.org/protobuf/encoding/protojson"
 )
@@ -23,14 +23,19 @@ func (a *api) Register(r *gin.RouterGroup) {
 
 func (a *api) apiSubmission(c *gin.Context) {
 	id := c.Query("id")
-	resp, err := a.client.Submission(c, &pb.SubmissionRequest{
-		Id: id,
-	})
+	resp, err := a.client.Submission(c, pb.SubmissionRequest_builder{
+		Id: &id,
+	}.Build())
 	if err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
-	c.JSON(http.StatusOK, resp.Submissions)
+	ct, err := protojson.Marshal(resp)
+	if err != nil {
+		c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+	c.Data(http.StatusOK, "application/json; charset=utf-8", ct)
 }
 
 func (a *api) apiSubmit(c *gin.Context) {

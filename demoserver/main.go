@@ -10,8 +10,8 @@ import (
 	"os"
 	"os/signal"
 
+	"github.com/criyle/go-judge-demo/pb"
 	execpb "github.com/criyle/go-judge/pb"
-	"github.com/criyle/go-judger-demo/pb"
 	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-middleware/providers/prometheus"
 	grpc_auth "github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/auth"
 	"github.com/grpc-ecosystem/go-grpc-middleware/v2/interceptors/logging"

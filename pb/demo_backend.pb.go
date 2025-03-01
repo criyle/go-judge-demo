@@ -9,10 +9,10 @@ package pb
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	_ "google.golang.org/protobuf/types/gofeaturespb"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
 	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	reflect "reflect"
-	sync "sync"
 	unsafe "unsafe"
 )
 
@@ -24,10 +24,12 @@ const (
 )
 
 type SubmissionRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state                  protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Id          *string                `protobuf:"bytes,1,opt,name=id"`
+	XXX_raceDetectHookData protoimpl.RaceDetectHookData
+	XXX_presence           [1]uint32
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
 }
 
 func (x *SubmissionRequest) Reset() {
@@ -55,23 +57,55 @@ func (x *SubmissionRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use SubmissionRequest.ProtoReflect.Descriptor instead.
-func (*SubmissionRequest) Descriptor() ([]byte, []int) {
-	return file_demo_backend_proto_rawDescGZIP(), []int{0}
-}
-
 func (x *SubmissionRequest) GetId() string {
 	if x != nil {
-		return x.Id
+		if x.xxx_hidden_Id != nil {
+			return *x.xxx_hidden_Id
+		}
+		return ""
 	}
 	return ""
 }
 
+func (x *SubmissionRequest) SetId(v string) {
+	x.xxx_hidden_Id = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 1)
+}
+
+func (x *SubmissionRequest) HasId() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 0)
+}
+
+func (x *SubmissionRequest) ClearId() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
+	x.xxx_hidden_Id = nil
+}
+
+type SubmissionRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Id *string
+}
+
+func (b0 SubmissionRequest_builder) Build() *SubmissionRequest {
+	m0 := &SubmissionRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	if b.Id != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 1)
+		x.xxx_hidden_Id = b.Id
+	}
+	return m0
+}
+
 type SubmissionResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Submissions   []*Submission          `protobuf:"bytes,1,rep,name=submissions,proto3" json:"submissions,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state                  protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Submissions *[]*Submission         `protobuf:"bytes,1,rep,name=submissions"`
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
 }
 
 func (x *SubmissionResponse) Reset() {
@@ -99,30 +133,47 @@ func (x *SubmissionResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use SubmissionResponse.ProtoReflect.Descriptor instead.
-func (*SubmissionResponse) Descriptor() ([]byte, []int) {
-	return file_demo_backend_proto_rawDescGZIP(), []int{1}
-}
-
 func (x *SubmissionResponse) GetSubmissions() []*Submission {
 	if x != nil {
-		return x.Submissions
+		if x.xxx_hidden_Submissions != nil {
+			return *x.xxx_hidden_Submissions
+		}
 	}
 	return nil
 }
 
+func (x *SubmissionResponse) SetSubmissions(v []*Submission) {
+	x.xxx_hidden_Submissions = &v
+}
+
+type SubmissionResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Submissions []*Submission
+}
+
+func (b0 SubmissionResponse_builder) Build() *SubmissionResponse {
+	m0 := &SubmissionResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Submissions = &b.Submissions
+	return m0
+}
+
 type Submission struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Language      *Language              `protobuf:"bytes,2,opt,name=language,proto3" json:"language,omitempty"`
-	Source        string                 `protobuf:"bytes,3,opt,name=source,proto3" json:"source,omitempty"`
-	Date          *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=date,proto3" json:"date,omitempty"`
-	Status        string                 `protobuf:"bytes,5,opt,name=status,proto3" json:"status,omitempty"`
-	TotalTime     uint64                 `protobuf:"varint,6,opt,name=totalTime,proto3" json:"totalTime,omitempty"` // ms
-	MaxMemory     uint64                 `protobuf:"varint,7,opt,name=maxMemory,proto3" json:"maxMemory,omitempty"` // kb
-	Results       []*Result              `protobuf:"bytes,8,rep,name=results,proto3" json:"results,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state                  protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Id          *string                `protobuf:"bytes,1,opt,name=id"`
+	xxx_hidden_Language    *Language              `protobuf:"bytes,2,opt,name=language"`
+	xxx_hidden_Source      *string                `protobuf:"bytes,3,opt,name=source"`
+	xxx_hidden_Date        *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=date"`
+	xxx_hidden_Status      *string                `protobuf:"bytes,5,opt,name=status"`
+	xxx_hidden_TotalTime   uint64                 `protobuf:"varint,6,opt,name=totalTime"`
+	xxx_hidden_MaxMemory   uint64                 `protobuf:"varint,7,opt,name=maxMemory"`
+	xxx_hidden_Results     *[]*Result             `protobuf:"bytes,8,rep,name=results"`
+	XXX_raceDetectHookData protoimpl.RaceDetectHookData
+	XXX_presence           [1]uint32
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
 }
 
 func (x *Submission) Reset() {
@@ -150,76 +201,246 @@ func (x *Submission) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Submission.ProtoReflect.Descriptor instead.
-func (*Submission) Descriptor() ([]byte, []int) {
-	return file_demo_backend_proto_rawDescGZIP(), []int{2}
-}
-
 func (x *Submission) GetId() string {
 	if x != nil {
-		return x.Id
+		if x.xxx_hidden_Id != nil {
+			return *x.xxx_hidden_Id
+		}
+		return ""
 	}
 	return ""
 }
 
 func (x *Submission) GetLanguage() *Language {
 	if x != nil {
-		return x.Language
+		return x.xxx_hidden_Language
 	}
 	return nil
 }
 
 func (x *Submission) GetSource() string {
 	if x != nil {
-		return x.Source
+		if x.xxx_hidden_Source != nil {
+			return *x.xxx_hidden_Source
+		}
+		return ""
 	}
 	return ""
 }
 
 func (x *Submission) GetDate() *timestamppb.Timestamp {
 	if x != nil {
-		return x.Date
+		return x.xxx_hidden_Date
 	}
 	return nil
 }
 
 func (x *Submission) GetStatus() string {
 	if x != nil {
-		return x.Status
+		if x.xxx_hidden_Status != nil {
+			return *x.xxx_hidden_Status
+		}
+		return ""
 	}
 	return ""
 }
 
 func (x *Submission) GetTotalTime() uint64 {
 	if x != nil {
-		return x.TotalTime
+		return x.xxx_hidden_TotalTime
 	}
 	return 0
 }
 
 func (x *Submission) GetMaxMemory() uint64 {
 	if x != nil {
-		return x.MaxMemory
+		return x.xxx_hidden_MaxMemory
 	}
 	return 0
 }
 
 func (x *Submission) GetResults() []*Result {
 	if x != nil {
-		return x.Results
+		if x.xxx_hidden_Results != nil {
+			return *x.xxx_hidden_Results
+		}
 	}
 	return nil
 }
 
+func (x *Submission) SetId(v string) {
+	x.xxx_hidden_Id = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 8)
+}
+
+func (x *Submission) SetLanguage(v *Language) {
+	x.xxx_hidden_Language = v
+}
+
+func (x *Submission) SetSource(v string) {
+	x.xxx_hidden_Source = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 2, 8)
+}
+
+func (x *Submission) SetDate(v *timestamppb.Timestamp) {
+	x.xxx_hidden_Date = v
+}
+
+func (x *Submission) SetStatus(v string) {
+	x.xxx_hidden_Status = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 4, 8)
+}
+
+func (x *Submission) SetTotalTime(v uint64) {
+	x.xxx_hidden_TotalTime = v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 5, 8)
+}
+
+func (x *Submission) SetMaxMemory(v uint64) {
+	x.xxx_hidden_MaxMemory = v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 6, 8)
+}
+
+func (x *Submission) SetResults(v []*Result) {
+	x.xxx_hidden_Results = &v
+}
+
+func (x *Submission) HasId() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 0)
+}
+
+func (x *Submission) HasLanguage() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Language != nil
+}
+
+func (x *Submission) HasSource() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 2)
+}
+
+func (x *Submission) HasDate() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Date != nil
+}
+
+func (x *Submission) HasStatus() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 4)
+}
+
+func (x *Submission) HasTotalTime() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 5)
+}
+
+func (x *Submission) HasMaxMemory() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 6)
+}
+
+func (x *Submission) ClearId() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
+	x.xxx_hidden_Id = nil
+}
+
+func (x *Submission) ClearLanguage() {
+	x.xxx_hidden_Language = nil
+}
+
+func (x *Submission) ClearSource() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 2)
+	x.xxx_hidden_Source = nil
+}
+
+func (x *Submission) ClearDate() {
+	x.xxx_hidden_Date = nil
+}
+
+func (x *Submission) ClearStatus() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 4)
+	x.xxx_hidden_Status = nil
+}
+
+func (x *Submission) ClearTotalTime() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 5)
+	x.xxx_hidden_TotalTime = 0
+}
+
+func (x *Submission) ClearMaxMemory() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 6)
+	x.xxx_hidden_MaxMemory = 0
+}
+
+type Submission_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Id        *string
+	Language  *Language
+	Source    *string
+	Date      *timestamppb.Timestamp
+	Status    *string
+	TotalTime *uint64
+	MaxMemory *uint64
+	Results   []*Result
+}
+
+func (b0 Submission_builder) Build() *Submission {
+	m0 := &Submission{}
+	b, x := &b0, m0
+	_, _ = b, x
+	if b.Id != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 8)
+		x.xxx_hidden_Id = b.Id
+	}
+	x.xxx_hidden_Language = b.Language
+	if b.Source != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 2, 8)
+		x.xxx_hidden_Source = b.Source
+	}
+	x.xxx_hidden_Date = b.Date
+	if b.Status != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 4, 8)
+		x.xxx_hidden_Status = b.Status
+	}
+	if b.TotalTime != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 5, 8)
+		x.xxx_hidden_TotalTime = *b.TotalTime
+	}
+	if b.MaxMemory != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 6, 8)
+		x.xxx_hidden_MaxMemory = *b.MaxMemory
+	}
+	x.xxx_hidden_Results = &b.Results
+	return m0
+}
+
 type Language struct {
-	state          protoimpl.MessageState `protogen:"open.v1"`
-	Name           string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	SourceFileName string                 `protobuf:"bytes,2,opt,name=sourceFileName,proto3" json:"sourceFileName,omitempty"`
-	CompileCmd     string                 `protobuf:"bytes,3,opt,name=compileCmd,proto3" json:"compileCmd,omitempty"`
-	Executables    string                 `protobuf:"bytes,4,opt,name=executables,proto3" json:"executables,omitempty"`
-	RunCmd         string                 `protobuf:"bytes,5,opt,name=runCmd,proto3" json:"runCmd,omitempty"`
-	unknownFields  protoimpl.UnknownFields
-	sizeCache      protoimpl.SizeCache
+	state                     protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Name           *string                `protobuf:"bytes,1,opt,name=name"`
+	xxx_hidden_SourceFileName *string                `protobuf:"bytes,2,opt,name=sourceFileName"`
+	xxx_hidden_CompileCmd     *string                `protobuf:"bytes,3,opt,name=compileCmd"`
+	xxx_hidden_Executables    *string                `protobuf:"bytes,4,opt,name=executables"`
+	xxx_hidden_RunCmd         *string                `protobuf:"bytes,5,opt,name=runCmd"`
+	XXX_raceDetectHookData    protoimpl.RaceDetectHookData
+	XXX_presence              [1]uint32
+	unknownFields             protoimpl.UnknownFields
+	sizeCache                 protoimpl.SizeCache
 }
 
 func (x *Language) Reset() {
@@ -247,56 +468,190 @@ func (x *Language) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Language.ProtoReflect.Descriptor instead.
-func (*Language) Descriptor() ([]byte, []int) {
-	return file_demo_backend_proto_rawDescGZIP(), []int{3}
-}
-
 func (x *Language) GetName() string {
 	if x != nil {
-		return x.Name
+		if x.xxx_hidden_Name != nil {
+			return *x.xxx_hidden_Name
+		}
+		return ""
 	}
 	return ""
 }
 
 func (x *Language) GetSourceFileName() string {
 	if x != nil {
-		return x.SourceFileName
+		if x.xxx_hidden_SourceFileName != nil {
+			return *x.xxx_hidden_SourceFileName
+		}
+		return ""
 	}
 	return ""
 }
 
 func (x *Language) GetCompileCmd() string {
 	if x != nil {
-		return x.CompileCmd
+		if x.xxx_hidden_CompileCmd != nil {
+			return *x.xxx_hidden_CompileCmd
+		}
+		return ""
 	}
 	return ""
 }
 
 func (x *Language) GetExecutables() string {
 	if x != nil {
-		return x.Executables
+		if x.xxx_hidden_Executables != nil {
+			return *x.xxx_hidden_Executables
+		}
+		return ""
 	}
 	return ""
 }
 
 func (x *Language) GetRunCmd() string {
 	if x != nil {
-		return x.RunCmd
+		if x.xxx_hidden_RunCmd != nil {
+			return *x.xxx_hidden_RunCmd
+		}
+		return ""
 	}
 	return ""
 }
 
+func (x *Language) SetName(v string) {
+	x.xxx_hidden_Name = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 5)
+}
+
+func (x *Language) SetSourceFileName(v string) {
+	x.xxx_hidden_SourceFileName = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 5)
+}
+
+func (x *Language) SetCompileCmd(v string) {
+	x.xxx_hidden_CompileCmd = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 2, 5)
+}
+
+func (x *Language) SetExecutables(v string) {
+	x.xxx_hidden_Executables = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 3, 5)
+}
+
+func (x *Language) SetRunCmd(v string) {
+	x.xxx_hidden_RunCmd = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 4, 5)
+}
+
+func (x *Language) HasName() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 0)
+}
+
+func (x *Language) HasSourceFileName() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
+}
+
+func (x *Language) HasCompileCmd() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 2)
+}
+
+func (x *Language) HasExecutables() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 3)
+}
+
+func (x *Language) HasRunCmd() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 4)
+}
+
+func (x *Language) ClearName() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
+	x.xxx_hidden_Name = nil
+}
+
+func (x *Language) ClearSourceFileName() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
+	x.xxx_hidden_SourceFileName = nil
+}
+
+func (x *Language) ClearCompileCmd() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 2)
+	x.xxx_hidden_CompileCmd = nil
+}
+
+func (x *Language) ClearExecutables() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 3)
+	x.xxx_hidden_Executables = nil
+}
+
+func (x *Language) ClearRunCmd() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 4)
+	x.xxx_hidden_RunCmd = nil
+}
+
+type Language_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Name           *string
+	SourceFileName *string
+	CompileCmd     *string
+	Executables    *string
+	RunCmd         *string
+}
+
+func (b0 Language_builder) Build() *Language {
+	m0 := &Language{}
+	b, x := &b0, m0
+	_, _ = b, x
+	if b.Name != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 5)
+		x.xxx_hidden_Name = b.Name
+	}
+	if b.SourceFileName != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 5)
+		x.xxx_hidden_SourceFileName = b.SourceFileName
+	}
+	if b.CompileCmd != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 2, 5)
+		x.xxx_hidden_CompileCmd = b.CompileCmd
+	}
+	if b.Executables != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 3, 5)
+		x.xxx_hidden_Executables = b.Executables
+	}
+	if b.RunCmd != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 4, 5)
+		x.xxx_hidden_RunCmd = b.RunCmd
+	}
+	return m0
+}
+
 type Result struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Time          uint64                 `protobuf:"varint,1,opt,name=time,proto3" json:"time,omitempty"`     // ms
-	Memory        uint64                 `protobuf:"varint,2,opt,name=memory,proto3" json:"memory,omitempty"` // kb
-	Stdin         string                 `protobuf:"bytes,3,opt,name=stdin,proto3" json:"stdin,omitempty"`
-	Stdout        string                 `protobuf:"bytes,4,opt,name=stdout,proto3" json:"stdout,omitempty"`
-	Stderr        string                 `protobuf:"bytes,5,opt,name=stderr,proto3" json:"stderr,omitempty"`
-	Log           string                 `protobuf:"bytes,6,opt,name=log,proto3" json:"log,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state                  protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Time        uint64                 `protobuf:"varint,1,opt,name=time"`
+	xxx_hidden_Memory      uint64                 `protobuf:"varint,2,opt,name=memory"`
+	xxx_hidden_Stdin       *string                `protobuf:"bytes,3,opt,name=stdin"`
+	xxx_hidden_Stdout      *string                `protobuf:"bytes,4,opt,name=stdout"`
+	xxx_hidden_Stderr      *string                `protobuf:"bytes,5,opt,name=stderr"`
+	xxx_hidden_Log         *string                `protobuf:"bytes,6,opt,name=log"`
+	XXX_raceDetectHookData protoimpl.RaceDetectHookData
+	XXX_presence           [1]uint32
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
 }
 
 func (x *Result) Reset() {
@@ -324,59 +679,212 @@ func (x *Result) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Result.ProtoReflect.Descriptor instead.
-func (*Result) Descriptor() ([]byte, []int) {
-	return file_demo_backend_proto_rawDescGZIP(), []int{4}
-}
-
 func (x *Result) GetTime() uint64 {
 	if x != nil {
-		return x.Time
+		return x.xxx_hidden_Time
 	}
 	return 0
 }
 
 func (x *Result) GetMemory() uint64 {
 	if x != nil {
-		return x.Memory
+		return x.xxx_hidden_Memory
 	}
 	return 0
 }
 
 func (x *Result) GetStdin() string {
 	if x != nil {
-		return x.Stdin
+		if x.xxx_hidden_Stdin != nil {
+			return *x.xxx_hidden_Stdin
+		}
+		return ""
 	}
 	return ""
 }
 
 func (x *Result) GetStdout() string {
 	if x != nil {
-		return x.Stdout
+		if x.xxx_hidden_Stdout != nil {
+			return *x.xxx_hidden_Stdout
+		}
+		return ""
 	}
 	return ""
 }
 
 func (x *Result) GetStderr() string {
 	if x != nil {
-		return x.Stderr
+		if x.xxx_hidden_Stderr != nil {
+			return *x.xxx_hidden_Stderr
+		}
+		return ""
 	}
 	return ""
 }
 
 func (x *Result) GetLog() string {
 	if x != nil {
-		return x.Log
+		if x.xxx_hidden_Log != nil {
+			return *x.xxx_hidden_Log
+		}
+		return ""
 	}
 	return ""
 }
 
+func (x *Result) SetTime(v uint64) {
+	x.xxx_hidden_Time = v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 6)
+}
+
+func (x *Result) SetMemory(v uint64) {
+	x.xxx_hidden_Memory = v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 6)
+}
+
+func (x *Result) SetStdin(v string) {
+	x.xxx_hidden_Stdin = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 2, 6)
+}
+
+func (x *Result) SetStdout(v string) {
+	x.xxx_hidden_Stdout = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 3, 6)
+}
+
+func (x *Result) SetStderr(v string) {
+	x.xxx_hidden_Stderr = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 4, 6)
+}
+
+func (x *Result) SetLog(v string) {
+	x.xxx_hidden_Log = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 5, 6)
+}
+
+func (x *Result) HasTime() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 0)
+}
+
+func (x *Result) HasMemory() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
+}
+
+func (x *Result) HasStdin() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 2)
+}
+
+func (x *Result) HasStdout() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 3)
+}
+
+func (x *Result) HasStderr() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 4)
+}
+
+func (x *Result) HasLog() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 5)
+}
+
+func (x *Result) ClearTime() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
+	x.xxx_hidden_Time = 0
+}
+
+func (x *Result) ClearMemory() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
+	x.xxx_hidden_Memory = 0
+}
+
+func (x *Result) ClearStdin() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 2)
+	x.xxx_hidden_Stdin = nil
+}
+
+func (x *Result) ClearStdout() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 3)
+	x.xxx_hidden_Stdout = nil
+}
+
+func (x *Result) ClearStderr() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 4)
+	x.xxx_hidden_Stderr = nil
+}
+
+func (x *Result) ClearLog() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 5)
+	x.xxx_hidden_Log = nil
+}
+
+type Result_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Time   *uint64
+	Memory *uint64
+	Stdin  *string
+	Stdout *string
+	Stderr *string
+	Log    *string
+}
+
+func (b0 Result_builder) Build() *Result {
+	m0 := &Result{}
+	b, x := &b0, m0
+	_, _ = b, x
+	if b.Time != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 6)
+		x.xxx_hidden_Time = *b.Time
+	}
+	if b.Memory != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 6)
+		x.xxx_hidden_Memory = *b.Memory
+	}
+	if b.Stdin != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 2, 6)
+		x.xxx_hidden_Stdin = b.Stdin
+	}
+	if b.Stdout != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 3, 6)
+		x.xxx_hidden_Stdout = b.Stdout
+	}
+	if b.Stderr != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 4, 6)
+		x.xxx_hidden_Stderr = b.Stderr
+	}
+	if b.Log != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 5, 6)
+		x.xxx_hidden_Log = b.Log
+	}
+	return m0
+}
+
 type InputAnswer struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Input         string                 `protobuf:"bytes,1,opt,name=input,proto3" json:"input,omitempty"`
-	Answer        string                 `protobuf:"bytes,2,opt,name=answer,proto3" json:"answer,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state                  protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Input       *string                `protobuf:"bytes,1,opt,name=input"`
+	xxx_hidden_Answer      *string                `protobuf:"bytes,2,opt,name=answer"`
+	XXX_raceDetectHookData protoimpl.RaceDetectHookData
+	XXX_presence           [1]uint32
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
 }
 
 func (x *InputAnswer) Reset() {
@@ -404,32 +912,91 @@ func (x *InputAnswer) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use InputAnswer.ProtoReflect.Descriptor instead.
-func (*InputAnswer) Descriptor() ([]byte, []int) {
-	return file_demo_backend_proto_rawDescGZIP(), []int{5}
-}
-
 func (x *InputAnswer) GetInput() string {
 	if x != nil {
-		return x.Input
+		if x.xxx_hidden_Input != nil {
+			return *x.xxx_hidden_Input
+		}
+		return ""
 	}
 	return ""
 }
 
 func (x *InputAnswer) GetAnswer() string {
 	if x != nil {
-		return x.Answer
+		if x.xxx_hidden_Answer != nil {
+			return *x.xxx_hidden_Answer
+		}
+		return ""
 	}
 	return ""
 }
 
+func (x *InputAnswer) SetInput(v string) {
+	x.xxx_hidden_Input = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 2)
+}
+
+func (x *InputAnswer) SetAnswer(v string) {
+	x.xxx_hidden_Answer = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 2)
+}
+
+func (x *InputAnswer) HasInput() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 0)
+}
+
+func (x *InputAnswer) HasAnswer() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
+}
+
+func (x *InputAnswer) ClearInput() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
+	x.xxx_hidden_Input = nil
+}
+
+func (x *InputAnswer) ClearAnswer() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
+	x.xxx_hidden_Answer = nil
+}
+
+type InputAnswer_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Input  *string
+	Answer *string
+}
+
+func (b0 InputAnswer_builder) Build() *InputAnswer {
+	m0 := &InputAnswer{}
+	b, x := &b0, m0
+	_, _ = b, x
+	if b.Input != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 2)
+		x.xxx_hidden_Input = b.Input
+	}
+	if b.Answer != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 2)
+		x.xxx_hidden_Answer = b.Answer
+	}
+	return m0
+}
+
 type SubmitRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Language      *Language              `protobuf:"bytes,1,opt,name=language,proto3" json:"language,omitempty"`
-	Source        string                 `protobuf:"bytes,2,opt,name=source,proto3" json:"source,omitempty"`
-	InputAnswer   []*InputAnswer         `protobuf:"bytes,3,rep,name=inputAnswer,proto3" json:"inputAnswer,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state                  protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Language    *Language              `protobuf:"bytes,1,opt,name=language"`
+	xxx_hidden_Source      *string                `protobuf:"bytes,2,opt,name=source"`
+	xxx_hidden_InputAnswer *[]*InputAnswer        `protobuf:"bytes,3,rep,name=inputAnswer"`
+	XXX_raceDetectHookData protoimpl.RaceDetectHookData
+	XXX_presence           [1]uint32
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
 }
 
 func (x *SubmitRequest) Reset() {
@@ -457,37 +1024,96 @@ func (x *SubmitRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use SubmitRequest.ProtoReflect.Descriptor instead.
-func (*SubmitRequest) Descriptor() ([]byte, []int) {
-	return file_demo_backend_proto_rawDescGZIP(), []int{6}
-}
-
 func (x *SubmitRequest) GetLanguage() *Language {
 	if x != nil {
-		return x.Language
+		return x.xxx_hidden_Language
 	}
 	return nil
 }
 
 func (x *SubmitRequest) GetSource() string {
 	if x != nil {
-		return x.Source
+		if x.xxx_hidden_Source != nil {
+			return *x.xxx_hidden_Source
+		}
+		return ""
 	}
 	return ""
 }
 
 func (x *SubmitRequest) GetInputAnswer() []*InputAnswer {
 	if x != nil {
-		return x.InputAnswer
+		if x.xxx_hidden_InputAnswer != nil {
+			return *x.xxx_hidden_InputAnswer
+		}
 	}
 	return nil
 }
 
+func (x *SubmitRequest) SetLanguage(v *Language) {
+	x.xxx_hidden_Language = v
+}
+
+func (x *SubmitRequest) SetSource(v string) {
+	x.xxx_hidden_Source = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 3)
+}
+
+func (x *SubmitRequest) SetInputAnswer(v []*InputAnswer) {
+	x.xxx_hidden_InputAnswer = &v
+}
+
+func (x *SubmitRequest) HasLanguage() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Language != nil
+}
+
+func (x *SubmitRequest) HasSource() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
+}
+
+func (x *SubmitRequest) ClearLanguage() {
+	x.xxx_hidden_Language = nil
+}
+
+func (x *SubmitRequest) ClearSource() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
+	x.xxx_hidden_Source = nil
+}
+
+type SubmitRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Language    *Language
+	Source      *string
+	InputAnswer []*InputAnswer
+}
+
+func (b0 SubmitRequest_builder) Build() *SubmitRequest {
+	m0 := &SubmitRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	x.xxx_hidden_Language = b.Language
+	if b.Source != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 3)
+		x.xxx_hidden_Source = b.Source
+	}
+	x.xxx_hidden_InputAnswer = &b.InputAnswer
+	return m0
+}
+
 type SubmitResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state                  protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Id          *string                `protobuf:"bytes,1,opt,name=id"`
+	XXX_raceDetectHookData protoimpl.RaceDetectHookData
+	XXX_presence           [1]uint32
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
 }
 
 func (x *SubmitResponse) Reset() {
@@ -515,29 +1141,63 @@ func (x *SubmitResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use SubmitResponse.ProtoReflect.Descriptor instead.
-func (*SubmitResponse) Descriptor() ([]byte, []int) {
-	return file_demo_backend_proto_rawDescGZIP(), []int{7}
-}
-
 func (x *SubmitResponse) GetId() string {
 	if x != nil {
-		return x.Id
+		if x.xxx_hidden_Id != nil {
+			return *x.xxx_hidden_Id
+		}
+		return ""
 	}
 	return ""
 }
 
+func (x *SubmitResponse) SetId(v string) {
+	x.xxx_hidden_Id = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 1)
+}
+
+func (x *SubmitResponse) HasId() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 0)
+}
+
+func (x *SubmitResponse) ClearId() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
+	x.xxx_hidden_Id = nil
+}
+
+type SubmitResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Id *string
+}
+
+func (b0 SubmitResponse_builder) Build() *SubmitResponse {
+	m0 := &SubmitResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	if b.Id != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 1)
+		x.xxx_hidden_Id = b.Id
+	}
+	return m0
+}
+
 type JudgeUpdate struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Type          string                 `protobuf:"bytes,2,opt,name=type,proto3" json:"type,omitempty"`
-	Status        string                 `protobuf:"bytes,3,opt,name=status,proto3" json:"status,omitempty"`
-	Date          *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=date,proto3" json:"date,omitempty"`
-	Language      *Language              `protobuf:"bytes,5,opt,name=language,proto3" json:"language,omitempty"`
-	Results       []*Result              `protobuf:"bytes,6,rep,name=results,proto3" json:"results,omitempty"`
-	Source        string                 `protobuf:"bytes,7,opt,name=source,proto3" json:"source,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state                  protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Id          *string                `protobuf:"bytes,1,opt,name=id"`
+	xxx_hidden_Type        *string                `protobuf:"bytes,2,opt,name=type"`
+	xxx_hidden_Status      *string                `protobuf:"bytes,3,opt,name=status"`
+	xxx_hidden_Date        *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=date"`
+	xxx_hidden_Language    *Language              `protobuf:"bytes,5,opt,name=language"`
+	xxx_hidden_Results     *[]*Result             `protobuf:"bytes,6,rep,name=results"`
+	xxx_hidden_Source      *string                `protobuf:"bytes,7,opt,name=source"`
+	XXX_raceDetectHookData protoimpl.RaceDetectHookData
+	XXX_presence           [1]uint32
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
 }
 
 func (x *JudgeUpdate) Reset() {
@@ -565,68 +1225,219 @@ func (x *JudgeUpdate) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use JudgeUpdate.ProtoReflect.Descriptor instead.
-func (*JudgeUpdate) Descriptor() ([]byte, []int) {
-	return file_demo_backend_proto_rawDescGZIP(), []int{8}
-}
-
 func (x *JudgeUpdate) GetId() string {
 	if x != nil {
-		return x.Id
+		if x.xxx_hidden_Id != nil {
+			return *x.xxx_hidden_Id
+		}
+		return ""
 	}
 	return ""
 }
 
 func (x *JudgeUpdate) GetType() string {
 	if x != nil {
-		return x.Type
+		if x.xxx_hidden_Type != nil {
+			return *x.xxx_hidden_Type
+		}
+		return ""
 	}
 	return ""
 }
 
 func (x *JudgeUpdate) GetStatus() string {
 	if x != nil {
-		return x.Status
+		if x.xxx_hidden_Status != nil {
+			return *x.xxx_hidden_Status
+		}
+		return ""
 	}
 	return ""
 }
 
 func (x *JudgeUpdate) GetDate() *timestamppb.Timestamp {
 	if x != nil {
-		return x.Date
+		return x.xxx_hidden_Date
 	}
 	return nil
 }
 
 func (x *JudgeUpdate) GetLanguage() *Language {
 	if x != nil {
-		return x.Language
+		return x.xxx_hidden_Language
 	}
 	return nil
 }
 
 func (x *JudgeUpdate) GetResults() []*Result {
 	if x != nil {
-		return x.Results
+		if x.xxx_hidden_Results != nil {
+			return *x.xxx_hidden_Results
+		}
 	}
 	return nil
 }
 
 func (x *JudgeUpdate) GetSource() string {
 	if x != nil {
-		return x.Source
+		if x.xxx_hidden_Source != nil {
+			return *x.xxx_hidden_Source
+		}
+		return ""
 	}
 	return ""
 }
 
+func (x *JudgeUpdate) SetId(v string) {
+	x.xxx_hidden_Id = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 7)
+}
+
+func (x *JudgeUpdate) SetType(v string) {
+	x.xxx_hidden_Type = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 7)
+}
+
+func (x *JudgeUpdate) SetStatus(v string) {
+	x.xxx_hidden_Status = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 2, 7)
+}
+
+func (x *JudgeUpdate) SetDate(v *timestamppb.Timestamp) {
+	x.xxx_hidden_Date = v
+}
+
+func (x *JudgeUpdate) SetLanguage(v *Language) {
+	x.xxx_hidden_Language = v
+}
+
+func (x *JudgeUpdate) SetResults(v []*Result) {
+	x.xxx_hidden_Results = &v
+}
+
+func (x *JudgeUpdate) SetSource(v string) {
+	x.xxx_hidden_Source = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 6, 7)
+}
+
+func (x *JudgeUpdate) HasId() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 0)
+}
+
+func (x *JudgeUpdate) HasType() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
+}
+
+func (x *JudgeUpdate) HasStatus() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 2)
+}
+
+func (x *JudgeUpdate) HasDate() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Date != nil
+}
+
+func (x *JudgeUpdate) HasLanguage() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Language != nil
+}
+
+func (x *JudgeUpdate) HasSource() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 6)
+}
+
+func (x *JudgeUpdate) ClearId() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
+	x.xxx_hidden_Id = nil
+}
+
+func (x *JudgeUpdate) ClearType() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
+	x.xxx_hidden_Type = nil
+}
+
+func (x *JudgeUpdate) ClearStatus() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 2)
+	x.xxx_hidden_Status = nil
+}
+
+func (x *JudgeUpdate) ClearDate() {
+	x.xxx_hidden_Date = nil
+}
+
+func (x *JudgeUpdate) ClearLanguage() {
+	x.xxx_hidden_Language = nil
+}
+
+func (x *JudgeUpdate) ClearSource() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 6)
+	x.xxx_hidden_Source = nil
+}
+
+type JudgeUpdate_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Id       *string
+	Type     *string
+	Status   *string
+	Date     *timestamppb.Timestamp
+	Language *Language
+	Results  []*Result
+	Source   *string
+}
+
+func (b0 JudgeUpdate_builder) Build() *JudgeUpdate {
+	m0 := &JudgeUpdate{}
+	b, x := &b0, m0
+	_, _ = b, x
+	if b.Id != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 7)
+		x.xxx_hidden_Id = b.Id
+	}
+	if b.Type != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 7)
+		x.xxx_hidden_Type = b.Type
+	}
+	if b.Status != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 2, 7)
+		x.xxx_hidden_Status = b.Status
+	}
+	x.xxx_hidden_Date = b.Date
+	x.xxx_hidden_Language = b.Language
+	x.xxx_hidden_Results = &b.Results
+	if b.Source != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 6, 7)
+		x.xxx_hidden_Source = b.Source
+	}
+	return m0
+}
+
 type JudgeClientRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Language      *Language              `protobuf:"bytes,2,opt,name=language,proto3" json:"language,omitempty"`
-	Source        string                 `protobuf:"bytes,3,opt,name=source,proto3" json:"source,omitempty"`
-	InputAnswer   []*InputAnswer         `protobuf:"bytes,4,rep,name=inputAnswer,proto3" json:"inputAnswer,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state                  protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Id          *string                `protobuf:"bytes,1,opt,name=id"`
+	xxx_hidden_Language    *Language              `protobuf:"bytes,2,opt,name=language"`
+	xxx_hidden_Source      *string                `protobuf:"bytes,3,opt,name=source"`
+	xxx_hidden_InputAnswer *[]*InputAnswer        `protobuf:"bytes,4,rep,name=inputAnswer"`
+	XXX_raceDetectHookData protoimpl.RaceDetectHookData
+	XXX_presence           [1]uint32
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
 }
 
 func (x *JudgeClientRequest) Reset() {
@@ -654,50 +1465,134 @@ func (x *JudgeClientRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use JudgeClientRequest.ProtoReflect.Descriptor instead.
-func (*JudgeClientRequest) Descriptor() ([]byte, []int) {
-	return file_demo_backend_proto_rawDescGZIP(), []int{9}
-}
-
 func (x *JudgeClientRequest) GetId() string {
 	if x != nil {
-		return x.Id
+		if x.xxx_hidden_Id != nil {
+			return *x.xxx_hidden_Id
+		}
+		return ""
 	}
 	return ""
 }
 
 func (x *JudgeClientRequest) GetLanguage() *Language {
 	if x != nil {
-		return x.Language
+		return x.xxx_hidden_Language
 	}
 	return nil
 }
 
 func (x *JudgeClientRequest) GetSource() string {
 	if x != nil {
-		return x.Source
+		if x.xxx_hidden_Source != nil {
+			return *x.xxx_hidden_Source
+		}
+		return ""
 	}
 	return ""
 }
 
 func (x *JudgeClientRequest) GetInputAnswer() []*InputAnswer {
 	if x != nil {
-		return x.InputAnswer
+		if x.xxx_hidden_InputAnswer != nil {
+			return *x.xxx_hidden_InputAnswer
+		}
 	}
 	return nil
 }
 
+func (x *JudgeClientRequest) SetId(v string) {
+	x.xxx_hidden_Id = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 4)
+}
+
+func (x *JudgeClientRequest) SetLanguage(v *Language) {
+	x.xxx_hidden_Language = v
+}
+
+func (x *JudgeClientRequest) SetSource(v string) {
+	x.xxx_hidden_Source = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 2, 4)
+}
+
+func (x *JudgeClientRequest) SetInputAnswer(v []*InputAnswer) {
+	x.xxx_hidden_InputAnswer = &v
+}
+
+func (x *JudgeClientRequest) HasId() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 0)
+}
+
+func (x *JudgeClientRequest) HasLanguage() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Language != nil
+}
+
+func (x *JudgeClientRequest) HasSource() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 2)
+}
+
+func (x *JudgeClientRequest) ClearId() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
+	x.xxx_hidden_Id = nil
+}
+
+func (x *JudgeClientRequest) ClearLanguage() {
+	x.xxx_hidden_Language = nil
+}
+
+func (x *JudgeClientRequest) ClearSource() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 2)
+	x.xxx_hidden_Source = nil
+}
+
+type JudgeClientRequest_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Id          *string
+	Language    *Language
+	Source      *string
+	InputAnswer []*InputAnswer
+}
+
+func (b0 JudgeClientRequest_builder) Build() *JudgeClientRequest {
+	m0 := &JudgeClientRequest{}
+	b, x := &b0, m0
+	_, _ = b, x
+	if b.Id != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 4)
+		x.xxx_hidden_Id = b.Id
+	}
+	x.xxx_hidden_Language = b.Language
+	if b.Source != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 2, 4)
+		x.xxx_hidden_Source = b.Source
+	}
+	x.xxx_hidden_InputAnswer = &b.InputAnswer
+	return m0
+}
+
 type JudgeClientResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Type          string                 `protobuf:"bytes,2,opt,name=type,proto3" json:"type,omitempty"`
-	Status        string                 `protobuf:"bytes,3,opt,name=status,proto3" json:"status,omitempty"`
-	Date          *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=date,proto3" json:"date,omitempty"`
-	Language      *Language              `protobuf:"bytes,5,opt,name=language,proto3" json:"language,omitempty"`
-	Results       []*Result              `protobuf:"bytes,6,rep,name=results,proto3" json:"results,omitempty"`
-	Source        string                 `protobuf:"bytes,7,opt,name=source,proto3" json:"source,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state                  protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Id          *string                `protobuf:"bytes,1,opt,name=id"`
+	xxx_hidden_Type        *string                `protobuf:"bytes,2,opt,name=type"`
+	xxx_hidden_Status      *string                `protobuf:"bytes,3,opt,name=status"`
+	xxx_hidden_Date        *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=date"`
+	xxx_hidden_Language    *Language              `protobuf:"bytes,5,opt,name=language"`
+	xxx_hidden_Results     *[]*Result             `protobuf:"bytes,6,rep,name=results"`
+	xxx_hidden_Source      *string                `protobuf:"bytes,7,opt,name=source"`
+	XXX_raceDetectHookData protoimpl.RaceDetectHookData
+	XXX_presence           [1]uint32
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
 }
 
 func (x *JudgeClientResponse) Reset() {
@@ -725,65 +1620,216 @@ func (x *JudgeClientResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use JudgeClientResponse.ProtoReflect.Descriptor instead.
-func (*JudgeClientResponse) Descriptor() ([]byte, []int) {
-	return file_demo_backend_proto_rawDescGZIP(), []int{10}
-}
-
 func (x *JudgeClientResponse) GetId() string {
 	if x != nil {
-		return x.Id
+		if x.xxx_hidden_Id != nil {
+			return *x.xxx_hidden_Id
+		}
+		return ""
 	}
 	return ""
 }
 
 func (x *JudgeClientResponse) GetType() string {
 	if x != nil {
-		return x.Type
+		if x.xxx_hidden_Type != nil {
+			return *x.xxx_hidden_Type
+		}
+		return ""
 	}
 	return ""
 }
 
 func (x *JudgeClientResponse) GetStatus() string {
 	if x != nil {
-		return x.Status
+		if x.xxx_hidden_Status != nil {
+			return *x.xxx_hidden_Status
+		}
+		return ""
 	}
 	return ""
 }
 
 func (x *JudgeClientResponse) GetDate() *timestamppb.Timestamp {
 	if x != nil {
-		return x.Date
+		return x.xxx_hidden_Date
 	}
 	return nil
 }
 
 func (x *JudgeClientResponse) GetLanguage() *Language {
 	if x != nil {
-		return x.Language
+		return x.xxx_hidden_Language
 	}
 	return nil
 }
 
 func (x *JudgeClientResponse) GetResults() []*Result {
 	if x != nil {
-		return x.Results
+		if x.xxx_hidden_Results != nil {
+			return *x.xxx_hidden_Results
+		}
 	}
 	return nil
 }
 
 func (x *JudgeClientResponse) GetSource() string {
 	if x != nil {
-		return x.Source
+		if x.xxx_hidden_Source != nil {
+			return *x.xxx_hidden_Source
+		}
+		return ""
 	}
 	return ""
 }
 
+func (x *JudgeClientResponse) SetId(v string) {
+	x.xxx_hidden_Id = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 7)
+}
+
+func (x *JudgeClientResponse) SetType(v string) {
+	x.xxx_hidden_Type = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 7)
+}
+
+func (x *JudgeClientResponse) SetStatus(v string) {
+	x.xxx_hidden_Status = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 2, 7)
+}
+
+func (x *JudgeClientResponse) SetDate(v *timestamppb.Timestamp) {
+	x.xxx_hidden_Date = v
+}
+
+func (x *JudgeClientResponse) SetLanguage(v *Language) {
+	x.xxx_hidden_Language = v
+}
+
+func (x *JudgeClientResponse) SetResults(v []*Result) {
+	x.xxx_hidden_Results = &v
+}
+
+func (x *JudgeClientResponse) SetSource(v string) {
+	x.xxx_hidden_Source = &v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 6, 7)
+}
+
+func (x *JudgeClientResponse) HasId() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 0)
+}
+
+func (x *JudgeClientResponse) HasType() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
+}
+
+func (x *JudgeClientResponse) HasStatus() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 2)
+}
+
+func (x *JudgeClientResponse) HasDate() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Date != nil
+}
+
+func (x *JudgeClientResponse) HasLanguage() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Language != nil
+}
+
+func (x *JudgeClientResponse) HasSource() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 6)
+}
+
+func (x *JudgeClientResponse) ClearId() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
+	x.xxx_hidden_Id = nil
+}
+
+func (x *JudgeClientResponse) ClearType() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
+	x.xxx_hidden_Type = nil
+}
+
+func (x *JudgeClientResponse) ClearStatus() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 2)
+	x.xxx_hidden_Status = nil
+}
+
+func (x *JudgeClientResponse) ClearDate() {
+	x.xxx_hidden_Date = nil
+}
+
+func (x *JudgeClientResponse) ClearLanguage() {
+	x.xxx_hidden_Language = nil
+}
+
+func (x *JudgeClientResponse) ClearSource() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 6)
+	x.xxx_hidden_Source = nil
+}
+
+type JudgeClientResponse_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Id       *string
+	Type     *string
+	Status   *string
+	Date     *timestamppb.Timestamp
+	Language *Language
+	Results  []*Result
+	Source   *string
+}
+
+func (b0 JudgeClientResponse_builder) Build() *JudgeClientResponse {
+	m0 := &JudgeClientResponse{}
+	b, x := &b0, m0
+	_, _ = b, x
+	if b.Id != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 7)
+		x.xxx_hidden_Id = b.Id
+	}
+	if b.Type != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 7)
+		x.xxx_hidden_Type = b.Type
+	}
+	if b.Status != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 2, 7)
+		x.xxx_hidden_Status = b.Status
+	}
+	x.xxx_hidden_Date = b.Date
+	x.xxx_hidden_Language = b.Language
+	x.xxx_hidden_Results = &b.Results
+	if b.Source != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 6, 7)
+		x.xxx_hidden_Source = b.Source
+	}
+	return m0
+}
+
 type Input struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Content       []byte                 `protobuf:"bytes,1,opt,name=content,proto3" json:"content,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state                  protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Content     []byte                 `protobuf:"bytes,1,opt,name=content"`
+	XXX_raceDetectHookData protoimpl.RaceDetectHookData
+	XXX_presence           [1]uint32
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
 }
 
 func (x *Input) Reset() {
@@ -811,26 +1857,60 @@ func (x *Input) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Input.ProtoReflect.Descriptor instead.
-func (*Input) Descriptor() ([]byte, []int) {
-	return file_demo_backend_proto_rawDescGZIP(), []int{11}
-}
-
 func (x *Input) GetContent() []byte {
 	if x != nil {
-		return x.Content
+		return x.xxx_hidden_Content
 	}
 	return nil
 }
 
+func (x *Input) SetContent(v []byte) {
+	if v == nil {
+		v = []byte{}
+	}
+	x.xxx_hidden_Content = v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 1)
+}
+
+func (x *Input) HasContent() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 0)
+}
+
+func (x *Input) ClearContent() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
+	x.xxx_hidden_Content = nil
+}
+
+type Input_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Content []byte
+}
+
+func (b0 Input_builder) Build() *Input {
+	m0 := &Input{}
+	b, x := &b0, m0
+	_, _ = b, x
+	if b.Content != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 1)
+		x.xxx_hidden_Content = b.Content
+	}
+	return m0
+}
+
 type Resize struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Rows          uint32                 `protobuf:"varint,1,opt,name=rows,proto3" json:"rows,omitempty"`
-	Cols          uint32                 `protobuf:"varint,2,opt,name=cols,proto3" json:"cols,omitempty"`
-	X             uint32                 `protobuf:"varint,3,opt,name=x,proto3" json:"x,omitempty"`
-	Y             uint32                 `protobuf:"varint,4,opt,name=y,proto3" json:"y,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state                  protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Rows        uint32                 `protobuf:"varint,1,opt,name=rows"`
+	xxx_hidden_Cols        uint32                 `protobuf:"varint,2,opt,name=cols"`
+	xxx_hidden_X           uint32                 `protobuf:"varint,3,opt,name=x"`
+	xxx_hidden_Y           uint32                 `protobuf:"varint,4,opt,name=y"`
+	XXX_raceDetectHookData protoimpl.RaceDetectHookData
+	XXX_presence           [1]uint32
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
 }
 
 func (x *Resize) Reset() {
@@ -858,48 +1938,139 @@ func (x *Resize) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use Resize.ProtoReflect.Descriptor instead.
-func (*Resize) Descriptor() ([]byte, []int) {
-	return file_demo_backend_proto_rawDescGZIP(), []int{12}
-}
-
 func (x *Resize) GetRows() uint32 {
 	if x != nil {
-		return x.Rows
+		return x.xxx_hidden_Rows
 	}
 	return 0
 }
 
 func (x *Resize) GetCols() uint32 {
 	if x != nil {
-		return x.Cols
+		return x.xxx_hidden_Cols
 	}
 	return 0
 }
 
 func (x *Resize) GetX() uint32 {
 	if x != nil {
-		return x.X
+		return x.xxx_hidden_X
 	}
 	return 0
 }
 
 func (x *Resize) GetY() uint32 {
 	if x != nil {
-		return x.Y
+		return x.xxx_hidden_Y
 	}
 	return 0
 }
 
+func (x *Resize) SetRows(v uint32) {
+	x.xxx_hidden_Rows = v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 4)
+}
+
+func (x *Resize) SetCols(v uint32) {
+	x.xxx_hidden_Cols = v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 1, 4)
+}
+
+func (x *Resize) SetX(v uint32) {
+	x.xxx_hidden_X = v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 2, 4)
+}
+
+func (x *Resize) SetY(v uint32) {
+	x.xxx_hidden_Y = v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 3, 4)
+}
+
+func (x *Resize) HasRows() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 0)
+}
+
+func (x *Resize) HasCols() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 1)
+}
+
+func (x *Resize) HasX() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 2)
+}
+
+func (x *Resize) HasY() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 3)
+}
+
+func (x *Resize) ClearRows() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
+	x.xxx_hidden_Rows = 0
+}
+
+func (x *Resize) ClearCols() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 1)
+	x.xxx_hidden_Cols = 0
+}
+
+func (x *Resize) ClearX() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 2)
+	x.xxx_hidden_X = 0
+}
+
+func (x *Resize) ClearY() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 3)
+	x.xxx_hidden_Y = 0
+}
+
+type Resize_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Rows *uint32
+	Cols *uint32
+	X    *uint32
+	Y    *uint32
+}
+
+func (b0 Resize_builder) Build() *Resize {
+	m0 := &Resize{}
+	b, x := &b0, m0
+	_, _ = b, x
+	if b.Rows != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 4)
+		x.xxx_hidden_Rows = *b.Rows
+	}
+	if b.Cols != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 1, 4)
+		x.xxx_hidden_Cols = *b.Cols
+	}
+	if b.X != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 2, 4)
+		x.xxx_hidden_X = *b.X
+	}
+	if b.Y != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 3, 4)
+		x.xxx_hidden_Y = *b.Y
+	}
+	return m0
+}
+
 type ShellInput struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// Types that are valid to be assigned to Request:
-	//
-	//	*ShellInput_Input
-	//	*ShellInput_Resize
-	Request       isShellInput_Request `protobuf_oneof:"request"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state              protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Request isShellInput_Request   `protobuf_oneof:"request"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
 }
 
 func (x *ShellInput) Reset() {
@@ -927,21 +2098,9 @@ func (x *ShellInput) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ShellInput.ProtoReflect.Descriptor instead.
-func (*ShellInput) Descriptor() ([]byte, []int) {
-	return file_demo_backend_proto_rawDescGZIP(), []int{13}
-}
-
-func (x *ShellInput) GetRequest() isShellInput_Request {
-	if x != nil {
-		return x.Request
-	}
-	return nil
-}
-
 func (x *ShellInput) GetInput() *Input {
 	if x != nil {
-		if x, ok := x.Request.(*ShellInput_Input); ok {
+		if x, ok := x.xxx_hidden_Request.(*shellInput_Input); ok {
 			return x.Input
 		}
 	}
@@ -950,34 +2109,141 @@ func (x *ShellInput) GetInput() *Input {
 
 func (x *ShellInput) GetResize() *Resize {
 	if x != nil {
-		if x, ok := x.Request.(*ShellInput_Resize); ok {
+		if x, ok := x.xxx_hidden_Request.(*shellInput_Resize); ok {
 			return x.Resize
 		}
 	}
 	return nil
 }
 
+func (x *ShellInput) SetInput(v *Input) {
+	if v == nil {
+		x.xxx_hidden_Request = nil
+		return
+	}
+	x.xxx_hidden_Request = &shellInput_Input{v}
+}
+
+func (x *ShellInput) SetResize(v *Resize) {
+	if v == nil {
+		x.xxx_hidden_Request = nil
+		return
+	}
+	x.xxx_hidden_Request = &shellInput_Resize{v}
+}
+
+func (x *ShellInput) HasRequest() bool {
+	if x == nil {
+		return false
+	}
+	return x.xxx_hidden_Request != nil
+}
+
+func (x *ShellInput) HasInput() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.xxx_hidden_Request.(*shellInput_Input)
+	return ok
+}
+
+func (x *ShellInput) HasResize() bool {
+	if x == nil {
+		return false
+	}
+	_, ok := x.xxx_hidden_Request.(*shellInput_Resize)
+	return ok
+}
+
+func (x *ShellInput) ClearRequest() {
+	x.xxx_hidden_Request = nil
+}
+
+func (x *ShellInput) ClearInput() {
+	if _, ok := x.xxx_hidden_Request.(*shellInput_Input); ok {
+		x.xxx_hidden_Request = nil
+	}
+}
+
+func (x *ShellInput) ClearResize() {
+	if _, ok := x.xxx_hidden_Request.(*shellInput_Resize); ok {
+		x.xxx_hidden_Request = nil
+	}
+}
+
+const ShellInput_Request_not_set_case case_ShellInput_Request = 0
+const ShellInput_Input_case case_ShellInput_Request = 1
+const ShellInput_Resize_case case_ShellInput_Request = 2
+
+func (x *ShellInput) WhichRequest() case_ShellInput_Request {
+	if x == nil {
+		return ShellInput_Request_not_set_case
+	}
+	switch x.xxx_hidden_Request.(type) {
+	case *shellInput_Input:
+		return ShellInput_Input_case
+	case *shellInput_Resize:
+		return ShellInput_Resize_case
+	default:
+		return ShellInput_Request_not_set_case
+	}
+}
+
+type ShellInput_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	// Fields of oneof xxx_hidden_Request:
+	Input  *Input
+	Resize *Resize
+	// -- end of xxx_hidden_Request
+}
+
+func (b0 ShellInput_builder) Build() *ShellInput {
+	m0 := &ShellInput{}
+	b, x := &b0, m0
+	_, _ = b, x
+	if b.Input != nil {
+		x.xxx_hidden_Request = &shellInput_Input{b.Input}
+	}
+	if b.Resize != nil {
+		x.xxx_hidden_Request = &shellInput_Resize{b.Resize}
+	}
+	return m0
+}
+
+type case_ShellInput_Request protoreflect.FieldNumber
+
+func (x case_ShellInput_Request) String() string {
+	md := file_demo_backend_proto_msgTypes[13].Descriptor()
+	if x == 0 {
+		return "not set"
+	}
+	return protoimpl.X.MessageFieldStringOf(md, protoreflect.FieldNumber(x))
+}
+
 type isShellInput_Request interface {
 	isShellInput_Request()
 }
 
-type ShellInput_Input struct {
-	Input *Input `protobuf:"bytes,1,opt,name=input,proto3,oneof"`
+type shellInput_Input struct {
+	Input *Input `protobuf:"bytes,1,opt,name=input,oneof"`
 }
 
-type ShellInput_Resize struct {
-	Resize *Resize `protobuf:"bytes,2,opt,name=resize,proto3,oneof"`
+type shellInput_Resize struct {
+	Resize *Resize `protobuf:"bytes,2,opt,name=resize,oneof"`
 }
 
-func (*ShellInput_Input) isShellInput_Request() {}
+func (*shellInput_Input) isShellInput_Request() {}
 
-func (*ShellInput_Resize) isShellInput_Request() {}
+func (*shellInput_Resize) isShellInput_Request() {}
 
 type ShellOutput struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Content       []byte                 `protobuf:"bytes,2,opt,name=content,proto3" json:"content,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state                  protoimpl.MessageState `protogen:"opaque.v1"`
+	xxx_hidden_Content     []byte                 `protobuf:"bytes,2,opt,name=content"`
+	XXX_raceDetectHookData protoimpl.RaceDetectHookData
+	XXX_presence           [1]uint32
+	unknownFields          protoimpl.UnknownFields
+	sizeCache              protoimpl.SizeCache
 }
 
 func (x *ShellOutput) Reset() {
@@ -1005,16 +2271,48 @@ func (x *ShellOutput) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use ShellOutput.ProtoReflect.Descriptor instead.
-func (*ShellOutput) Descriptor() ([]byte, []int) {
-	return file_demo_backend_proto_rawDescGZIP(), []int{14}
-}
-
 func (x *ShellOutput) GetContent() []byte {
 	if x != nil {
-		return x.Content
+		return x.xxx_hidden_Content
 	}
 	return nil
+}
+
+func (x *ShellOutput) SetContent(v []byte) {
+	if v == nil {
+		v = []byte{}
+	}
+	x.xxx_hidden_Content = v
+	protoimpl.X.SetPresent(&(x.XXX_presence[0]), 0, 1)
+}
+
+func (x *ShellOutput) HasContent() bool {
+	if x == nil {
+		return false
+	}
+	return protoimpl.X.Present(&(x.XXX_presence[0]), 0)
+}
+
+func (x *ShellOutput) ClearContent() {
+	protoimpl.X.ClearPresent(&(x.XXX_presence[0]), 0)
+	x.xxx_hidden_Content = nil
+}
+
+type ShellOutput_builder struct {
+	_ [0]func() // Prevents comparability and use of unkeyed literals for the builder.
+
+	Content []byte
+}
+
+func (b0 ShellOutput_builder) Build() *ShellOutput {
+	m0 := &ShellOutput{}
+	b, x := &b0, m0
+	_, _ = b, x
+	if b.Content != nil {
+		protoimpl.X.SetPresentNonAtomic(&(x.XXX_presence[0]), 0, 1)
+		x.xxx_hidden_Content = b.Content
+	}
+	return m0
 }
 
 var File_demo_backend_proto protoreflect.FileDescriptor
@@ -1025,152 +2323,143 @@ var file_demo_backend_proto_rawDesc = string([]byte{
 	0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2f, 0x65, 0x6d, 0x70, 0x74, 0x79, 0x2e,
 	0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x1f, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2f, 0x70, 0x72,
 	0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2f, 0x74, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70,
-	0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0x23, 0x0a, 0x11, 0x53, 0x75, 0x62, 0x6d, 0x69, 0x73,
-	0x73, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x0e, 0x0a, 0x02, 0x69,
-	0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x22, 0x46, 0x0a, 0x12, 0x53,
-	0x75, 0x62, 0x6d, 0x69, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
-	0x65, 0x12, 0x30, 0x0a, 0x0b, 0x73, 0x75, 0x62, 0x6d, 0x69, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x73,
-	0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x0e, 0x2e, 0x70, 0x62, 0x2e, 0x53, 0x75, 0x62, 0x6d,
-	0x69, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x52, 0x0b, 0x73, 0x75, 0x62, 0x6d, 0x69, 0x73, 0x73, 0x69,
-	0x6f, 0x6e, 0x73, 0x22, 0x88, 0x02, 0x0a, 0x0a, 0x53, 0x75, 0x62, 0x6d, 0x69, 0x73, 0x73, 0x69,
-	0x6f, 0x6e, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02,
-	0x69, 0x64, 0x12, 0x28, 0x0a, 0x08, 0x6c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x18, 0x02,
+	0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x1a, 0x21, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2f, 0x70,
+	0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2f, 0x67, 0x6f, 0x5f, 0x66, 0x65, 0x61, 0x74, 0x75,
+	0x72, 0x65, 0x73, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0x23, 0x0a, 0x11, 0x53, 0x75, 0x62,
+	0x6d, 0x69, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x0e,
+	0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x22, 0x46,
+	0x0a, 0x12, 0x53, 0x75, 0x62, 0x6d, 0x69, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x73, 0x70,
+	0x6f, 0x6e, 0x73, 0x65, 0x12, 0x30, 0x0a, 0x0b, 0x73, 0x75, 0x62, 0x6d, 0x69, 0x73, 0x73, 0x69,
+	0x6f, 0x6e, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x0e, 0x2e, 0x70, 0x62, 0x2e, 0x53,
+	0x75, 0x62, 0x6d, 0x69, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x52, 0x0b, 0x73, 0x75, 0x62, 0x6d, 0x69,
+	0x73, 0x73, 0x69, 0x6f, 0x6e, 0x73, 0x22, 0x88, 0x02, 0x0a, 0x0a, 0x53, 0x75, 0x62, 0x6d, 0x69,
+	0x73, 0x73, 0x69, 0x6f, 0x6e, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x02, 0x69, 0x64, 0x12, 0x28, 0x0a, 0x08, 0x6c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67,
+	0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x0c, 0x2e, 0x70, 0x62, 0x2e, 0x4c, 0x61, 0x6e,
+	0x67, 0x75, 0x61, 0x67, 0x65, 0x52, 0x08, 0x6c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x12,
+	0x16, 0x0a, 0x06, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x06, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x12, 0x2e, 0x0a, 0x04, 0x64, 0x61, 0x74, 0x65, 0x18,
+	0x04, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70,
+	0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d,
+	0x70, 0x52, 0x04, 0x64, 0x61, 0x74, 0x65, 0x12, 0x16, 0x0a, 0x06, 0x73, 0x74, 0x61, 0x74, 0x75,
+	0x73, 0x18, 0x05, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x73, 0x74, 0x61, 0x74, 0x75, 0x73, 0x12,
+	0x1c, 0x0a, 0x09, 0x74, 0x6f, 0x74, 0x61, 0x6c, 0x54, 0x69, 0x6d, 0x65, 0x18, 0x06, 0x20, 0x01,
+	0x28, 0x04, 0x52, 0x09, 0x74, 0x6f, 0x74, 0x61, 0x6c, 0x54, 0x69, 0x6d, 0x65, 0x12, 0x1c, 0x0a,
+	0x09, 0x6d, 0x61, 0x78, 0x4d, 0x65, 0x6d, 0x6f, 0x72, 0x79, 0x18, 0x07, 0x20, 0x01, 0x28, 0x04,
+	0x52, 0x09, 0x6d, 0x61, 0x78, 0x4d, 0x65, 0x6d, 0x6f, 0x72, 0x79, 0x12, 0x24, 0x0a, 0x07, 0x72,
+	0x65, 0x73, 0x75, 0x6c, 0x74, 0x73, 0x18, 0x08, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x0a, 0x2e, 0x70,
+	0x62, 0x2e, 0x52, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x52, 0x07, 0x72, 0x65, 0x73, 0x75, 0x6c, 0x74,
+	0x73, 0x22, 0xa0, 0x01, 0x0a, 0x08, 0x4c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x12, 0x12,
+	0x0a, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6e, 0x61,
+	0x6d, 0x65, 0x12, 0x26, 0x0a, 0x0e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x46, 0x69, 0x6c, 0x65,
+	0x4e, 0x61, 0x6d, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0e, 0x73, 0x6f, 0x75, 0x72,
+	0x63, 0x65, 0x46, 0x69, 0x6c, 0x65, 0x4e, 0x61, 0x6d, 0x65, 0x12, 0x1e, 0x0a, 0x0a, 0x63, 0x6f,
+	0x6d, 0x70, 0x69, 0x6c, 0x65, 0x43, 0x6d, 0x64, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a,
+	0x63, 0x6f, 0x6d, 0x70, 0x69, 0x6c, 0x65, 0x43, 0x6d, 0x64, 0x12, 0x20, 0x0a, 0x0b, 0x65, 0x78,
+	0x65, 0x63, 0x75, 0x74, 0x61, 0x62, 0x6c, 0x65, 0x73, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x0b, 0x65, 0x78, 0x65, 0x63, 0x75, 0x74, 0x61, 0x62, 0x6c, 0x65, 0x73, 0x12, 0x16, 0x0a, 0x06,
+	0x72, 0x75, 0x6e, 0x43, 0x6d, 0x64, 0x18, 0x05, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x72, 0x75,
+	0x6e, 0x43, 0x6d, 0x64, 0x22, 0x8c, 0x01, 0x0a, 0x06, 0x52, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x12,
+	0x12, 0x0a, 0x04, 0x74, 0x69, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x04, 0x52, 0x04, 0x74,
+	0x69, 0x6d, 0x65, 0x12, 0x16, 0x0a, 0x06, 0x6d, 0x65, 0x6d, 0x6f, 0x72, 0x79, 0x18, 0x02, 0x20,
+	0x01, 0x28, 0x04, 0x52, 0x06, 0x6d, 0x65, 0x6d, 0x6f, 0x72, 0x79, 0x12, 0x14, 0x0a, 0x05, 0x73,
+	0x74, 0x64, 0x69, 0x6e, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x73, 0x74, 0x64, 0x69,
+	0x6e, 0x12, 0x16, 0x0a, 0x06, 0x73, 0x74, 0x64, 0x6f, 0x75, 0x74, 0x18, 0x04, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x06, 0x73, 0x74, 0x64, 0x6f, 0x75, 0x74, 0x12, 0x16, 0x0a, 0x06, 0x73, 0x74, 0x64,
+	0x65, 0x72, 0x72, 0x18, 0x05, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x73, 0x74, 0x64, 0x65, 0x72,
+	0x72, 0x12, 0x10, 0x0a, 0x03, 0x6c, 0x6f, 0x67, 0x18, 0x06, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03,
+	0x6c, 0x6f, 0x67, 0x22, 0x3b, 0x0a, 0x0b, 0x49, 0x6e, 0x70, 0x75, 0x74, 0x41, 0x6e, 0x73, 0x77,
+	0x65, 0x72, 0x12, 0x14, 0x0a, 0x05, 0x69, 0x6e, 0x70, 0x75, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x05, 0x69, 0x6e, 0x70, 0x75, 0x74, 0x12, 0x16, 0x0a, 0x06, 0x61, 0x6e, 0x73, 0x77,
+	0x65, 0x72, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x61, 0x6e, 0x73, 0x77, 0x65, 0x72,
+	0x22, 0x84, 0x01, 0x0a, 0x0d, 0x53, 0x75, 0x62, 0x6d, 0x69, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65,
+	0x73, 0x74, 0x12, 0x28, 0x0a, 0x08, 0x6c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x18, 0x01,
 	0x20, 0x01, 0x28, 0x0b, 0x32, 0x0c, 0x2e, 0x70, 0x62, 0x2e, 0x4c, 0x61, 0x6e, 0x67, 0x75, 0x61,
 	0x67, 0x65, 0x52, 0x08, 0x6c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x12, 0x16, 0x0a, 0x06,
-	0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x73, 0x6f,
-	0x75, 0x72, 0x63, 0x65, 0x12, 0x2e, 0x0a, 0x04, 0x64, 0x61, 0x74, 0x65, 0x18, 0x04, 0x20, 0x01,
-	0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74,
-	0x6f, 0x62, 0x75, 0x66, 0x2e, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x52, 0x04,
-	0x64, 0x61, 0x74, 0x65, 0x12, 0x16, 0x0a, 0x06, 0x73, 0x74, 0x61, 0x74, 0x75, 0x73, 0x18, 0x05,
-	0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x73, 0x74, 0x61, 0x74, 0x75, 0x73, 0x12, 0x1c, 0x0a, 0x09,
-	0x74, 0x6f, 0x74, 0x61, 0x6c, 0x54, 0x69, 0x6d, 0x65, 0x18, 0x06, 0x20, 0x01, 0x28, 0x04, 0x52,
-	0x09, 0x74, 0x6f, 0x74, 0x61, 0x6c, 0x54, 0x69, 0x6d, 0x65, 0x12, 0x1c, 0x0a, 0x09, 0x6d, 0x61,
-	0x78, 0x4d, 0x65, 0x6d, 0x6f, 0x72, 0x79, 0x18, 0x07, 0x20, 0x01, 0x28, 0x04, 0x52, 0x09, 0x6d,
-	0x61, 0x78, 0x4d, 0x65, 0x6d, 0x6f, 0x72, 0x79, 0x12, 0x24, 0x0a, 0x07, 0x72, 0x65, 0x73, 0x75,
-	0x6c, 0x74, 0x73, 0x18, 0x08, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x0a, 0x2e, 0x70, 0x62, 0x2e, 0x52,
-	0x65, 0x73, 0x75, 0x6c, 0x74, 0x52, 0x07, 0x72, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x73, 0x22, 0xa0,
-	0x01, 0x0a, 0x08, 0x4c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x12, 0x12, 0x0a, 0x04, 0x6e,
-	0x61, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x6e, 0x61, 0x6d, 0x65, 0x12,
-	0x26, 0x0a, 0x0e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x46, 0x69, 0x6c, 0x65, 0x4e, 0x61, 0x6d,
-	0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0e, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x46,
-	0x69, 0x6c, 0x65, 0x4e, 0x61, 0x6d, 0x65, 0x12, 0x1e, 0x0a, 0x0a, 0x63, 0x6f, 0x6d, 0x70, 0x69,
-	0x6c, 0x65, 0x43, 0x6d, 0x64, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x63, 0x6f, 0x6d,
-	0x70, 0x69, 0x6c, 0x65, 0x43, 0x6d, 0x64, 0x12, 0x20, 0x0a, 0x0b, 0x65, 0x78, 0x65, 0x63, 0x75,
-	0x74, 0x61, 0x62, 0x6c, 0x65, 0x73, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0b, 0x65, 0x78,
-	0x65, 0x63, 0x75, 0x74, 0x61, 0x62, 0x6c, 0x65, 0x73, 0x12, 0x16, 0x0a, 0x06, 0x72, 0x75, 0x6e,
-	0x43, 0x6d, 0x64, 0x18, 0x05, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x72, 0x75, 0x6e, 0x43, 0x6d,
-	0x64, 0x22, 0x8c, 0x01, 0x0a, 0x06, 0x52, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x12, 0x12, 0x0a, 0x04,
-	0x74, 0x69, 0x6d, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x04, 0x52, 0x04, 0x74, 0x69, 0x6d, 0x65,
-	0x12, 0x16, 0x0a, 0x06, 0x6d, 0x65, 0x6d, 0x6f, 0x72, 0x79, 0x18, 0x02, 0x20, 0x01, 0x28, 0x04,
-	0x52, 0x06, 0x6d, 0x65, 0x6d, 0x6f, 0x72, 0x79, 0x12, 0x14, 0x0a, 0x05, 0x73, 0x74, 0x64, 0x69,
-	0x6e, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05, 0x73, 0x74, 0x64, 0x69, 0x6e, 0x12, 0x16,
-	0x0a, 0x06, 0x73, 0x74, 0x64, 0x6f, 0x75, 0x74, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06,
-	0x73, 0x74, 0x64, 0x6f, 0x75, 0x74, 0x12, 0x16, 0x0a, 0x06, 0x73, 0x74, 0x64, 0x65, 0x72, 0x72,
-	0x18, 0x05, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x73, 0x74, 0x64, 0x65, 0x72, 0x72, 0x12, 0x10,
-	0x0a, 0x03, 0x6c, 0x6f, 0x67, 0x18, 0x06, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x6c, 0x6f, 0x67,
-	0x22, 0x3b, 0x0a, 0x0b, 0x49, 0x6e, 0x70, 0x75, 0x74, 0x41, 0x6e, 0x73, 0x77, 0x65, 0x72, 0x12,
-	0x14, 0x0a, 0x05, 0x69, 0x6e, 0x70, 0x75, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x05,
-	0x69, 0x6e, 0x70, 0x75, 0x74, 0x12, 0x16, 0x0a, 0x06, 0x61, 0x6e, 0x73, 0x77, 0x65, 0x72, 0x18,
-	0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x61, 0x6e, 0x73, 0x77, 0x65, 0x72, 0x22, 0x84, 0x01,
-	0x0a, 0x0d, 0x53, 0x75, 0x62, 0x6d, 0x69, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12,
-	0x28, 0x0a, 0x08, 0x6c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28,
-	0x0b, 0x32, 0x0c, 0x2e, 0x70, 0x62, 0x2e, 0x4c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x52,
-	0x08, 0x6c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x12, 0x16, 0x0a, 0x06, 0x73, 0x6f, 0x75,
-	0x72, 0x63, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x73, 0x6f, 0x75, 0x72, 0x63,
-	0x65, 0x12, 0x31, 0x0a, 0x0b, 0x69, 0x6e, 0x70, 0x75, 0x74, 0x41, 0x6e, 0x73, 0x77, 0x65, 0x72,
-	0x18, 0x03, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x0f, 0x2e, 0x70, 0x62, 0x2e, 0x49, 0x6e, 0x70, 0x75,
-	0x74, 0x41, 0x6e, 0x73, 0x77, 0x65, 0x72, 0x52, 0x0b, 0x69, 0x6e, 0x70, 0x75, 0x74, 0x41, 0x6e,
-	0x73, 0x77, 0x65, 0x72, 0x22, 0x20, 0x0a, 0x0e, 0x53, 0x75, 0x62, 0x6d, 0x69, 0x74, 0x52, 0x65,
-	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01,
-	0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x22, 0xe1, 0x01, 0x0a, 0x0b, 0x4a, 0x75, 0x64, 0x67, 0x65,
-	0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01,
-	0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x12, 0x12, 0x0a, 0x04, 0x74, 0x79, 0x70, 0x65, 0x18, 0x02,
-	0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x74, 0x79, 0x70, 0x65, 0x12, 0x16, 0x0a, 0x06, 0x73, 0x74,
-	0x61, 0x74, 0x75, 0x73, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x73, 0x74, 0x61, 0x74,
-	0x75, 0x73, 0x12, 0x2e, 0x0a, 0x04, 0x64, 0x61, 0x74, 0x65, 0x18, 0x04, 0x20, 0x01, 0x28, 0x0b,
-	0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62,
-	0x75, 0x66, 0x2e, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x52, 0x04, 0x64, 0x61,
-	0x74, 0x65, 0x12, 0x28, 0x0a, 0x08, 0x6c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x18, 0x05,
-	0x20, 0x01, 0x28, 0x0b, 0x32, 0x0c, 0x2e, 0x70, 0x62, 0x2e, 0x4c, 0x61, 0x6e, 0x67, 0x75, 0x61,
-	0x67, 0x65, 0x52, 0x08, 0x6c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x12, 0x24, 0x0a, 0x07,
-	0x72, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x73, 0x18, 0x06, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x0a, 0x2e,
-	0x70, 0x62, 0x2e, 0x52, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x52, 0x07, 0x72, 0x65, 0x73, 0x75, 0x6c,
-	0x74, 0x73, 0x12, 0x16, 0x0a, 0x06, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x18, 0x07, 0x20, 0x01,
-	0x28, 0x09, 0x52, 0x06, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x22, 0x99, 0x01, 0x0a, 0x12, 0x4a,
-	0x75, 0x64, 0x67, 0x65, 0x43, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
-	0x74, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69,
-	0x64, 0x12, 0x28, 0x0a, 0x08, 0x6c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x18, 0x02, 0x20,
-	0x01, 0x28, 0x0b, 0x32, 0x0c, 0x2e, 0x70, 0x62, 0x2e, 0x4c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67,
-	0x65, 0x52, 0x08, 0x6c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x12, 0x16, 0x0a, 0x06, 0x73,
-	0x6f, 0x75, 0x72, 0x63, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x73, 0x6f, 0x75,
-	0x72, 0x63, 0x65, 0x12, 0x31, 0x0a, 0x0b, 0x69, 0x6e, 0x70, 0x75, 0x74, 0x41, 0x6e, 0x73, 0x77,
-	0x65, 0x72, 0x18, 0x04, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x0f, 0x2e, 0x70, 0x62, 0x2e, 0x49, 0x6e,
-	0x70, 0x75, 0x74, 0x41, 0x6e, 0x73, 0x77, 0x65, 0x72, 0x52, 0x0b, 0x69, 0x6e, 0x70, 0x75, 0x74,
-	0x41, 0x6e, 0x73, 0x77, 0x65, 0x72, 0x22, 0xe9, 0x01, 0x0a, 0x13, 0x4a, 0x75, 0x64, 0x67, 0x65,
-	0x43, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x0e,
-	0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x12, 0x12,
-	0x0a, 0x04, 0x74, 0x79, 0x70, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x74, 0x79,
-	0x70, 0x65, 0x12, 0x16, 0x0a, 0x06, 0x73, 0x74, 0x61, 0x74, 0x75, 0x73, 0x18, 0x03, 0x20, 0x01,
-	0x28, 0x09, 0x52, 0x06, 0x73, 0x74, 0x61, 0x74, 0x75, 0x73, 0x12, 0x2e, 0x0a, 0x04, 0x64, 0x61,
-	0x74, 0x65, 0x18, 0x04, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c,
-	0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x54, 0x69, 0x6d, 0x65, 0x73,
-	0x74, 0x61, 0x6d, 0x70, 0x52, 0x04, 0x64, 0x61, 0x74, 0x65, 0x12, 0x28, 0x0a, 0x08, 0x6c, 0x61,
-	0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x18, 0x05, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x0c, 0x2e, 0x70,
-	0x62, 0x2e, 0x4c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x52, 0x08, 0x6c, 0x61, 0x6e, 0x67,
-	0x75, 0x61, 0x67, 0x65, 0x12, 0x24, 0x0a, 0x07, 0x72, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x73, 0x18,
-	0x06, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x0a, 0x2e, 0x70, 0x62, 0x2e, 0x52, 0x65, 0x73, 0x75, 0x6c,
-	0x74, 0x52, 0x07, 0x72, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x73, 0x12, 0x16, 0x0a, 0x06, 0x73, 0x6f,
-	0x75, 0x72, 0x63, 0x65, 0x18, 0x07, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x73, 0x6f, 0x75, 0x72,
-	0x63, 0x65, 0x22, 0x21, 0x0a, 0x05, 0x49, 0x6e, 0x70, 0x75, 0x74, 0x12, 0x18, 0x0a, 0x07, 0x63,
-	0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0c, 0x52, 0x07, 0x63, 0x6f,
-	0x6e, 0x74, 0x65, 0x6e, 0x74, 0x22, 0x4c, 0x0a, 0x06, 0x52, 0x65, 0x73, 0x69, 0x7a, 0x65, 0x12,
-	0x12, 0x0a, 0x04, 0x72, 0x6f, 0x77, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x04, 0x72,
-	0x6f, 0x77, 0x73, 0x12, 0x12, 0x0a, 0x04, 0x63, 0x6f, 0x6c, 0x73, 0x18, 0x02, 0x20, 0x01, 0x28,
-	0x0d, 0x52, 0x04, 0x63, 0x6f, 0x6c, 0x73, 0x12, 0x0c, 0x0a, 0x01, 0x78, 0x18, 0x03, 0x20, 0x01,
-	0x28, 0x0d, 0x52, 0x01, 0x78, 0x12, 0x0c, 0x0a, 0x01, 0x79, 0x18, 0x04, 0x20, 0x01, 0x28, 0x0d,
-	0x52, 0x01, 0x79, 0x22, 0x60, 0x0a, 0x0a, 0x53, 0x68, 0x65, 0x6c, 0x6c, 0x49, 0x6e, 0x70, 0x75,
-	0x74, 0x12, 0x21, 0x0a, 0x05, 0x69, 0x6e, 0x70, 0x75, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b,
-	0x32, 0x09, 0x2e, 0x70, 0x62, 0x2e, 0x49, 0x6e, 0x70, 0x75, 0x74, 0x48, 0x00, 0x52, 0x05, 0x69,
-	0x6e, 0x70, 0x75, 0x74, 0x12, 0x24, 0x0a, 0x06, 0x72, 0x65, 0x73, 0x69, 0x7a, 0x65, 0x18, 0x02,
-	0x20, 0x01, 0x28, 0x0b, 0x32, 0x0a, 0x2e, 0x70, 0x62, 0x2e, 0x52, 0x65, 0x73, 0x69, 0x7a, 0x65,
-	0x48, 0x00, 0x52, 0x06, 0x72, 0x65, 0x73, 0x69, 0x7a, 0x65, 0x42, 0x09, 0x0a, 0x07, 0x72, 0x65,
-	0x71, 0x75, 0x65, 0x73, 0x74, 0x22, 0x27, 0x0a, 0x0b, 0x53, 0x68, 0x65, 0x6c, 0x6c, 0x4f, 0x75,
-	0x74, 0x70, 0x75, 0x74, 0x12, 0x18, 0x0a, 0x07, 0x63, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x18,
-	0x02, 0x20, 0x01, 0x28, 0x0c, 0x52, 0x07, 0x63, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x32, 0x9d,
-	0x02, 0x0a, 0x0b, 0x44, 0x65, 0x6d, 0x6f, 0x42, 0x61, 0x63, 0x6b, 0x65, 0x6e, 0x64, 0x12, 0x3b,
-	0x0a, 0x0a, 0x53, 0x75, 0x62, 0x6d, 0x69, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x12, 0x15, 0x2e, 0x70,
-	0x62, 0x2e, 0x53, 0x75, 0x62, 0x6d, 0x69, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x71, 0x75,
-	0x65, 0x73, 0x74, 0x1a, 0x16, 0x2e, 0x70, 0x62, 0x2e, 0x53, 0x75, 0x62, 0x6d, 0x69, 0x73, 0x73,
-	0x69, 0x6f, 0x6e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x2f, 0x0a, 0x06, 0x53,
-	0x75, 0x62, 0x6d, 0x69, 0x74, 0x12, 0x11, 0x2e, 0x70, 0x62, 0x2e, 0x53, 0x75, 0x62, 0x6d, 0x69,
-	0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x12, 0x2e, 0x70, 0x62, 0x2e, 0x53, 0x75,
-	0x62, 0x6d, 0x69, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x34, 0x0a, 0x07,
-	0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x73, 0x12, 0x16, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65,
-	0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x45, 0x6d, 0x70, 0x74, 0x79, 0x1a,
-	0x0f, 0x2e, 0x70, 0x62, 0x2e, 0x4a, 0x75, 0x64, 0x67, 0x65, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65,
-	0x30, 0x01, 0x12, 0x3c, 0x0a, 0x05, 0x4a, 0x75, 0x64, 0x67, 0x65, 0x12, 0x17, 0x2e, 0x70, 0x62,
-	0x2e, 0x4a, 0x75, 0x64, 0x67, 0x65, 0x43, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x52, 0x65, 0x73, 0x70,
-	0x6f, 0x6e, 0x73, 0x65, 0x1a, 0x16, 0x2e, 0x70, 0x62, 0x2e, 0x4a, 0x75, 0x64, 0x67, 0x65, 0x43,
-	0x6c, 0x69, 0x65, 0x6e, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x28, 0x01, 0x30, 0x01,
-	0x12, 0x2c, 0x0a, 0x05, 0x53, 0x68, 0x65, 0x6c, 0x6c, 0x12, 0x0e, 0x2e, 0x70, 0x62, 0x2e, 0x53,
-	0x68, 0x65, 0x6c, 0x6c, 0x49, 0x6e, 0x70, 0x75, 0x74, 0x1a, 0x0f, 0x2e, 0x70, 0x62, 0x2e, 0x53,
-	0x68, 0x65, 0x6c, 0x6c, 0x4f, 0x75, 0x74, 0x70, 0x75, 0x74, 0x28, 0x01, 0x30, 0x01, 0x42, 0x25,
-	0x5a, 0x23, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x63, 0x72, 0x69,
-	0x79, 0x6c, 0x65, 0x2f, 0x67, 0x6f, 0x2d, 0x6a, 0x75, 0x64, 0x67, 0x65, 0x72, 0x2d, 0x64, 0x65,
-	0x6d, 0x6f, 0x2f, 0x70, 0x62, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x73, 0x6f,
+	0x75, 0x72, 0x63, 0x65, 0x12, 0x31, 0x0a, 0x0b, 0x69, 0x6e, 0x70, 0x75, 0x74, 0x41, 0x6e, 0x73,
+	0x77, 0x65, 0x72, 0x18, 0x03, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x0f, 0x2e, 0x70, 0x62, 0x2e, 0x49,
+	0x6e, 0x70, 0x75, 0x74, 0x41, 0x6e, 0x73, 0x77, 0x65, 0x72, 0x52, 0x0b, 0x69, 0x6e, 0x70, 0x75,
+	0x74, 0x41, 0x6e, 0x73, 0x77, 0x65, 0x72, 0x22, 0x20, 0x0a, 0x0e, 0x53, 0x75, 0x62, 0x6d, 0x69,
+	0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18,
+	0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x22, 0xe1, 0x01, 0x0a, 0x0b, 0x4a, 0x75,
+	0x64, 0x67, 0x65, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18,
+	0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x12, 0x12, 0x0a, 0x04, 0x74, 0x79, 0x70,
+	0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x74, 0x79, 0x70, 0x65, 0x12, 0x16, 0x0a,
+	0x06, 0x73, 0x74, 0x61, 0x74, 0x75, 0x73, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x73,
+	0x74, 0x61, 0x74, 0x75, 0x73, 0x12, 0x2e, 0x0a, 0x04, 0x64, 0x61, 0x74, 0x65, 0x18, 0x04, 0x20,
+	0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f, 0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f,
+	0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x54, 0x69, 0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x52,
+	0x04, 0x64, 0x61, 0x74, 0x65, 0x12, 0x28, 0x0a, 0x08, 0x6c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67,
+	0x65, 0x18, 0x05, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x0c, 0x2e, 0x70, 0x62, 0x2e, 0x4c, 0x61, 0x6e,
+	0x67, 0x75, 0x61, 0x67, 0x65, 0x52, 0x08, 0x6c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x12,
+	0x24, 0x0a, 0x07, 0x72, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x73, 0x18, 0x06, 0x20, 0x03, 0x28, 0x0b,
+	0x32, 0x0a, 0x2e, 0x70, 0x62, 0x2e, 0x52, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x52, 0x07, 0x72, 0x65,
+	0x73, 0x75, 0x6c, 0x74, 0x73, 0x12, 0x16, 0x0a, 0x06, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x18,
+	0x07, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x22, 0x99, 0x01,
+	0x0a, 0x12, 0x4a, 0x75, 0x64, 0x67, 0x65, 0x43, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x52, 0x65, 0x71,
+	0x75, 0x65, 0x73, 0x74, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09,
+	0x52, 0x02, 0x69, 0x64, 0x12, 0x28, 0x0a, 0x08, 0x6c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65,
+	0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x0c, 0x2e, 0x70, 0x62, 0x2e, 0x4c, 0x61, 0x6e, 0x67,
+	0x75, 0x61, 0x67, 0x65, 0x52, 0x08, 0x6c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x12, 0x16,
+	0x0a, 0x06, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06,
+	0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x12, 0x31, 0x0a, 0x0b, 0x69, 0x6e, 0x70, 0x75, 0x74, 0x41,
+	0x6e, 0x73, 0x77, 0x65, 0x72, 0x18, 0x04, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x0f, 0x2e, 0x70, 0x62,
+	0x2e, 0x49, 0x6e, 0x70, 0x75, 0x74, 0x41, 0x6e, 0x73, 0x77, 0x65, 0x72, 0x52, 0x0b, 0x69, 0x6e,
+	0x70, 0x75, 0x74, 0x41, 0x6e, 0x73, 0x77, 0x65, 0x72, 0x22, 0xe9, 0x01, 0x0a, 0x13, 0x4a, 0x75,
+	0x64, 0x67, 0x65, 0x43, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
+	0x65, 0x12, 0x0e, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69,
+	0x64, 0x12, 0x12, 0x0a, 0x04, 0x74, 0x79, 0x70, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x04, 0x74, 0x79, 0x70, 0x65, 0x12, 0x16, 0x0a, 0x06, 0x73, 0x74, 0x61, 0x74, 0x75, 0x73, 0x18,
+	0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x73, 0x74, 0x61, 0x74, 0x75, 0x73, 0x12, 0x2e, 0x0a,
+	0x04, 0x64, 0x61, 0x74, 0x65, 0x18, 0x04, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x1a, 0x2e, 0x67, 0x6f,
+	0x6f, 0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x54, 0x69,
+	0x6d, 0x65, 0x73, 0x74, 0x61, 0x6d, 0x70, 0x52, 0x04, 0x64, 0x61, 0x74, 0x65, 0x12, 0x28, 0x0a,
+	0x08, 0x6c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x18, 0x05, 0x20, 0x01, 0x28, 0x0b, 0x32,
+	0x0c, 0x2e, 0x70, 0x62, 0x2e, 0x4c, 0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x52, 0x08, 0x6c,
+	0x61, 0x6e, 0x67, 0x75, 0x61, 0x67, 0x65, 0x12, 0x24, 0x0a, 0x07, 0x72, 0x65, 0x73, 0x75, 0x6c,
+	0x74, 0x73, 0x18, 0x06, 0x20, 0x03, 0x28, 0x0b, 0x32, 0x0a, 0x2e, 0x70, 0x62, 0x2e, 0x52, 0x65,
+	0x73, 0x75, 0x6c, 0x74, 0x52, 0x07, 0x72, 0x65, 0x73, 0x75, 0x6c, 0x74, 0x73, 0x12, 0x16, 0x0a,
+	0x06, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x18, 0x07, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x73,
+	0x6f, 0x75, 0x72, 0x63, 0x65, 0x22, 0x21, 0x0a, 0x05, 0x49, 0x6e, 0x70, 0x75, 0x74, 0x12, 0x18,
+	0x0a, 0x07, 0x63, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0c, 0x52,
+	0x07, 0x63, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x22, 0x4c, 0x0a, 0x06, 0x52, 0x65, 0x73, 0x69,
+	0x7a, 0x65, 0x12, 0x12, 0x0a, 0x04, 0x72, 0x6f, 0x77, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0d,
+	0x52, 0x04, 0x72, 0x6f, 0x77, 0x73, 0x12, 0x12, 0x0a, 0x04, 0x63, 0x6f, 0x6c, 0x73, 0x18, 0x02,
+	0x20, 0x01, 0x28, 0x0d, 0x52, 0x04, 0x63, 0x6f, 0x6c, 0x73, 0x12, 0x0c, 0x0a, 0x01, 0x78, 0x18,
+	0x03, 0x20, 0x01, 0x28, 0x0d, 0x52, 0x01, 0x78, 0x12, 0x0c, 0x0a, 0x01, 0x79, 0x18, 0x04, 0x20,
+	0x01, 0x28, 0x0d, 0x52, 0x01, 0x79, 0x22, 0x60, 0x0a, 0x0a, 0x53, 0x68, 0x65, 0x6c, 0x6c, 0x49,
+	0x6e, 0x70, 0x75, 0x74, 0x12, 0x21, 0x0a, 0x05, 0x69, 0x6e, 0x70, 0x75, 0x74, 0x18, 0x01, 0x20,
+	0x01, 0x28, 0x0b, 0x32, 0x09, 0x2e, 0x70, 0x62, 0x2e, 0x49, 0x6e, 0x70, 0x75, 0x74, 0x48, 0x00,
+	0x52, 0x05, 0x69, 0x6e, 0x70, 0x75, 0x74, 0x12, 0x24, 0x0a, 0x06, 0x72, 0x65, 0x73, 0x69, 0x7a,
+	0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x0a, 0x2e, 0x70, 0x62, 0x2e, 0x52, 0x65, 0x73,
+	0x69, 0x7a, 0x65, 0x48, 0x00, 0x52, 0x06, 0x72, 0x65, 0x73, 0x69, 0x7a, 0x65, 0x42, 0x09, 0x0a,
+	0x07, 0x72, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x22, 0x27, 0x0a, 0x0b, 0x53, 0x68, 0x65, 0x6c,
+	0x6c, 0x4f, 0x75, 0x74, 0x70, 0x75, 0x74, 0x12, 0x18, 0x0a, 0x07, 0x63, 0x6f, 0x6e, 0x74, 0x65,
+	0x6e, 0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0c, 0x52, 0x07, 0x63, 0x6f, 0x6e, 0x74, 0x65, 0x6e,
+	0x74, 0x32, 0x9d, 0x02, 0x0a, 0x0b, 0x44, 0x65, 0x6d, 0x6f, 0x42, 0x61, 0x63, 0x6b, 0x65, 0x6e,
+	0x64, 0x12, 0x3b, 0x0a, 0x0a, 0x53, 0x75, 0x62, 0x6d, 0x69, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x12,
+	0x15, 0x2e, 0x70, 0x62, 0x2e, 0x53, 0x75, 0x62, 0x6d, 0x69, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x52,
+	0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x16, 0x2e, 0x70, 0x62, 0x2e, 0x53, 0x75, 0x62, 0x6d,
+	0x69, 0x73, 0x73, 0x69, 0x6f, 0x6e, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x2f,
+	0x0a, 0x06, 0x53, 0x75, 0x62, 0x6d, 0x69, 0x74, 0x12, 0x11, 0x2e, 0x70, 0x62, 0x2e, 0x53, 0x75,
+	0x62, 0x6d, 0x69, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x12, 0x2e, 0x70, 0x62,
+	0x2e, 0x53, 0x75, 0x62, 0x6d, 0x69, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12,
+	0x34, 0x0a, 0x07, 0x55, 0x70, 0x64, 0x61, 0x74, 0x65, 0x73, 0x12, 0x16, 0x2e, 0x67, 0x6f, 0x6f,
+	0x67, 0x6c, 0x65, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x75, 0x66, 0x2e, 0x45, 0x6d, 0x70,
+	0x74, 0x79, 0x1a, 0x0f, 0x2e, 0x70, 0x62, 0x2e, 0x4a, 0x75, 0x64, 0x67, 0x65, 0x55, 0x70, 0x64,
+	0x61, 0x74, 0x65, 0x30, 0x01, 0x12, 0x3c, 0x0a, 0x05, 0x4a, 0x75, 0x64, 0x67, 0x65, 0x12, 0x17,
+	0x2e, 0x70, 0x62, 0x2e, 0x4a, 0x75, 0x64, 0x67, 0x65, 0x43, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x52,
+	0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x1a, 0x16, 0x2e, 0x70, 0x62, 0x2e, 0x4a, 0x75, 0x64,
+	0x67, 0x65, 0x43, 0x6c, 0x69, 0x65, 0x6e, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x28,
+	0x01, 0x30, 0x01, 0x12, 0x2c, 0x0a, 0x05, 0x53, 0x68, 0x65, 0x6c, 0x6c, 0x12, 0x0e, 0x2e, 0x70,
+	0x62, 0x2e, 0x53, 0x68, 0x65, 0x6c, 0x6c, 0x49, 0x6e, 0x70, 0x75, 0x74, 0x1a, 0x0f, 0x2e, 0x70,
+	0x62, 0x2e, 0x53, 0x68, 0x65, 0x6c, 0x6c, 0x4f, 0x75, 0x74, 0x70, 0x75, 0x74, 0x28, 0x01, 0x30,
+	0x01, 0x42, 0x2c, 0x5a, 0x22, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f,
+	0x63, 0x72, 0x69, 0x79, 0x6c, 0x65, 0x2f, 0x67, 0x6f, 0x2d, 0x6a, 0x75, 0x64, 0x67, 0x65, 0x2d,
+	0x64, 0x65, 0x6d, 0x6f, 0x2f, 0x70, 0x62, 0x92, 0x03, 0x05, 0xd2, 0x3e, 0x02, 0x10, 0x03, 0x62,
+	0x08, 0x65, 0x64, 0x69, 0x74, 0x69, 0x6f, 0x6e, 0x73, 0x70, 0xe8, 0x07,
 })
-
-var (
-	file_demo_backend_proto_rawDescOnce sync.Once
-	file_demo_backend_proto_rawDescData []byte
-)
-
-func file_demo_backend_proto_rawDescGZIP() []byte {
-	file_demo_backend_proto_rawDescOnce.Do(func() {
-		file_demo_backend_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_demo_backend_proto_rawDesc), len(file_demo_backend_proto_rawDesc)))
-	})
-	return file_demo_backend_proto_rawDescData
-}
 
 var file_demo_backend_proto_msgTypes = make([]protoimpl.MessageInfo, 15)
 var file_demo_backend_proto_goTypes = []any{
@@ -1232,8 +2521,8 @@ func file_demo_backend_proto_init() {
 		return
 	}
 	file_demo_backend_proto_msgTypes[13].OneofWrappers = []any{
-		(*ShellInput_Input)(nil),
-		(*ShellInput_Resize)(nil),
+		(*shellInput_Input)(nil),
+		(*shellInput_Resize)(nil),
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{

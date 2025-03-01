@@ -9,7 +9,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/criyle/go-judger-demo/pb"
+	"github.com/criyle/go-judge-demo/pb"
 	ginzap "github.com/gin-contrib/zap"
 	"github.com/gin-gonic/contrib/static"
 	"github.com/gin-gonic/gin"

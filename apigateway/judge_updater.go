@@ -1,16 +1,15 @@
 package main
 
 import (
-	"bytes"
 	"context"
-	"encoding/json"
 	"net/http"
 	"time"
 
-	"github.com/criyle/go-judger-demo/pb"
+	"github.com/criyle/go-judge-demo/pb"
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
 	"go.uber.org/zap"
+	"google.golang.org/protobuf/encoding/protojson"
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
@@ -79,13 +78,12 @@ func (j *judgeUpdater) broadcastLoop() {
 			delete(j.observers, c)
 
 		case msg := <-j.broadcast:
-			buf := new(bytes.Buffer)
-			err := json.NewEncoder(buf).Encode(msg)
+			buf, err := protojson.Marshal(msg)
 			if err != nil {
 				j.logger.Sugar().Debug("encode fail:", err)
 				continue
 			}
-			pMsg, err := websocket.NewPreparedMessage(websocket.TextMessage, buf.Bytes())
+			pMsg, err := websocket.NewPreparedMessage(websocket.TextMessage, buf)
 			if err != nil {
 				j.logger.Sugar().Debug("prepare fail:", err)
 				continue

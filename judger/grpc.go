@@ -9,8 +9,8 @@ import (
 	"time"
 
 	"github.com/criyle/go-judge-client/pkg/diff"
+	demopb "github.com/criyle/go-judge-demo/pb"
 	"github.com/criyle/go-judge/pb"
-	demopb "github.com/criyle/go-judger-demo/pb"
 	"github.com/google/shlex"
 	"golang.org/x/sync/errgroup"
 )
@@ -95,23 +95,27 @@ func (j *judger) judgeLoop() {
 	}
 }
 
+func judgeClientResponse(id string, t string, status string) *demopb.JudgeClientResponse {
+	return demopb.JudgeClientResponse_builder{
+		Id:     &id,
+		Type:   &t,
+		Status: &status,
+	}.Build()
+}
+
 func (j *judger) judgeSingle(req *demopb.JudgeClientRequest) {
 	sTime := time.Now()
 
-	j.response <- &demopb.JudgeClientResponse{
-		Id:     req.Id,
-		Type:   "progress",
-		Status: "Compiling",
-	}
+	j.response <- judgeClientResponse(req.GetId(), "progress", "Compiling")
 
 	// Compile
-	args, err := shlex.Split(req.Language.CompileCmd)
+	args, err := shlex.Split(req.GetLanguage().GetCompileCmd())
 	if err != nil {
-		j.response <- &demopb.JudgeClientResponse{Id: req.Id, Type: "finished", Status: fmt.Sprintf("Invalid CompileCmd %v", err)}
+		j.response <- judgeClientResponse(req.GetId(), "finished", fmt.Sprintf("Invalid CompileCmd %v", err))
 		return
 	}
 
-	copyOutFiles := strings.Split(req.Language.Executables, " ")
+	copyOutFiles := strings.Split(req.GetLanguage().GetExecutables(), " ")
 	copyOut := make([]*pb.Request_CmdCopyOutFile, 0, len(copyOutFiles))
 	for _, f := range copyOutFiles {
 		copyOut = append(copyOut, &pb.Request_CmdCopyOutFile{Name: f})
@@ -151,10 +155,10 @@ func (j *judger) judgeSingle(req *demopb.JudgeClientRequest) {
 			MemoryLimit:    memoryLimit,
 			ProcLimit:      100,
 			CopyIn: map[string]*pb.Request_File{
-				req.Language.SourceFileName: {
+				req.GetLanguage().GetSourceFileName(): {
 					File: &pb.Request_File_Memory{
 						Memory: &pb.Request_MemoryFile{
-							Content: []byte(req.Source),
+							Content: []byte(req.GetSource()),
 						},
 					},
 				},
@@ -165,21 +169,25 @@ func (j *judger) judgeSingle(req *demopb.JudgeClientRequest) {
 	}
 	compileRet, err := j.execClient.Exec(context.TODO(), compileReq)
 	if err != nil {
-		j.response <- &demopb.JudgeClientResponse{Id: req.Id, Type: "finished", Status: fmt.Sprintf("Compile Error %v", err)}
+		j.response <- judgeClientResponse(req.GetId(), "finished", fmt.Sprintf("Compile Error %v", err))
 		return
 	}
 	if compileRet.Error != "" {
-		j.response <- &demopb.JudgeClientResponse{Id: req.Id, Type: "finished", Status: fmt.Sprintf("Compile Error %v", compileRet.Error)}
+		j.response <- judgeClientResponse(req.GetId(), "finished", fmt.Sprintf("Compile Error %v", compileRet.Error))
 		return
 	}
 	cRet := compileRet.Results[0]
 	var result []*demopb.Result
-	result = append(result, &demopb.Result{
-		Time:   uint64(time.Duration(cRet.Time).Round(time.Millisecond) / time.Millisecond),
-		Memory: cRet.Memory >> 10,
-		Stdout: string(cRet.Files["stdout"]),
-		Stderr: string(cRet.Files["stderr"]),
-	})
+	rtTime := uint64(time.Duration(cRet.Time).Round(time.Millisecond) / time.Millisecond)
+	rtMemory := cRet.Memory >> 10
+	rtStdout := string(cRet.Files["stdout"])
+	rtStderr := string(cRet.Files["stderr"])
+	result = append(result, demopb.Result_builder{
+		Time:   &rtTime,
+		Memory: &rtMemory,
+		Stdout: &rtStdout,
+		Stderr: &rtStderr,
+	}.Build())
 
 	// remove exec file
 	defer func() {
@@ -191,20 +199,13 @@ func (j *judger) judgeSingle(req *demopb.JudgeClientRequest) {
 	}()
 
 	if cRet.Status != pb.Response_Result_Accepted {
-		j.response <- &demopb.JudgeClientResponse{
-			Id:      req.Id,
-			Type:    "finished",
-			Status:  fmt.Sprintf("Compile %v %v", cRet.Status.String(), compileRet.Error),
-			Results: result,
-		}
+		rt := judgeClientResponse(req.GetId(), "finished", fmt.Sprintf("Compile %v %v", cRet.Status.String(), compileRet.Error))
+		rt.SetResults(result)
+		j.response <- rt
 		return
 	}
 
-	j.response <- &demopb.JudgeClientResponse{
-		Id:     req.Id,
-		Type:   "progress",
-		Status: "Compiled",
-	}
+	j.response <- judgeClientResponse(req.GetId(), "progress", "Compiled")
 
 	var completed int32
 
@@ -221,21 +222,21 @@ func (j *judger) judgeSingle(req *demopb.JudgeClientRequest) {
 		eg.Go(func() (err error) {
 			defer func() {
 				if err != nil {
-					runResult[i].Log = string(err.Error())
+					runResult[i].SetLog(string(err.Error()))
 					runStatus[i] = pb.Response_Result_JudgementFailed
 				}
 			}()
 
-			args, err := shlex.Split(req.Language.RunCmd)
+			args, err := shlex.Split(req.GetLanguage().GetRunCmd())
 			if err != nil {
 				return err
 			}
-			input := inputOutput.Input
-			ansContent := inputOutput.Answer
+			input := inputOutput.GetInput()
+			ansContent := inputOutput.GetAnswer()
 			// java, go, node needs more threads.. need a better way
 			// may be add cpu bandwidth on cgroup..
 			var procLimit uint64 = 1
-			switch req.Language.Name {
+			switch req.GetLanguage().GetName() {
 			case "java":
 				procLimit = 25
 			case "go", "javascript", "typescript", "ruby", "csharp", "perl":
@@ -300,21 +301,17 @@ func (j *judger) judgeSingle(req *demopb.JudgeClientRequest) {
 			err = diff.Compare(bytes.NewBufferString(ansContent), bytes.NewBuffer(ret.Files["stdout"]))
 			if err != nil && ret.Status == pb.Response_Result_Accepted {
 				ret.Status = pb.Response_Result_WrongAnswer
-				runResult[i].Log = err.Error()
+				runResult[i].SetLog(err.Error())
 			}
-			runResult[i].Time = ret.Time / 1e6
-			runResult[i].Memory = ret.Memory >> 10
-			runResult[i].Stdin = input
-			runResult[i].Stdout = string(ret.Files["stdout"])
-			runResult[i].Stderr = string(ret.Files["stderr"])
+			runResult[i].SetTime(ret.Time / 1e6)
+			runResult[i].SetMemory(ret.Memory >> 10)
+			runResult[i].SetStdin(input)
+			runResult[i].SetStdout(string(ret.Files["stdout"]))
+			runResult[i].SetStderr(string(ret.Files["stderr"]))
 			runStatus[i] = ret.Status
 
 			n := atomic.AddInt32(&completed, 1)
-			j.response <- &demopb.JudgeClientResponse{
-				Id:     req.Id,
-				Type:   "progress",
-				Status: fmt.Sprintf("Judging (%d / %d)", n, len(io)),
-			}
+			j.response <- judgeClientResponse(req.GetId(), "progress", fmt.Sprintf("Judging (%d / %d)", n, len(io)))
 			return nil
 		})
 	}
@@ -334,10 +331,7 @@ func (j *judger) judgeSingle(req *demopb.JudgeClientRequest) {
 	taskHist.WithLabelValues(status.String()).Observe(t.Seconds())
 	taskSummry.WithLabelValues(status.String()).Observe(t.Seconds())
 
-	j.response <- &demopb.JudgeClientResponse{
-		Id:      req.Id,
-		Type:    "finished",
-		Status:  status.String(),
-		Results: result,
-	}
+	rt := judgeClientResponse(req.GetId(), "finished", status.String())
+	rt.SetResults(result)
+	j.response <- rt
 }

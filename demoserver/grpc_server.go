@@ -5,8 +5,8 @@ import (
 	"context"
 	"time"
 
+	"github.com/criyle/go-judge-demo/pb"
 	execpb "github.com/criyle/go-judge/pb"
-	"github.com/criyle/go-judger-demo/pb"
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.uber.org/zap"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -54,18 +54,19 @@ func (s *demoServer) Submission(ctx context.Context, req *pb.SubmissionRequest) 
 	}
 	sub := make([]*pb.Submission, 0, len(m))
 	for _, v := range m {
-		sub = append(sub, &pb.Submission{
-			Id:        v.ID.Hex(),
+		id := v.ID.Hex()
+		sub = append(sub, pb.Submission_builder{
+			Id:        &id,
 			Language:  convertLanguage(v.Lang),
-			Source:    v.Source,
+			Source:    &v.Source,
 			Date:      timestamppb.New(*v.Date),
-			Status:    v.Status,
-			TotalTime: v.TotalTime,
-			MaxMemory: v.MaxMemory,
+			Status:    &v.Status,
+			TotalTime: &v.TotalTime,
+			MaxMemory: &v.MaxMemory,
 			Results:   convertResults(v.Results),
-		})
+		}.Build())
 	}
-	return &pb.SubmissionResponse{Submissions: sub}, nil
+	return pb.SubmissionResponse_builder{Submissions: sub}.Build(), nil
 }
 
 func (s *demoServer) Submit(ctx context.Context, req *pb.SubmitRequest) (*pb.SubmitResponse, error) {
@@ -76,22 +77,24 @@ func (s *demoServer) Submit(ctx context.Context, req *pb.SubmitRequest) (*pb.Sub
 	if err != nil {
 		return nil, err
 	}
-	s.submit <- &pb.JudgeClientRequest{
-		Id:          m.ID.Hex(),
+	id := m.ID.Hex()
+	source := req.GetSource()
+	s.submit <- pb.JudgeClientRequest_builder{
+		Id:          &id,
 		Language:    req.GetLanguage(),
-		Source:      req.GetSource(),
+		Source:      &source,
 		InputAnswer: req.GetInputAnswer(),
-	}
-	s.update <- &pb.JudgeClientResponse{
-		Id:       m.ID.Hex(),
-		Language: req.Language,
+	}.Build()
+	s.update <- pb.JudgeClientResponse_builder{
+		Id:       &id,
+		Language: req.GetLanguage(),
 		Date:     timestamppb.New(*m.Date),
-		Source:   m.Source,
-	}
+		Source:   &source,
+	}.Build()
 	s.logger.Sugar().Debug("submit: ", m)
-	return &pb.SubmitResponse{
-		Id: m.ID.Hex(),
-	}, nil
+	return pb.SubmitResponse_builder{
+		Id: &id,
+	}.Build(), nil
 }
 
 func (s *demoServer) Judge(js pb.DemoBackend_JudgeServer) error {
@@ -118,7 +121,7 @@ func (s *demoServer) Judge(js pb.DemoBackend_JudgeServer) error {
 				return err
 			}
 			s.update <- resp
-			if resp.Type == "finished" {
+			if resp.GetType() == "finished" {
 				break
 			}
 		}
@@ -193,13 +196,13 @@ func (s *demoServer) Shell(ss pb.DemoBackend_ShellServer) error {
 			switch msg := msg.Response.(type) {
 			case *execpb.StreamResponse_ExecOutput:
 				output.Write(msg.ExecOutput.Content)
-				err = ss.Send(&pb.ShellOutput{Content: msg.ExecOutput.Content})
+				err = ss.Send(pb.ShellOutput_builder{Content: msg.ExecOutput.Content}.Build())
 				if err != nil {
 					return
 				}
 
 			case *execpb.StreamResponse_ExecResponse:
-				err = ss.Send(&pb.ShellOutput{Content: []byte(msg.ExecResponse.String())})
+				err = ss.Send(pb.ShellOutput_builder{Content: []byte(msg.ExecResponse.String())}.Build())
 				if err != nil {
 					return
 				}
@@ -217,22 +220,22 @@ func (s *demoServer) Shell(ss pb.DemoBackend_ShellServer) error {
 			if err != nil {
 				return
 			}
-			switch msg := msg.Request.(type) {
-			case *pb.ShellInput_Input:
-				input.Write(msg.Input.Content)
+			switch msg.WhichRequest() {
+			case pb.ShellInput_Input_case:
+				input.Write(msg.GetInput().GetContent())
 				err = sc.Send(&execpb.StreamRequest{Request: &execpb.StreamRequest_ExecInput{ExecInput: &execpb.StreamRequest_Input{
-					Content: msg.Input.Content,
+					Content: msg.GetInput().GetContent(),
 				}}})
 				if err != nil {
 					return
 				}
 
-			case *pb.ShellInput_Resize:
+			case pb.ShellInput_Resize_case:
 				err = sc.Send(&execpb.StreamRequest{Request: &execpb.StreamRequest_ExecResize{ExecResize: &execpb.StreamRequest_Resize{
-					Rows: msg.Resize.Rows,
-					Cols: msg.Resize.Cols,
-					X:    msg.Resize.X,
-					Y:    msg.Resize.Y,
+					Rows: msg.GetResize().GetRows(),
+					Cols: msg.GetResize().GetCols(),
+					X:    msg.GetResize().GetX(),
+					Y:    msg.GetResize().GetY(),
 				}}})
 				if err != nil {
 					return
@@ -258,15 +261,15 @@ func (s *demoServer) updateLoop() {
 			delete(s.observers, o)
 
 		case u := <-s.update:
-			up := &pb.JudgeUpdate{
-				Id:       u.GetId(),
-				Type:     u.GetType(),
-				Status:   u.GetStatus(),
+			up := pb.JudgeUpdate_builder{
 				Date:     u.GetDate(),
 				Language: u.GetLanguage(),
 				Results:  u.GetResults(),
-				Source:   u.GetSource(),
-			}
+			}.Build()
+			up.SetId(u.GetId())
+			up.SetType(u.GetType())
+			up.SetStatus(u.GetStatus())
+			up.SetSource(u.GetSource())
 			// save to db
 			id, _ := bson.ObjectIDFromHex(u.GetId())
 			s.db.Update(context.TODO(), &JudgerUpdate{
@@ -299,13 +302,13 @@ func convertLanguagePB(l *pb.Language) Language {
 }
 
 func convertLanguage(l Language) *pb.Language {
-	return &pb.Language{
-		Name:           l.Name,
-		SourceFileName: l.SourceFileName,
-		CompileCmd:     l.CompileCmd,
-		Executables:    l.Executables,
-		RunCmd:         l.RunCmd,
-	}
+	return pb.Language_builder{
+		Name:           &l.Name,
+		SourceFileName: &l.SourceFileName,
+		CompileCmd:     &l.CompileCmd,
+		Executables:    &l.Executables,
+		RunCmd:         &l.RunCmd,
+	}.Build()
 }
 
 func convertResultsPB(r []*pb.Result) []Result {
@@ -318,12 +321,12 @@ func convertResultsPB(r []*pb.Result) []Result {
 
 func convertResultPB(r *pb.Result) Result {
 	return Result{
-		Time:   r.Time,
-		Memory: r.Memory,
-		Stdin:  r.Stdin,
-		Stdout: r.Stdout,
-		Stderr: r.Stderr,
-		Log:    r.Log,
+		Time:   r.GetTime(),
+		Memory: r.GetMemory(),
+		Stdin:  r.GetStdin(),
+		Stdout: r.GetStdout(),
+		Stderr: r.GetStderr(),
+		Log:    r.GetLog(),
 	}
 }
 
@@ -336,12 +339,12 @@ func convertResults(r []Result) []*pb.Result {
 }
 
 func convertResult(r Result) *pb.Result {
-	return &pb.Result{
-		Time:   r.Time,
-		Memory: r.Memory,
-		Stdin:  r.Stdin,
-		Stdout: r.Stdout,
-		Stderr: r.Stderr,
-		Log:    r.Log,
-	}
+	return pb.Result_builder{
+		Time:   &r.Time,
+		Memory: &r.Memory,
+		Stdin:  &r.Stdin,
+		Stdout: &r.Stdout,
+		Stderr: &r.Stderr,
+		Log:    &r.Log,
+	}.Build()
 }

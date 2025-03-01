@@ -1,15 +1,15 @@
-# go-sandbox-demo
+# go-judge-demo
 
-A simple demo site for the [go-judge](https://github.com/criyle/go-judge), deployed on [heroku](https://go-judger.herokuapp.com).
+A simple demo site for the [go-judge](https://github.com/criyle/go-judge), deployed on M1 Mac Mini docker desktop [site](https://goj.ac).
 Under development...
 
 Components:
 
-- Frontend: Vue.js
+- Frontend: Vue 3, Naive UI, monaco editor
 - APIGateway: GO
 - Backend: GO
 - Judger Client: GO
-- Dev Server Compiler: Air
+- Dev Server Compiler: Air, Overmind
 
 Tools:
 
@@ -85,13 +85,13 @@ docker build -t judger_exec -f Dockerfile.exec .
 ```bash
 docker run --name mongo -d -p 27017:27017 mongo
 
-docker run --name demo --link mongo -d -e TOKEN=token -e GRPC_ADDR=:6081 -e MONGODB_URI=mongodb://mongo:27017/admin -e RELEASE=1 -p 6081:6081 -p 5082:5082 demoserver
+docker run --name demo --link mongo -d -e MONGODB_URI=mongodb://mongo:27017/test -p 5081:5081 -p 5082:5082 demoserver
 
-docker run --name apigateway --link demo -d -e TOKEN=token -e DEMO_SERVER=demo:6081 -e RELEASE=1 -p 5000:5000 apigateway
+docker run --name apigateway --link demo -d -e DEMO_SERVER=demo:5081 -p 5000:5000 apigateway
 
-docker run --name exec -d --privileged -e ES_AUTH_TOKEN=token -e ES_ENABLE_GRPC=1 -e ES_ENABLE_METRICS=1 -e ES_ENABLE_DEBUG=1 -e ES_GRPC_ADDR=:6051 -e ES_HTTP_ADDR=:6050 -p 6051:6051 -p 6050:6050 judger_exec
+docker run --name exec -d --privileged -e ES_ENABLE_GRPC=1 -e ES_ENABLE_METRICS=1 -e ES_ENABLE_DEBUG=1 -p 5052:5052 -p 5051:5051 -p 5050:5050 judger_exec
 
-docker run --name judger --link exec --link demo -d -e TOKEN=token -e DEMO_SERVER=demo:6081 -e EXEC_SERVER=exec:6051 -e RELEASE=1 -p 2112:2112 judger
+docker run --name judger --link exec --link demo -d -e DEMO_SERVER=demo:5081 -e EXEC_SERVER=exec:5051 -p 2112:2112 judger
 ```
 
 ## Data Model

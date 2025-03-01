@@ -22,7 +22,7 @@ const loadMore = () => {
       params: p,
     })
     .then((r) => {
-      r.data.forEach((data) => {
+      r.data.submissions.forEach((data) => {
         const idx = submissions.value.findIndex((s) => s.id === data.id);
         if (idx == -1) {
           submissions.value.push(data);
