@@ -3,8 +3,8 @@ module github.com/criyle/go-judge-demo
 go 1.23.0
 
 require (
-	github.com/criyle/go-judge v1.9.0
 	github.com/criyle/go-judge-client v0.1.3
+	github.com/criyle/go-judge/pb v1.0.0
 	github.com/gin-contrib/zap v1.1.4
 	github.com/gin-gonic/contrib v0.0.0-20250113154928-93b827325fec
 	github.com/gin-gonic/gin v1.10.0
@@ -22,7 +22,7 @@ require (
 
 require (
 	github.com/beorn7/perks v1.0.1 // indirect
-	github.com/bytedance/sonic v1.12.9 // indirect
+	github.com/bytedance/sonic v1.12.10 // indirect
 	github.com/bytedance/sonic/loader v0.2.3 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/cloudwego/base64x v0.1.5 // indirect
