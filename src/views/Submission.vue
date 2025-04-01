@@ -14,7 +14,7 @@ const loadMore = () => {
   const p =
     submissions.value.length > 0
       ? {
-        id: submissions[submissions.value.length - 1].id,
+        id: submissions.value[submissions.value.length - 1].id,
       }
       : {};
   axios
