@@ -1,7 +1,6 @@
 # go-judge-demo
 
 A simple demo site for the [go-judge](https://github.com/criyle/go-judge), deployed on M1 Mac Mini docker desktop [site](https://goj.ac).
-Under development...
 
 Components:
 
@@ -52,7 +51,7 @@ default ports:
 
 Connect to backend with judge()
 
--metrics: `:2112`
+- metrics: `:2112`
 
 ## Development
 
@@ -63,19 +62,19 @@ npm run dev
 # demoserver
 # judger
 overmind start -f Procfile.dev
-
 # mongoDB
 docker run -p 27017:27017 mongo
-# exec server
+# exec server in go-judge directory
 air
 ```
 
 ## Docker build
 
 ```bash
+# front end and api server
 docker build -t apigateway -f Dockerfile.apigateway .
 docker build -t demoserver -f Dockerfile.demoserver .
-
+# judge client and go-judge executor
 docker build -t judger -f Dockerfile.judger .
 docker build -t judger_exec -f Dockerfile.exec .
 ```
@@ -83,14 +82,15 @@ docker build -t judger_exec -f Dockerfile.exec .
 ## Docker run
 
 ```bash
+# mongo database
 docker run --name mongo -d -p 27017:27017 mongo
-
+# demo server
 docker run --name demo --link mongo -d -e MONGODB_URI=mongodb://mongo:27017/test -p 5081:5081 -p 5082:5082 demoserver
-
+# api gateway
 docker run --name apigateway --link demo -d -e DEMO_SERVER=demo:5081 -p 5000:5000 apigateway
-
+# go-judge executor service
 docker run --name exec -d --privileged -e ES_ENABLE_GRPC=1 -e ES_ENABLE_METRICS=1 -e ES_ENABLE_DEBUG=1 -p 5052:5052 -p 5051:5051 -p 5050:5050 judger_exec
-
+# judger client
 docker run --name judger --link exec --link demo -d -e DEMO_SERVER=demo:5081 -e EXEC_SERVER=exec:5051 -p 2112:2112 judger
 ```
 
