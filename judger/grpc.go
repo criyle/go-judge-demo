@@ -12,6 +12,7 @@ import (
 	demopb "github.com/criyle/go-judge-demo/pb"
 	"github.com/criyle/go-judge/pb"
 	"github.com/google/shlex"
+	"go.uber.org/zap"
 	"golang.org/x/sync/errgroup"
 )
 
@@ -40,9 +41,9 @@ func (j *judger) Start() {
 
 func (j *judger) demoLoop() {
 	for {
-		logger.Sugar().Info("connect to demo")
+		logger.Info("connect to demo")
 		j.reportLoop()
-		logger.Sugar().Info("disconnected to demo")
+		logger.Info("disconnected to demo")
 		time.Sleep(5 * time.Second)
 	}
 }
@@ -59,7 +60,7 @@ func (j *judger) reportLoop() error {
 	go func() {
 		for {
 			req, err := r.Recv()
-			logger.Sugar().Debug("request:", req)
+			logger.Debug("request", zap.Any("request", req))
 			if err != nil {
 				cancel()
 				return
@@ -76,7 +77,7 @@ func (j *judger) reportLoop() error {
 				return
 
 			case resp := <-j.response:
-				logger.Sugar().Debug("response:", resp)
+				logger.Debug("response", zap.Any("response", resp))
 				if err := r.Send(resp); err != nil {
 					cancel()
 					return

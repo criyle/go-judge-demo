@@ -43,9 +43,9 @@ func (j *judgeUpdater) Register(r *gin.RouterGroup) {
 
 func (j *judgeUpdater) getUpdateLoop() {
 	for {
-		j.logger.Sugar().Debug("connected to updater")
+		j.logger.Debug("connected to updater")
 		j.getUpdateSingle()
-		j.logger.Sugar().Debug("disconnected to updater")
+		j.logger.Debug("disconnected to updater")
 		time.Sleep(5 * time.Second)
 	}
 }
@@ -60,7 +60,7 @@ func (j *judgeUpdater) getUpdateSingle() error {
 	}
 	for {
 		updates, err := c.Recv()
-		j.logger.Sugar().Debug("update", updates)
+		j.logger.Debug("update", zap.Any("updates", updates))
 		if err != nil {
 			return err
 		}
@@ -80,20 +80,20 @@ func (j *judgeUpdater) broadcastLoop() {
 		case msg := <-j.broadcast:
 			buf, err := protojson.Marshal(msg)
 			if err != nil {
-				j.logger.Sugar().Debug("encode fail:", err)
+				j.logger.Debug("encode fail", zap.Error(err))
 				continue
 			}
 			pMsg, err := websocket.NewPreparedMessage(websocket.TextMessage, buf)
 			if err != nil {
-				j.logger.Sugar().Debug("prepare fail:", err)
+				j.logger.Debug("prepare fail", zap.Error(err))
 				continue
 			}
-			j.logger.Sugar().Debug("#observer:", len(j.observers))
+			j.logger.Debug("#observer", zap.Int("count", len(j.observers)))
 			for o := range j.observers {
 				select {
 				case o.send <- pMsg:
 				default:
-					j.logger.Sugar().Debug("too slow")
+					j.logger.Debug("too slow")
 					// client too slow, stop it
 					delete(j.observers, o)
 					close(o.send)

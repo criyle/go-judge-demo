@@ -134,8 +134,8 @@ func main() {
 		log.Fatalln(err)
 	}
 	go func() {
-		logger.Sugar().Info("Starting gRPC server at ", grpcAddr)
-		logger.Sugar().Info("gRPC serve finished: ", grpcServer.Serve(lis))
+		logger.Info("Starting gRPC server", zap.String("addr", grpcAddr))
+		logger.Info("gRPC serve finished", zap.Error(grpcServer.Serve(lis)))
 	}()
 
 	// collect metrics

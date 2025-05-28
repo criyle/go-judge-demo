@@ -91,7 +91,7 @@ func (s *demoServer) Submit(ctx context.Context, req *pb.SubmitRequest) (*pb.Sub
 		Date:     timestamppb.New(*m.Date),
 		Source:   &source,
 	}.Build()
-	s.logger.Sugar().Debug("submit: ", m)
+	s.logger.Debug("submit", zap.Any("model", m))
 	return pb.SubmitResponse_builder{
 		Id: &id,
 	}.Build(), nil
@@ -101,7 +101,7 @@ func (s *demoServer) Judge(js pb.DemoBackend_JudgeServer) error {
 	for {
 		// Send request to client
 		req, ok := <-s.submit
-		s.logger.Sugar().Info("judge request: ", req)
+		s.logger.Info("judge request", zap.Any("request", req))
 		if !ok {
 			break
 		}
@@ -114,7 +114,7 @@ func (s *demoServer) Judge(js pb.DemoBackend_JudgeServer) error {
 		// Recv updates from client
 		for {
 			resp, err := js.Recv()
-			s.logger.Sugar().Info("judge response: ", req, err)
+			s.logger.Info("judge response", zap.Any("request", req), zap.Error(err))
 			if err != nil {
 				// If encouters error, do not consume this
 				s.submit <- req
@@ -142,7 +142,7 @@ func (s *demoServer) Updates(_ *emptypb.Empty, us pb.DemoBackend_UpdatesServer) 
 			if !ok {
 				return nil
 			}
-			s.logger.Sugar().Info("send updates:", u)
+			s.logger.Info("send updates", zap.Any("updates", u))
 			if err := us.Send(u); err != nil {
 				return err
 			}
@@ -189,7 +189,7 @@ func (s *demoServer) Shell(ss pb.DemoBackend_ShellServer) error {
 
 		for {
 			msg, err := sc.Recv()
-			s.logger.Sugar().Debug("sc recv: ", msg)
+			s.logger.Debug("sc recv", zap.Any("message", msg))
 			if err != nil {
 				return
 			}
@@ -216,7 +216,7 @@ func (s *demoServer) Shell(ss pb.DemoBackend_ShellServer) error {
 
 		for {
 			msg, err := ss.Recv()
-			s.logger.Sugar().Debug("ss recv: ", msg)
+			s.logger.Debug("ss recv", zap.Any("message", msg))
 			if err != nil {
 				return
 			}

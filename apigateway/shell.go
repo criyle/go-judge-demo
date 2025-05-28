@@ -59,7 +59,7 @@ type shell struct {
 func (s *shell) readLoop() {
 	defer s.cancel()
 	defer s.conn.Close()
-	defer s.logger.Sugar().Debug("wsread exit")
+	defer s.logger.Debug("wsread exit")
 
 	s.conn.SetReadDeadline(time.Now().Add(pongWait))
 	s.conn.SetPongHandler(func(string) error {
@@ -85,7 +85,7 @@ func (s *shell) readLoop() {
 func (s *shell) writeLoop() {
 	defer s.cancel()
 	defer s.conn.Close()
-	defer s.logger.Sugar().Debug("wswrite exit")
+	defer s.logger.Debug("wswrite exit")
 
 	ticker := time.NewTicker(pingPeriod)
 	defer ticker.Stop()
@@ -115,7 +115,7 @@ func (s *shell) writeLoop() {
 func (s *shell) recvLoop() {
 	defer s.cancel()
 	defer close(s.msg)
-	defer s.logger.Sugar().Debug("recv exit")
+	defer s.logger.Debug("recv exit")
 
 	for {
 		msg, err := s.sc.Recv()
