@@ -158,26 +158,24 @@ func (s *demoServer) Shell(ss pb.DemoBackend_ShellServer) error {
 	if err != nil {
 		return err
 	}
-	err = sc.Send(&execpb.StreamRequest{
-		Request: &execpb.StreamRequest_ExecRequest{
-			ExecRequest: &execpb.Request{
-				Cmd: []*execpb.Request_CmdType{{
-					Args: []string{"/bin/bash"},
-					Env:  []string{"PATH=/usr/local/bin:/usr/bin:/bin", "HOME=/w", "TERM=xterm-256color"},
-					Files: []*execpb.Request_File{
-						{File: &execpb.Request_File_StreamIn{}},
-						{File: &execpb.Request_File_StreamOut{}},
-						{File: &execpb.Request_File_StreamOut{}},
-					},
-					Tty:            true,
-					CpuTimeLimit:   uint64(30 * time.Second),
-					ClockTimeLimit: uint64(30 * time.Minute),
-					MemoryLimit:    256 << 20,
-					ProcLimit:      50,
-				}},
-			},
-		},
-	})
+	err = sc.Send(execpb.StreamRequest_builder{
+		ExecRequest: execpb.Request_builder{
+			Cmd: []*execpb.Request_CmdType{execpb.Request_CmdType_builder{
+				Args: []string{"/bin/bash"},
+				Env:  []string{"PATH=/usr/local/bin:/usr/bin:/bin", "HOME=/w", "TERM=xterm-256color"},
+				Files: []*execpb.Request_File{
+					execpb.Request_File_builder{StreamIn: &emptypb.Empty{}}.Build(),
+					execpb.Request_File_builder{StreamOut: &emptypb.Empty{}}.Build(),
+					execpb.Request_File_builder{StreamOut: &emptypb.Empty{}}.Build(),
+				},
+				Tty:            true,
+				CpuTimeLimit:   uint64(30 * time.Second),
+				ClockTimeLimit: uint64(30 * time.Minute),
+				MemoryLimit:    256 << 20,
+				ProcLimit:      50,
+			}.Build()},
+		}.Build(),
+	}.Build())
 	if err != nil {
 		return err
 	}
@@ -193,16 +191,16 @@ func (s *demoServer) Shell(ss pb.DemoBackend_ShellServer) error {
 			if err != nil {
 				return
 			}
-			switch msg := msg.Response.(type) {
-			case *execpb.StreamResponse_ExecOutput:
-				output.Write(msg.ExecOutput.Content)
-				err = ss.Send(pb.ShellOutput_builder{Content: msg.ExecOutput.Content}.Build())
+			switch msg.WhichResponse() {
+			case execpb.StreamResponse_ExecOutput_case:
+				output.Write(msg.GetExecOutput().GetContent())
+				err = ss.Send(pb.ShellOutput_builder{Content: msg.GetExecOutput().GetContent()}.Build())
 				if err != nil {
 					return
 				}
 
-			case *execpb.StreamResponse_ExecResponse:
-				err = ss.Send(pb.ShellOutput_builder{Content: []byte(msg.ExecResponse.String())}.Build())
+			case execpb.StreamResponse_ExecResponse_case:
+				err = ss.Send(pb.ShellOutput_builder{Content: []byte(msg.GetExecResponse().String())}.Build())
 				if err != nil {
 					return
 				}
@@ -223,20 +221,20 @@ func (s *demoServer) Shell(ss pb.DemoBackend_ShellServer) error {
 			switch msg.WhichRequest() {
 			case pb.ShellInput_Input_case:
 				input.Write(msg.GetInput().GetContent())
-				err = sc.Send(&execpb.StreamRequest{Request: &execpb.StreamRequest_ExecInput{ExecInput: &execpb.StreamRequest_Input{
+				err = sc.Send(execpb.StreamRequest_builder{ExecInput: execpb.StreamRequest_Input_builder{
 					Content: msg.GetInput().GetContent(),
-				}}})
+				}.Build()}.Build())
 				if err != nil {
 					return
 				}
 
 			case pb.ShellInput_Resize_case:
-				err = sc.Send(&execpb.StreamRequest{Request: &execpb.StreamRequest_ExecResize{ExecResize: &execpb.StreamRequest_Resize{
+				err = sc.Send(execpb.StreamRequest_builder{ExecResize: execpb.StreamRequest_Resize_builder{
 					Rows: msg.GetResize().GetRows(),
 					Cols: msg.GetResize().GetCols(),
 					X:    msg.GetResize().GetX(),
 					Y:    msg.GetResize().GetY(),
-				}}})
+				}.Build()}.Build())
 				if err != nil {
 					return
 				}

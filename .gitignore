@@ -35,3 +35,4 @@ judger/run
 
 # overmind
 .overmind.sock
+.env

@@ -119,70 +119,62 @@ func (j *judger) judgeSingle(req *demopb.JudgeClientRequest) {
 	copyOutFiles := strings.Split(req.GetLanguage().GetExecutables(), " ")
 	copyOut := make([]*pb.Request_CmdCopyOutFile, 0, len(copyOutFiles))
 	for _, f := range copyOutFiles {
-		copyOut = append(copyOut, &pb.Request_CmdCopyOutFile{Name: f})
+		copyOut = append(copyOut, pb.Request_CmdCopyOutFile_builder{Name: f}.Build())
 	}
 
-	compileReq := &pb.Request{
-		Cmd: []*pb.Request_CmdType{{
+	compileReq := pb.Request_builder{
+		Cmd: []*pb.Request_CmdType{pb.Request_CmdType_builder{
 			Args: args,
 			Env:  env,
 			Files: []*pb.Request_File{
-				{
-					File: &pb.Request_File_Memory{
-						Memory: &pb.Request_MemoryFile{
-							Content: []byte{},
-						},
-					},
-				},
-				{
-					File: &pb.Request_File_Pipe{
-						Pipe: &pb.Request_PipeCollector{
-							Name: "stdout",
-							Max:  4096,
-						},
-					},
-				},
-				{
-					File: &pb.Request_File_Pipe{
-						Pipe: &pb.Request_PipeCollector{
-							Name: "stderr",
-							Max:  4096,
-						},
-					},
-				},
+				pb.Request_File_builder{
+					Memory: pb.Request_MemoryFile_builder{
+						Content: []byte{},
+					}.Build(),
+				}.Build(),
+				pb.Request_File_builder{
+					Pipe: pb.Request_PipeCollector_builder{
+						Name: "stdout",
+						Max:  4096,
+					}.Build(),
+				}.Build(),
+				pb.Request_File_builder{
+					Pipe: pb.Request_PipeCollector_builder{
+						Name: "stderr",
+						Max:  4096,
+					}.Build(),
+				}.Build(),
 			},
 			CpuTimeLimit:   uint64(10 * time.Second),
 			ClockTimeLimit: uint64(12 * time.Second),
 			MemoryLimit:    memoryLimit,
 			ProcLimit:      100,
 			CopyIn: map[string]*pb.Request_File{
-				req.GetLanguage().GetSourceFileName(): {
-					File: &pb.Request_File_Memory{
-						Memory: &pb.Request_MemoryFile{
-							Content: []byte(req.GetSource()),
-						},
-					},
-				},
+				req.GetLanguage().GetSourceFileName(): pb.Request_File_builder{
+					Memory: pb.Request_MemoryFile_builder{
+						Content: []byte(req.GetSource()),
+					}.Build(),
+				}.Build(),
 			},
-			CopyOut:       []*pb.Request_CmdCopyOutFile{{Name: "stdout"}, {Name: "stderr"}},
+			CopyOut:       []*pb.Request_CmdCopyOutFile{pb.Request_CmdCopyOutFile_builder{Name: "stdout"}.Build(), pb.Request_CmdCopyOutFile_builder{Name: "stderr"}.Build()},
 			CopyOutCached: copyOut,
-		}},
-	}
+		}.Build()},
+	}.Build()
 	compileRet, err := j.execClient.Exec(context.TODO(), compileReq)
 	if err != nil {
 		j.response <- judgeClientResponse(req.GetId(), "finished", fmt.Sprintf("Compile Error %v", err))
 		return
 	}
-	if compileRet.Error != "" {
-		j.response <- judgeClientResponse(req.GetId(), "finished", fmt.Sprintf("Compile Error %v", compileRet.Error))
+	if compileRet.GetError() != "" {
+		j.response <- judgeClientResponse(req.GetId(), "finished", fmt.Sprintf("Compile Error %v", compileRet.GetError()))
 		return
 	}
-	cRet := compileRet.Results[0]
+	cRet := compileRet.GetResults()[0]
 	var result []*demopb.Result
-	rtTime := uint64(time.Duration(cRet.Time).Round(time.Millisecond) / time.Millisecond)
-	rtMemory := cRet.Memory >> 10
-	rtStdout := string(cRet.Files["stdout"])
-	rtStderr := string(cRet.Files["stderr"])
+	rtTime := uint64(time.Duration(cRet.GetTime()).Round(time.Millisecond) / time.Millisecond)
+	rtMemory := cRet.GetMemory() >> 10
+	rtStdout := string(cRet.GetFiles()["stdout"])
+	rtStderr := string(cRet.GetFiles()["stderr"])
 	result = append(result, demopb.Result_builder{
 		Time:   &rtTime,
 		Memory: &rtMemory,
@@ -192,15 +184,15 @@ func (j *judger) judgeSingle(req *demopb.JudgeClientRequest) {
 
 	// remove exec file
 	defer func() {
-		for _, fid := range cRet.FileIDs {
-			j.execClient.FileDelete(context.TODO(), &pb.FileID{
+		for _, fid := range cRet.GetFileIDs() {
+			j.execClient.FileDelete(context.TODO(), pb.FileID_builder{
 				FileID: fid,
-			})
+			}.Build())
 		}
 	}()
 
-	if cRet.Status != pb.Response_Result_Accepted {
-		rt := judgeClientResponse(req.GetId(), "finished", fmt.Sprintf("Compile %v %v", cRet.Status.String(), compileRet.Error))
+	if cRet.GetStatus() != pb.Response_Result_Accepted {
+		rt := judgeClientResponse(req.GetId(), "finished", fmt.Sprintf("Compile %v %v", cRet.GetStatus().String(), compileRet.GetError()))
 		rt.SetResults(result)
 		j.response <- rt
 		return
@@ -244,43 +236,35 @@ func (j *judger) judgeSingle(req *demopb.JudgeClientRequest) {
 				procLimit = 12
 			}
 			copyin := make(map[string]*pb.Request_File)
-			for k, v := range cRet.FileIDs {
-				copyin[k] = &pb.Request_File{
-					File: &pb.Request_File_Cached{
-						Cached: &pb.Request_CachedFile{
-							FileID: v,
-						},
-					},
-				}
+			for k, v := range cRet.GetFileIDs() {
+				copyin[k] = pb.Request_File_builder{
+					Cached: pb.Request_CachedFile_builder{
+						FileID: v,
+					}.Build(),
+				}.Build()
 			}
-			execReq := &pb.Request{
-				Cmd: []*pb.Request_CmdType{{
+			execReq := pb.Request_builder{
+				Cmd: []*pb.Request_CmdType{pb.Request_CmdType_builder{
 					Args: args,
 					Env:  env,
 					Files: []*pb.Request_File{
-						{
-							File: &pb.Request_File_Memory{
-								Memory: &pb.Request_MemoryFile{
-									Content: []byte(input),
-								},
-							},
-						},
-						{
-							File: &pb.Request_File_Pipe{
-								Pipe: &pb.Request_PipeCollector{
-									Name: "stdout",
-									Max:  4096,
-								},
-							},
-						},
-						{
-							File: &pb.Request_File_Pipe{
-								Pipe: &pb.Request_PipeCollector{
-									Name: "stderr",
-									Max:  4096,
-								},
-							},
-						},
+						pb.Request_File_builder{
+							Memory: pb.Request_MemoryFile_builder{
+								Content: []byte(input),
+							}.Build(),
+						}.Build(),
+						pb.Request_File_builder{
+							Pipe: pb.Request_PipeCollector_builder{
+								Name: "stdout",
+								Max:  4096,
+							}.Build(),
+						}.Build(),
+						pb.Request_File_builder{
+							Pipe: pb.Request_PipeCollector_builder{
+								Name: "stderr",
+								Max:  4096,
+							}.Build(),
+						}.Build(),
 					},
 					CpuTimeLimit:   uint64(3 * time.Second),
 					ClockTimeLimit: uint64(6 * time.Second),
@@ -288,28 +272,28 @@ func (j *judger) judgeSingle(req *demopb.JudgeClientRequest) {
 					StackLimit:     memoryLimit,
 					ProcLimit:      procLimit,
 					CopyIn:         copyin,
-					CopyOut:        []*pb.Request_CmdCopyOutFile{{Name: "stdout"}, {Name: "stderr"}},
-				}},
-			}
+					CopyOut:        []*pb.Request_CmdCopyOutFile{pb.Request_CmdCopyOutFile_builder{Name: "stdout"}.Build(), pb.Request_CmdCopyOutFile_builder{Name: "stderr"}.Build()},
+				}.Build()},
+			}.Build()
 			response, err := j.execClient.Exec(context.TODO(), execReq)
 			if err != nil {
 				return err
 			}
-			if response.Error != "" {
-				return fmt.Errorf("case %d %v", i, response.Error)
+			if response.GetError() != "" {
+				return fmt.Errorf("case %d %v", i, response.GetError())
 			}
-			ret := response.Results[0]
-			err = diff.Compare(bytes.NewBufferString(ansContent), bytes.NewBuffer(ret.Files["stdout"]))
-			if err != nil && ret.Status == pb.Response_Result_Accepted {
-				ret.Status = pb.Response_Result_WrongAnswer
+			ret := response.GetResults()[0]
+			err = diff.Compare(bytes.NewBufferString(ansContent), bytes.NewBuffer(ret.GetFiles()["stdout"]))
+			if err != nil && ret.GetStatus() == pb.Response_Result_Accepted {
+				ret.SetStatus(pb.Response_Result_WrongAnswer)
 				runResult[i].SetLog(err.Error())
 			}
-			runResult[i].SetTime(ret.Time / 1e6)
-			runResult[i].SetMemory(ret.Memory >> 10)
+			runResult[i].SetTime(ret.GetTime() / 1e6)
+			runResult[i].SetMemory(ret.GetMemory() >> 10)
 			runResult[i].SetStdin(input)
-			runResult[i].SetStdout(string(ret.Files["stdout"]))
-			runResult[i].SetStderr(string(ret.Files["stderr"]))
-			runStatus[i] = ret.Status
+			runResult[i].SetStdout(string(ret.GetFiles()["stdout"]))
+			runResult[i].SetStderr(string(ret.GetFiles()["stderr"]))
+			runStatus[i] = ret.GetStatus()
 
 			n := atomic.AddInt32(&completed, 1)
 			j.response <- judgeClientResponse(req.GetId(), "progress", fmt.Sprintf("Judging (%d / %d)", n, len(io)))
