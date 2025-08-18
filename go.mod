@@ -4,7 +4,7 @@ go 1.24
 
 require (
 	github.com/criyle/go-judge-client v0.1.3
-	github.com/criyle/go-judge/pb v1.1.0
+	github.com/criyle/go-judge/pb v1.2.0
 	github.com/gin-contrib/zap v1.1.5
 	github.com/gin-gonic/contrib v0.0.0-20250521004450-2b1292699c15
 	github.com/gin-gonic/gin v1.10.1
