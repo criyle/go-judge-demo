@@ -16,7 +16,7 @@ import (
 type Model struct {
 	ID *bson.ObjectID `json:"id" bson:"_id,omitempty"`
 
-	Lang      Language   `json:"language,omitempty" bson:"language,omitempty"`
+	Lang      Language   `json:"language" bson:"language,omitempty"`
 	Source    string     `json:"source,omitempty" bson:"source,omitempty"`
 	Date      *time.Time `json:"date,omitempty" bson:"date,omitempty"`
 	Status    string     `json:"status,omitempty" bson:"status,omitempty"`

@@ -210,8 +210,6 @@ func (j *judger) judgeSingle(req *demopb.JudgeClientRequest) {
 	runStatus := make([]pb.Response_Result_StatusType, len(io))
 	var eg errgroup.Group
 	for i, inputOutput := range io {
-		i := i
-		inputOutput := inputOutput
 		eg.Go(func() (err error) {
 			defer func() {
 				if err != nil {

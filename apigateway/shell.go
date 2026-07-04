@@ -30,7 +30,7 @@ func (s *shellHandle) wsShell(c *gin.Context) {
 	ctx, cancel := context.WithCancel(c)
 	sc, err := s.client.Shell(ctx)
 	if err != nil {
-		conn.WriteMessage(websocket.TextMessage, []byte(fmt.Sprintf("shell error: %v", err)))
+		conn.WriteMessage(websocket.TextMessage, fmt.Appendf(nil, "shell error: %v", err))
 		conn.WriteMessage(websocket.CloseMessage, nil)
 		conn.Close()
 		cancel()
