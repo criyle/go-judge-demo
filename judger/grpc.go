@@ -200,7 +200,7 @@ func (j *judger) judgeSingle(req *demopb.JudgeClientRequest) {
 
 	j.response <- judgeClientResponse(req.GetId(), "progress", "Compiled")
 
-	var completed int32
+	var completed atomic.Int32
 
 	io := req.GetInputAnswer()
 	runResult := make([]*demopb.Result, len(io))
@@ -293,7 +293,7 @@ func (j *judger) judgeSingle(req *demopb.JudgeClientRequest) {
 			runResult[i].SetStderr(string(ret.GetFiles()["stderr"]))
 			runStatus[i] = ret.GetStatus()
 
-			n := atomic.AddInt32(&completed, 1)
+			n := completed.Add(1)
 			j.response <- judgeClientResponse(req.GetId(), "progress", fmt.Sprintf("Judging (%d / %d)", n, len(io)))
 			return nil
 		})
