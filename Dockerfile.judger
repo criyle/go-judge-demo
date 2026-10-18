@@ -1,6 +1,6 @@
 FROM golang:latest AS builder
 
-ENV CGO_ENABLE=0
+ENV CGO_ENABLED=0
 
 WORKDIR /build
 
